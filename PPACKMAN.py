@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Author: Pranav Khade(pranavk@iastate.edu)
 '''
@@ -218,7 +219,7 @@ def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=F
 
         centrality=nx.eccentricity(ProteinGraph)
         centrality_sorted_with_keys=numpy.array([float(centrality[j]) for j in sorted([i for i in centrality.keys()])]).reshape(-1, 1)
-        #Cluster
+        #Cluster (4 is like a resolution here)
         km=KMeans(n_clusters=4)
         km.fit(centrality_sorted_with_keys)
         central_nodes=numpy.argwhere(km.labels_==numpy.argmin(km.cluster_centers_)).T[0]
