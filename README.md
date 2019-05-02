@@ -47,9 +47,11 @@ pip install git+git://github.com/Pranavkhade/PPACKMAN
 Description
 
 ```
-usage: PPACKMAN.py [-h] (-pdbid PDB_ID PDB_ID | -filename FILENAME)
-                   [--chain CHAIN] [--generateobj {yes,no}]
-                   AlphaValue
+usage: PPACKMAN.py [-h] [-pdbid PDB_ID] [--chain CHAIN]
+                   [--generateobj GENERATEOBJ] [--outputfile OUTPUTFILE]
+                   [--logfile LOGFILE] [--callbackurl CALLBACKURL]
+                   [--nodeid NODEID]
+                   AlphaValue FILENAME
 
 PPACKMAN: Protein PACKing and Motion ANalysis.
 (https://github.com/Pranavkhade/PPACKMAN)
@@ -57,17 +59,30 @@ PPACKMAN: Protein PACKing and Motion ANalysis.
 positional arguments:
   AlphaValue            Recommended: 2.8 for closed; 4.5 for open form, Please
                         refer to the paper for more details
+  FILENAME              Path and filename of the PDB file.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -pdbid PDB_ID PDB_ID, --pdbid PDB_ID PDB_ID
-                        (1) PDB ID of the input file (2) Location and Name by
-                        which you wish to save the downloaded file
-  -filename FILENAME, --filename FILENAME
-                        Path and filename of the PDB file
+  -pdbid PDB_ID, --pdbid PDB_ID
+                        If provided, the PBD with this ID will be downloaded
+                        and saved to FILENAME.
   --chain CHAIN         Enter The Chain ID
-  --generateobj {yes,no}
-                        Select yes if you wish to generate the .obj file
+  --generateobj GENERATEOBJ
+                        Path and filename to save the .obj file at. Ignored
+                        unless --chain is provided.
+
+Web server parameters:
+  Used by the web form
+
+  --outputfile OUTPUTFILE
+                        Path and filename write output to
+  --logfile LOGFILE     Path and filename write log messages to
+  --callbackurl CALLBACKURL
+                        Optional callback url if this script was called from
+                        Drupal.
+  --nodeid NODEID       Optional node id if this script was called from
+                        Drupal.
+
 ```
 ### Examples
 
