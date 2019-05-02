@@ -86,9 +86,9 @@ Web server parameters:
 ```
 ### Examples
 
-1. `python PPACKMAN.py 2.8 --pdbid 1prw 1prw.pdb`
-First parameter 2.8 is the alpha value parameter which can be changed. for --pdbid, the first parameter is the PDB ID the user submits to download a corresponding PDB file and second is the name of the file you wish to save the downloaded PDB file.
+1. `python PPACKMAN.py --pdbid 1prw 2.8 1prw.pdb`
+for --pdbid, the parameter is the PDB ID the user submits to download a corresponding PDB file. First positional parameter 2.8 is the alpha value parameter which can be changed. and second is the name of the file you wish to save the downloaded PDB file.
 
 
-2. `python PPACKMAN.py 2.8 --filename 1prw.pdb`
-First parameter 2.8 is the alpha value parameter which can be changed. for --filename, the parameter is location and name of the PDB file.
+2. `python PPACKMAN.py 2.8 1prw.pdb`
+First parameter 2.8 is the alpha value parameter which can be changed. second parameter is the parameter is location and name of the PDB file.
