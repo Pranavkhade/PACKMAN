@@ -453,12 +453,12 @@ def main():
                 SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename)
         
         if args.nodeid is not None:
-            urllib.urlopen(args.callbackurl + str(args.nodeid) + "/0")
+            urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
 
     except Exception:
 
         if args.nodeid is not None:
-            urllib.urlopen(args.callbackurl + str(args.nodeid) + "/1")
+            urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
     
     finally:
         
