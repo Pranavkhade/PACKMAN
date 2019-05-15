@@ -1,4 +1,4 @@
-# PPACKMAN: Protein PACKing and Motion ANalysis.
+# PACKMAN: PACKing and Motion ANalysis.
 Description
 
 ### Prerequisites:
@@ -28,18 +28,18 @@ Description
 <!--
 Installing from source
 ```
-git clone https://github.com/Pranavkhade/PPACKMAN
-cd PPACKMAN
+git clone https://github.com/Pranavkhade/PACKMAN
+cd PACKMAN
 python setup.py install
 ```
 
 Installing with pip
 ```
-pip install PPACKMAN
+pip install PACKMAN
 ```
 OR
 ```
-pip install git+git://github.com/Pranavkhade/PPACKMAN
+pip install git+git://github.com/Pranavkhade/PACKMAN
 ```
 -->
 
@@ -47,12 +47,12 @@ pip install git+git://github.com/Pranavkhade/PPACKMAN
 Description
 
 ```
-usage: PPACKMAN.py [-h] (-pdbid PDB_ID PDB_ID | -filename FILENAME)
+usage: PACKMAN.py [-h] (-pdbid PDB_ID PDB_ID | -filename FILENAME)
                    [--chain CHAIN] [--generateobj {yes,no}]
                    AlphaValue
 
-PPACKMAN: Protein PACKing and Motion ANalysis.
-(https://github.com/Pranavkhade/PPACKMAN)
+PACKMAN: Protein PACKing and Motion ANalysis.
+(https://github.com/Pranavkhade/PACKMAN)
 
 positional arguments:
   AlphaValue            Recommended: 2.8 for closed; 4.5 for open form, Please
@@ -71,9 +71,9 @@ optional arguments:
 ```
 ### Examples
 
-1. `python PPACKMAN.py 2.8 --pdbid 1prw 1prw.pdb`
+1. `python PACKMAN.py 2.8 --pdbid 1prw 1prw.pdb`
 First parameter 2.8 is the alpha value parameter which can be changed. for --pdbid, the first parameter is the PDB ID the user submits to download a corresponding PDB file and second is the name of the file you wish to save the downloaded PDB file.
 
 
-2. `python PPACKMAN.py 2.8 --filename 1prw.pdb`
+2. `python PACKMAN.py 2.8 --filename 1prw.pdb`
 First parameter 2.8 is the alpha value parameter which can be changed. for --filename, the parameter is location and name of the PDB file.
