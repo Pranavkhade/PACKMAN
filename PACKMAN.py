@@ -27,7 +27,7 @@ from itertools import groupby, count
 
 '''
 ##################################################################################################
-#                                      PPACKMAN Functions                                        #
+#                                       PACKMAN Functions                                        #
 ##################################################################################################
 '''
 
@@ -406,7 +406,7 @@ def IO():
     """
     INFO: Argument parser to the program for now.
     """
-    parser=argparse.ArgumentParser(description='PPACKMAN: Protein PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PPACKMAN)')
+    parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)')
 
     required = parser.add_mutually_exclusive_group(required=True)
     required.add_argument('-pdbid','--pdbid',nargs=2,metavar='PDB_ID', type=str, help='(1) PDB ID of the input file (2) Location and Name by which you wish to save the downloaded file')
