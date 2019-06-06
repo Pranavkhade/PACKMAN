@@ -416,8 +416,8 @@ def IO():
     required.add_argument('-filename','--filename',nargs=1,metavar='FILENAME', type=str, help='Path and filename of the PDB file')
 
     parser.add_argument('alpha',metavar='AlphaValue',help='Recommended: Start from 2 and keep increasing the parameter value till the hinges become redundant compared to the previous alpha values (Typically around 5), Please refer to the paper for more details')
-    parser.add_argument('--e_clusters',metavar='NumberOfEccentricityClusters',default=4,help='Recommended: 4, Please refer to the paper for more details')
-    parser.add_argument('--minhnglen',metavar='MinimumHingeLength',default=5,help='Recommended: 5, Please refer to the paper for more details')
+    parser.add_argument('--e_clusters',metavar='NumberOfEccentricityClusters',type=int,default=4,help='Recommended: 4, Please refer to the paper for more details')
+    parser.add_argument('--minhnglen',metavar='MinimumHingeLength',type=int,default=5,help='Recommended: 5, Please refer to the paper for more details')
     parser.add_argument("--chain", help='Enter The Chain ID')
     parser.add_argument('--generateobj',choices=['yes', 'no'], default='no', help='Select yes if you wish to generate the .obj file')
     args=parser.parse_args()
@@ -434,6 +434,7 @@ def main():
     """
     args=IO()
 
+
     #Mutually Exclusive Opetion to load the file
     if(args.pdbid is not None):
         Molecule.DownloadPDB(args.pdbid[0],args.pdbid[1])
@@ -444,7 +445,7 @@ def main():
     if(args.chain):
         Backbone=[item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
         SelectedTesselations,PredictedHinges=HingePredict(Backbone,Alpha=float(args.alpha),filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
-        if(args.generateobj=='yes'):WriteOBJ(Backbone,SelectedTesselations,'CHAIN-'+args.chain+'-'+args.filename)
+        if(args.generateobj=='yes'):WriteOBJ(Backbone,SelectedTesselations,'CHAIN-'+args.chain+'-'+args.filename[0])
     else:
         for i in mol[0].get_chains():
             Backbone=[item for sublist in mol[0].get_backbone() for item in sublist]
