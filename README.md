@@ -48,15 +48,18 @@ Description
 
 ```
 usage: PACKMAN.py [-h] (-pdbid PDB_ID PDB_ID | -filename FILENAME)
-                   [--chain CHAIN] [--generateobj {yes,no}]
-                   AlphaValue
+                  [--e_clusters NumberOfEccentricityClusters]
+                  [--minhnglen MinimumHingeLength] [--chain CHAIN]
+                  [--generateobj {yes,no}]
+                  AlphaValue
 
-PACKMAN: Protein PACKing and Motion ANalysis.
-(https://github.com/Pranavkhade/PACKMAN)
+PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)
 
 positional arguments:
-  AlphaValue            Recommended: 2.8 for closed; 4.5 for open form, Please
-                        refer to the paper for more details
+  AlphaValue            Recommended: Start from 2 and keep increasing the
+                        parameter value till the hinges become redundant
+                        compared to the previous alpha values (Typically
+                        around 5), Please refer to the paper for more details
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -65,6 +68,12 @@ optional arguments:
                         which you wish to save the downloaded file
   -filename FILENAME, --filename FILENAME
                         Path and filename of the PDB file
+  --e_clusters NumberOfEccentricityClusters
+                        Recommended: 4, Please refer to the paper for more
+                        details
+  --minhnglen MinimumHingeLength
+                        Recommended: 5, Please refer to the paper for more
+                        details
   --chain CHAIN         Enter The Chain ID
   --generateobj {yes,no}
                         Select yes if you wish to generate the .obj file
