@@ -235,7 +235,7 @@ def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=F
                 PredictedHinges.append(SortedHingeResidues[HingeResiduesID.index(Hinge[0]):HingeResiduesID.index(Hinge[-1])+1])
 
         #Print part
-        sys.stdout.write('Filename= '+str(filename[0])+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
+        sys.stdout.write('Filename= '+str(filename)+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
         sys.stdout.write('Hindge Residues(Predicted):\n')
         for numi,i in enumerate(PredictedHinges):
             #sys.stdout.write('\nHinge #'+str(numi+1)+'\nResidues: '+','.join([j.get_name()+'-'+str(j.get_id()) for j in i])+'\n')
