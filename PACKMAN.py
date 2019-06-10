@@ -28,12 +28,12 @@ from itertools import groupby, count
 
 '''
 ##################################################################################################
-#                                      PPACKMAN Functions                                        #
+#                                       PACKMAN Functions                                        #
 ##################################################################################################
 '''
 
 
-def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5):
+def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5,nclusters=4):
     """
     """
     if(method=='AlphaShape'):
@@ -75,8 +75,9 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
 
             #Example\tGroup\tNumberofelements\tMin\tMax\tMean\tMode\tMedian\tStandardDeviation\n
 
-            outputfile.write('\nSTATISTICS\nTotal'+'\t'+str(len(all_atoms_bfactor))+'\t'+str(numpy.min(all_atoms_bfactor))+'\t'+str(numpy.max(all_atoms_bfactor))+'\t'+str(numpy.mean(all_atoms_bfactor))+'\t'+str(stats.mode(all_atoms_bfactor)[0][0])+'\t'+str(numpy.median(all_atoms_bfactor))+'\t'+str(numpy.std(all_atoms_bfactor))+'\n')
-            outputfile.write('Hinge'+'\t'+str(len(hinge_atoms_bfactor))+'\t'+str(numpy.min(hinge_atoms_bfactor))+'\t'+str(numpy.max(hinge_atoms_bfactor))+'\t'+str(numpy.mean(hinge_atoms_bfactor))+'\t'+str(stats.mode(hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(hinge_atoms_bfactor))+'\t'+str(numpy.std(hinge_atoms_bfactor))+'\n')
+            outputfile.write('\nSTATISTICS\n\t\tN\tMin\tMax\tMean\tMode\tMedian\tSTDDev\n')
+            outputfile.write('Total   '+'\t'+str(len(all_atoms_bfactor))+'\t'+str(numpy.min(all_atoms_bfactor))+'\t'+str(numpy.max(all_atoms_bfactor))+'\t'+str(numpy.mean(all_atoms_bfactor))+'\t'+str(stats.mode(all_atoms_bfactor)[0][0])+'\t'+str(numpy.median(all_atoms_bfactor))+'\t'+str(numpy.std(all_atoms_bfactor))+'\n')
+            outputfile.write('Hinge   '+'\t'+str(len(hinge_atoms_bfactor))+'\t'+str(numpy.min(hinge_atoms_bfactor))+'\t'+str(numpy.max(hinge_atoms_bfactor))+'\t'+str(numpy.mean(hinge_atoms_bfactor))+'\t'+str(stats.mode(hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(hinge_atoms_bfactor))+'\t'+str(numpy.std(hinge_atoms_bfactor))+'\n')
             outputfile.write('NonHinge'+'\t'+str(len(non_hinge_atoms_bfactor))+'\t'+str(numpy.min(non_hinge_atoms_bfactor))+'\t'+str(numpy.max(non_hinge_atoms_bfactor))+'\t'+str(numpy.mean(non_hinge_atoms_bfactor))+'\t'+str(stats.mode(non_hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(non_hinge_atoms_bfactor))+'\t'+str(numpy.std(non_hinge_atoms_bfactor))+'\n')
             
             p_value = permutation_test(hinge_atoms_bfactor, non_hinge_atoms_bfactor,method='approximate',num_rounds=10000,seed=0)
@@ -221,7 +222,7 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
         centrality=nx.eccentricity(ProteinGraph)
         centrality_sorted_with_keys=numpy.array([float(centrality[j]) for j in sorted([i for i in centrality.keys()])]).reshape(-1, 1)
         #Cluster (4 is like a resolution here)
-        km=KMeans(n_clusters=4)
+        km=KMeans(n_clusters=nclusters)
         km.fit(centrality_sorted_with_keys)
         central_nodes=numpy.argwhere(km.labels_==numpy.argmin(km.cluster_centers_)).T[0]
         HingeResidues=list(set([atoms[i].get_parent() for i in central_nodes]))
@@ -235,14 +236,16 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
                 PredictedHinges.append(SortedHingeResidues[HingeResiduesID.index(Hinge[0]):HingeResiduesID.index(Hinge[-1])+1])
 
         #Print part
-        outputfile.write('Filename= '+str(filename)+'\t| AlphaValue= '+str(Alpha)+'\t | MinimumHingeLength= '+str(MinimumHingeLength)+'\n')
+        outputfile.write('Filename= '+str(filename)+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
         outputfile.write('Hindge Residues(Predicted):\n')
         for numi,i in enumerate(PredictedHinges):
-            outputfile.write('\nHinge #'+str(numi+1)+'\nResidues: '+','.join([j.get_name()+'-'+str(j.get_id()) for j in i])+'\n')
+            #outputfile.write('\nHinge #'+str(numi+1)+'\nResidues: '+','.join([j.get_name()+'-'+str(j.get_id()) for j in i])+'\n')
+            outputfile.write('\nHinge #'+str(numi+1)+'\nResidues: '+i[0].get_name()+'-'+str(i[0].get_id()) +' to '+i[-1].get_name()+'-'+str(i[-1].get_id())+'\n')
             GetStats(atoms,i,filename=filename)
-            outputfile.write('\nEnter Following In the Pymol Terminal:\ncolor blue, resi '+'+'.join(str(j.get_id()) for j in i)+'\n')
+            #outputfile.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+'+'.join(str(j.get_id()) for j in i)+'\n')
+            outputfile.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+str(i[0].get_id())+':'+str(i[-1].get_id())+'\n')
             GetLeastSquarePlane(atoms,i,numi+1)
-            outputfile.write("##########----------##########----------##########\n")
+            outputfile.write("#--------------------------------------------------#\n")
         #RotateHingeBonds(atoms,HingeResidues)
 
         if(GenerateKirchoff):
@@ -404,13 +407,15 @@ def IO():
     """
     INFO: Argument parser to the program for now.
     """
-    parser=argparse.ArgumentParser(description='PPACKMAN: Protein PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PPACKMAN)')
+    parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)')
 
     parser.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
 
     parser.add_argument('alpha', metavar='AlphaValue', help='Recommended: 2.8 for closed; 4.5 for open form, Please refer to the paper for more details')
     parser.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
 
+    parser.add_argument('--e_clusters',metavar='NumberOfEccentricityClusters',type=int,default=4,help='Recommended: 4, Please refer to the paper for more details')
+    parser.add_argument('--minhnglen',metavar='MinimumHingeLength',type=int,default=5,help='Recommended: 5, Please refer to the paper for more details')
     parser.add_argument("--chain", help='Enter The Chain ID')
     parser.add_argument('--generateobj', type=argparse.FileType('wb', 0), help='Path and filename to save the .obj file at. Ignored unless --chain is provided.')
 
@@ -444,13 +449,13 @@ def main():
 
         if(args.chain):
             Backbone = [item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
-            SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename)
+            SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
             if(args.generateobj is not None):
                 WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
         else:
             for i in mol[0].get_chains():
                 Backbone = [item for sublist in mol[0].get_backbone() for item in sublist]
-                SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename)
+                SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
         
         if args.nodeid is not None:
             urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
@@ -461,14 +466,27 @@ def main():
             urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
     
     finally:
-        
+
+        print_footnotes(args.outputfile)
         args.outputfile.flush()
         args.logfile.flush()
 
         if(args.generateobj is not None):
             args.generateobj.flush()
-
+            
     return True
+
+'''
+##################################################################################################
+#                                             End                                                #
+##################################################################################################
+'''
+def print_footnotes(outputfile):
+    outputfile.write('Footnotes:\n\nSTATISTICS Section Legend:\nN: Number of residues\nMin: Minimum B-factor value\nMax: Maximum B-factor value\nMean: Mean B-factor value\nMode: Mode B-factor value\nMedian: Median B-factor value\nSTDDev: Standard Deviation of the B-factor values\n')
+    outputfile.write('\nRMSF Plane Visualization:\nDownload plane.py file from https://pymolwiki.org/index.php/Plane_Wizard and place it in the PyMol working directory if the RMSF plane needs to be visualized.\n')
+    return True
+
+
 
 if(__name__=='__main__'):
     main()
