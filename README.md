@@ -47,22 +47,26 @@ pip install git+git://github.com/Pranavkhade/PACKMAN
 Description
 
 ```
-usage: PACKMAN.py [-h] (-pdbid PDB_ID PDB_ID | -filename FILENAME)
+usage: PACKMAN.py [-h] [-pdbid PDB_ID]
                   [--e_clusters NumberOfEccentricityClusters]
                   [--minhnglen MinimumHingeLength] [--chain CHAIN]
-                  [--generateobj {yes,no}]
-                  AlphaValue
+                  [--generateobj GENERATEOBJ] [--outputfile OUTPUTFILE]
+                  [--logfile LOGFILE] [--callbackurl CALLBACKURL]
+                  [--nodeid NODEID]
+                  AlphaValue FILENAME
 
 PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)
 
 positional arguments:
-  AlphaValue            Recommended: Start from 2 and keep increasing the
-                        parameter value till the hinges become redundant
-                        compared to the previous alpha values (Typically
-                        around 5), Please refer to the paper for more details
+  AlphaValue            Recommended: 2.8 for closed; 4.5 for open form, Please
+                        refer to the paper for more details
+  FILENAME              Path and filename of the PDB file.
 
 optional arguments:
   -h, --help            show this help message and exit
+  -pdbid PDB_ID, --pdbid PDB_ID
+                        If provided, the PBD with this ID will be downloaded
+                        and saved to FILENAME.
   --e_clusters NumberOfEccentricityClusters
                         Recommended: 4, Please refer to the paper for more
                         details
