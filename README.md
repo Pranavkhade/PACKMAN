@@ -47,27 +47,26 @@ pip install git+git://github.com/Pranavkhade/PACKMAN
 Description
 
 ```
-usage: PACKMAN.py [-h] (-pdbid PDB_ID PDB_ID | -filename FILENAME)
+usage: PACKMAN.py [-h] [-pdbid PDB_ID]
                   [--e_clusters NumberOfEccentricityClusters]
                   [--minhnglen MinimumHingeLength] [--chain CHAIN]
-                  [--generateobj {yes,no}]
-                  AlphaValue
+                  [--generateobj GENERATEOBJ] [--outputfile OUTPUTFILE]
+                  [--logfile LOGFILE] [--callbackurl CALLBACKURL]
+                  [--nodeid NODEID]
+                  AlphaValue FILENAME
 
 PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)
 
 positional arguments:
-  AlphaValue            Recommended: Start from 2 and keep increasing the
-                        parameter value till the hinges become redundant
-                        compared to the previous alpha values (Typically
-                        around 5), Please refer to the paper for more details
+  AlphaValue            Recommended: 2.8 for closed; 4.5 for open form, Please
+                        refer to the paper for more details
+  FILENAME              Path and filename of the PDB file.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -pdbid PDB_ID PDB_ID, --pdbid PDB_ID PDB_ID
-                        (1) PDB ID of the input file (2) Location and Name by
-                        which you wish to save the downloaded file
-  -filename FILENAME, --filename FILENAME
-                        Path and filename of the PDB file
+  -pdbid PDB_ID, --pdbid PDB_ID
+                        If provided, the PBD with this ID will be downloaded
+                        and saved to FILENAME.
   --e_clusters NumberOfEccentricityClusters
                         Recommended: 4, Please refer to the paper for more
                         details
@@ -75,14 +74,28 @@ optional arguments:
                         Recommended: 5, Please refer to the paper for more
                         details
   --chain CHAIN         Enter The Chain ID
-  --generateobj {yes,no}
-                        Select yes if you wish to generate the .obj file
+  --generateobj GENERATEOBJ
+                        Path and filename to save the .obj file at. Ignored
+                        unless --chain is provided.
+
+Web server parameters:
+  Used by the web form
+
+  --outputfile OUTPUTFILE
+                        Path and filename write output to
+  --logfile LOGFILE     Path and filename write log messages to
+  --callbackurl CALLBACKURL
+                        Optional callback url if this script was called from
+                        Drupal.
+  --nodeid NODEID       Optional node id if this script was called from
+                        Drupal.
+
 ```
 ### Examples
 
-1. `python PACKMAN.py 2.8 --pdbid 1prw 1prw.pdb`
-First parameter 2.8 is the alpha value parameter which can be changed. for --pdbid, the first parameter is the PDB ID the user submits to download a corresponding PDB file and second is the name of the file you wish to save the downloaded PDB file.
+1. `python PPACKMAN.py --pdbid 1prw 2.8 1prw.pdb`
+for --pdbid, the parameter is the PDB ID the user submits to download a corresponding PDB file. First positional parameter 2.8 is the alpha value parameter which can be changed. and second is the name of the file you wish to save the downloaded PDB file.
 
 
-2. `python PACKMAN.py 2.8 --filename 1prw.pdb`
-First parameter 2.8 is the alpha value parameter which can be changed. for --filename, the parameter is location and name of the PDB file.
+2. `python PPACKMAN.py 2.8 1prw.pdb`
+First parameter 2.8 is the alpha value parameter which can be changed. second parameter is the parameter is location and name of the PDB file.

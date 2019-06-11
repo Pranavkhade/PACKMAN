@@ -11,6 +11,7 @@ import argparse
 import os
 import sys
 import functools
+import urllib
 
 import networkx as nx
 
@@ -32,7 +33,7 @@ from itertools import groupby, count
 '''
 
 
-def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5,nclusters=4):
+def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5,nclusters=4):
     """
     """
     if(method=='AlphaShape'):
@@ -74,13 +75,13 @@ def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=F
 
             #Example\tGroup\tNumberofelements\tMin\tMax\tMean\tMode\tMedian\tStandardDeviation\n
 
-            sys.stdout.write('\nSTATISTICS\n\t\tN\tMin\tMax\tMean\tMode\tMedian\tSTDDev\n')
-            sys.stdout.write('Total   '+'\t'+str(len(all_atoms_bfactor))+'\t'+str(numpy.min(all_atoms_bfactor))+'\t'+str(numpy.max(all_atoms_bfactor))+'\t'+str(numpy.mean(all_atoms_bfactor))+'\t'+str(stats.mode(all_atoms_bfactor)[0][0])+'\t'+str(numpy.median(all_atoms_bfactor))+'\t'+str(numpy.std(all_atoms_bfactor))+'\n')
-            sys.stdout.write('Hinge   '+'\t'+str(len(hinge_atoms_bfactor))+'\t'+str(numpy.min(hinge_atoms_bfactor))+'\t'+str(numpy.max(hinge_atoms_bfactor))+'\t'+str(numpy.mean(hinge_atoms_bfactor))+'\t'+str(stats.mode(hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(hinge_atoms_bfactor))+'\t'+str(numpy.std(hinge_atoms_bfactor))+'\n')
-            sys.stdout.write('NonHinge'+'\t'+str(len(non_hinge_atoms_bfactor))+'\t'+str(numpy.min(non_hinge_atoms_bfactor))+'\t'+str(numpy.max(non_hinge_atoms_bfactor))+'\t'+str(numpy.mean(non_hinge_atoms_bfactor))+'\t'+str(stats.mode(non_hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(non_hinge_atoms_bfactor))+'\t'+str(numpy.std(non_hinge_atoms_bfactor))+'\n')
+            outputfile.write('\nSTATISTICS\n\t\tN\tMin\tMax\tMean\tMode\tMedian\tSTDDev\n')
+            outputfile.write('Total   '+'\t'+str(len(all_atoms_bfactor))+'\t'+str(numpy.min(all_atoms_bfactor))+'\t'+str(numpy.max(all_atoms_bfactor))+'\t'+str(numpy.mean(all_atoms_bfactor))+'\t'+str(stats.mode(all_atoms_bfactor)[0][0])+'\t'+str(numpy.median(all_atoms_bfactor))+'\t'+str(numpy.std(all_atoms_bfactor))+'\n')
+            outputfile.write('Hinge   '+'\t'+str(len(hinge_atoms_bfactor))+'\t'+str(numpy.min(hinge_atoms_bfactor))+'\t'+str(numpy.max(hinge_atoms_bfactor))+'\t'+str(numpy.mean(hinge_atoms_bfactor))+'\t'+str(stats.mode(hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(hinge_atoms_bfactor))+'\t'+str(numpy.std(hinge_atoms_bfactor))+'\n')
+            outputfile.write('NonHinge'+'\t'+str(len(non_hinge_atoms_bfactor))+'\t'+str(numpy.min(non_hinge_atoms_bfactor))+'\t'+str(numpy.max(non_hinge_atoms_bfactor))+'\t'+str(numpy.mean(non_hinge_atoms_bfactor))+'\t'+str(stats.mode(non_hinge_atoms_bfactor)[0][0])+'\t'+str(numpy.median(non_hinge_atoms_bfactor))+'\t'+str(numpy.std(non_hinge_atoms_bfactor))+'\n')
             
             p_value = permutation_test(hinge_atoms_bfactor, non_hinge_atoms_bfactor,method='approximate',num_rounds=10000,seed=0)
-            sys.stdout.write('\np-value:\t'+str(p_value)+'\n')
+            outputfile.write('\np-value:\t'+str(p_value)+'\n')
             return p_value
         
         
@@ -166,12 +167,12 @@ def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=F
                 # This evaluates a * x3 + b * y3 + c * z3 which equals d
                 d = numpy.dot(cp, p3)
                 a,b,c,d=a/d,b/d,c/d,d/d
-                #print('The equation is {0}x + {1}y + {2}z = {3}'.format(a, b, c, d))
+                #outputfile.write('The equation is {0}x + {1}y + {2}z = {3}'.format(a, b, c, d))
 
                 #Plane in PyMol
-                sys.stdout.write('import plane\n')
-                sys.stdout.write('plane.make_plane_points(name=\'HingePlane'+ str(HingePlane) +'\', l1='+str(list(p4))+', l2='+str(list(p2))+', l3='+str(list(p3))+', center=False, makepseudo=False)'+'\n')
-                sys.stdout.write('set cgo_transparency, 0.35, HingePlane'+str(HingePlane)+'\n')
+                outputfile.write('import plane\n')
+                outputfile.write('plane.make_plane_points(name=\'HingePlane'+ str(HingePlane) +'\', l1='+str(list(p4))+', l2='+str(list(p2))+', l3='+str(list(p3))+', center=False, makepseudo=False)'+'\n')
+                outputfile.write('set cgo_transparency, 0.35, HingePlane'+str(HingePlane)+'\n')
                 return a,b,c,d
             
             a,b,c,d=FitPlane(hinge_points)
@@ -235,16 +236,16 @@ def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=F
                 PredictedHinges.append(SortedHingeResidues[HingeResiduesID.index(Hinge[0]):HingeResiduesID.index(Hinge[-1])+1])
 
         #Print part
-        sys.stdout.write('Filename= '+str(filename)+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
-        sys.stdout.write('Hindge Residues(Predicted):\n')
+        outputfile.write('Filename= '+str(filename)+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
+        outputfile.write('Hindge Residues(Predicted):\n')
         for numi,i in enumerate(PredictedHinges):
-            #sys.stdout.write('\nHinge #'+str(numi+1)+'\nResidues: '+','.join([j.get_name()+'-'+str(j.get_id()) for j in i])+'\n')
-            sys.stdout.write('\nHinge #'+str(numi+1)+'\nResidues: '+i[0].get_name()+'-'+str(i[0].get_id()) +' to '+i[-1].get_name()+'-'+str(i[-1].get_id())+'\n')
+            #outputfile.write('\nHinge #'+str(numi+1)+'\nResidues: '+','.join([j.get_name()+'-'+str(j.get_id()) for j in i])+'\n')
+            outputfile.write('\nHinge #'+str(numi+1)+'\nResidues: '+i[0].get_name()+'-'+str(i[0].get_id()) +' to '+i[-1].get_name()+'-'+str(i[-1].get_id())+'\n')
             GetStats(atoms,i,filename=filename)
-            #sys.stdout.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+'+'.join(str(j.get_id()) for j in i)+'\n')
-            sys.stdout.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+str(i[0].get_id())+':'+str(i[-1].get_id())+'\n')
+            #outputfile.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+'+'.join(str(j.get_id()) for j in i)+'\n')
+            outputfile.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+str(i[0].get_id())+':'+str(i[-1].get_id())+'\n')
             GetLeastSquarePlane(atoms,i,numi+1)
-            sys.stdout.write("#--------------------------------------------------#\n")
+            outputfile.write("#--------------------------------------------------#\n")
         #RotateHingeBonds(atoms,HingeResidues)
 
         if(GenerateKirchoff):
@@ -259,13 +260,10 @@ def HingePredict(atoms,Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=F
 ##################################################################################################
 '''
 
-def WriteOBJ(atoms,faces,filename='Output.obj'):
+def WriteOBJ(atoms,faces, fh):
     """
     """
-    filename='AlphaShape-'+filename.replace('pdb','obj')
     NewIDs={i.get_id():numi+1 for numi,i in enumerate(atoms)}
-    open(filename,'w').write('')
-    fh=open(filename,'a')
     fh.write('mtllib master.mtl\ng\n')
     fh.write('usemtl atoms\n')
     for i in atoms:
@@ -411,15 +409,23 @@ def IO():
     """
     parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)')
 
-    required = parser.add_mutually_exclusive_group(required=True)
-    required.add_argument('-pdbid','--pdbid',nargs=2,metavar='PDB_ID', type=str, help='(1) PDB ID of the input file (2) Location and Name by which you wish to save the downloaded file')
-    required.add_argument('-filename','--filename',nargs=1,metavar='FILENAME', type=str, help='Path and filename of the PDB file')
+    parser.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
 
-    parser.add_argument('alpha',metavar='AlphaValue',help='Recommended: Start from 2 and keep increasing the parameter value till the hinges become redundant compared to the previous alpha values (Typically around 5), Please refer to the paper for more details')
+    parser.add_argument('alpha', metavar='AlphaValue', help='Recommended: 2.8 for closed; 4.5 for open form, Please refer to the paper for more details')
+    parser.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
+
     parser.add_argument('--e_clusters',metavar='NumberOfEccentricityClusters',type=int,default=4,help='Recommended: 4, Please refer to the paper for more details')
     parser.add_argument('--minhnglen',metavar='MinimumHingeLength',type=int,default=5,help='Recommended: 5, Please refer to the paper for more details')
     parser.add_argument("--chain", help='Enter The Chain ID')
-    parser.add_argument('--generateobj',choices=['yes', 'no'], default='no', help='Select yes if you wish to generate the .obj file')
+    parser.add_argument('--generateobj', type=argparse.FileType('wb', 0), help='Path and filename to save the .obj file at. Ignored unless --chain is provided.')
+
+    # web server parameters
+    web_server_group = parser.add_argument_group('Web server parameters', 'Used by the web form')
+    web_server_group.add_argument('--outputfile', type=argparse.FileType('wb', 0), default=sys.stdout, help='Path and filename write output to')
+    web_server_group.add_argument('--logfile', type=argparse.FileType('wb', 0), default=sys.stderr, help='Path and filename write log messages to')
+    web_server_group.add_argument('--callbackurl', type=str, help='Optional callback url if this script was called from Drupal.')
+    web_server_group.add_argument('--nodeid', type=int, help='Optional node id if this script was called from Drupal.')
+    
     args=parser.parse_args()
     return args
 
@@ -434,26 +440,40 @@ def main():
     """
     args=IO()
 
-
-    #Mutually Exclusive Opetion to load the file
     if(args.pdbid is not None):
-        Molecule.DownloadPDB(args.pdbid[0],args.pdbid[1])
-        mol=Molecule.LoadPDB(args.pdbid[1])
-    elif(args.filename is not None):
-        mol=Molecule.LoadPDB(args.filename[0])
+        Molecule.DownloadPDB(args.pdbid, args.filename)
 
-    if(args.chain):
-        Backbone=[item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
-        SelectedTesselations,PredictedHinges=HingePredict(Backbone,Alpha=float(args.alpha),filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
-        if(args.generateobj=='yes'):WriteOBJ(Backbone,SelectedTesselations,'CHAIN-'+args.chain+'-'+args.filename[0])
-    else:
-        for i in mol[0].get_chains():
-            Backbone=[item for sublist in mol[0].get_backbone() for item in sublist]
-            SelectedTesselations,PredictedHinges=HingePredict(Backbone,Alpha=float(args.alpha),filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
-            if(args.generateobj=='yes'):WriteOBJ(Backbone,SelectedTesselations,'CHAIN-'+i.get_id()+'-'+args.filename)
+    mol = Molecule.LoadPDB(args.filename)
+
+    try:
+
+        if(args.chain):
+            Backbone = [item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
+            SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+            if(args.generateobj is not None):
+                WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
+        else:
+            for i in mol[0].get_chains():
+                Backbone = [item for sublist in mol[0].get_backbone() for item in sublist]
+                SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+        
+        if args.nodeid is not None:
+            urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
+
+    except Exception:
+
+        if args.nodeid is not None:
+            urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
     
-    print_footnotes()
-    sys.stdout.flush()
+    finally:
+
+        print_footnotes(args.outputfile)
+        args.outputfile.flush()
+        args.logfile.flush()
+
+        if(args.generateobj is not None):
+            args.generateobj.flush()
+            
     return True
 
 '''
@@ -461,9 +481,9 @@ def main():
 #                                             End                                                #
 ##################################################################################################
 '''
-def print_footnotes():
-    sys.stdout.write('Footnotes:\n\nSTATISTICS Section Legend:\nN: Number of residues\nMin: Minimum B-factor value\nMax: Maximum B-factor value\nMean: Mean B-factor value\nMode: Mode B-factor value\nMedian: Median B-factor value\nSTDDev: Standard Deviation of the B-factor values\n')
-    sys.stdout.write('\nRMSF Plane Visualization:\nDownload plane.py file from https://pymolwiki.org/index.php/Plane_Wizard and place it in the PyMol working directory if the RMSF plane needs to be visualized.\n')
+def print_footnotes(outputfile):
+    outputfile.write('Footnotes:\n\nSTATISTICS Section Legend:\nN: Number of residues\nMin: Minimum B-factor value\nMax: Maximum B-factor value\nMean: Mean B-factor value\nMode: Mode B-factor value\nMedian: Median B-factor value\nSTDDev: Standard Deviation of the B-factor values\n')
+    outputfile.write('\nRMSF Plane Visualization:\nDownload plane.py file from https://pymolwiki.org/index.php/Plane_Wizard and place it in the PyMol working directory if the RMSF plane needs to be visualized.\n')
     return True
 
 
