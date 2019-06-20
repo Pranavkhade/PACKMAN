@@ -2,6 +2,8 @@
 '''
 Author: Pranav Khade(pranavk@iastate.edu)
 '''
+#from __future__ import (absolute_import, division,print_function, unicode_literals)
+import traceback
 
 import numpy
 import Molecule
@@ -226,9 +228,11 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
         km.fit(centrality_sorted_with_keys)
         central_nodes=numpy.argwhere(km.labels_==numpy.argmin(km.cluster_centers_)).T[0]
         HingeResidues=list(set([atoms[i].get_parent() for i in central_nodes]))
-        SortedHingeResidues=sorted(HingeResidues)
-        HingeResiduesID=[i.get_id() for i in sorted(HingeResidues)]
+        HingeResiduesID=[i.get_id() for i in HingeResidues]
 
+        SortedHingeResidues=[x for _,x in sorted(zip(HingeResiduesID,HingeResidues))]
+        HingeResiduesID=[i.get_id() for i in SortedHingeResidues]
+        
         PredictedHinges=[]
         for i,j in groupby(HingeResiduesID,lambda n, c=count(): n-next(c)):
             Hinge=[k for k in j]
@@ -246,7 +250,6 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
             outputfile.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+str(i[0].get_id())+':'+str(i[-1].get_id())+'\n')
             GetLeastSquarePlane(atoms,i,numi+1)
             outputfile.write("#--------------------------------------------------#\n")
-        #RotateHingeBonds(atoms,HingeResidues)
 
         if(GenerateKirchoff):
             return AlphaKirchoff,SelectedTesselations,PredictedHinges
@@ -264,22 +267,22 @@ def WriteOBJ(atoms,faces, fh):
     """
     """
     NewIDs={i.get_id():numi+1 for numi,i in enumerate(atoms)}
-    fh.write('mtllib master.mtl\ng\n')
-    fh.write('usemtl atoms\n')
+    fh.write('mtllib master.mtl\ng\n'.encode())
+    fh.write('usemtl atoms\n'.encode())
     for i in atoms:
         x,y,z=i.get_location()
-        fh.write("v %f %f %f\n"%(x,y,z))
+        fh.write("v %f %f %f\n".encode()%(x,y,z))
     
     line='usemtl bonds\nl'
     for i in atoms:
         line=line+" "+str(NewIDs[i.get_id()])
     line=line+'\n'
-    fh.write(line)
+    fh.write(line.encode())
     
-    fh.write('usemtl faces\n')
+    fh.write('usemtl faces\n'.encode())
     for i in faces:
         faces=[NewIDs[j.get_id()] for j in i]
-        fh.write("f %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
+        fh.write("f %i %i %i %i\n".encode()%(faces[0],faces[1],faces[2],faces[3]))
         #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
     return True
 
@@ -340,7 +343,7 @@ def GenerateMovie(atoms,ProteinGraph,SelectedHingeResidues,gamma=1.0,dr=15.0,pf=
     new_coords=[]
     scale=0.1
     n=50
-    print eigenvalue
+    print(eigenvalue)
     with open('movie.pdb','w') as fh:
         for j in range(n)+range(n)[::-1]:
             #fh.write('MODEL        ')
@@ -363,7 +366,7 @@ def GenerateMovie(atoms,ProteinGraph,SelectedHingeResidues,gamma=1.0,dr=15.0,pf=
 def RotateHingeBonds(atoms,PredictedHinges):
     """
     """
-    print ConvexHull([i.get_location() for i in atoms]).area
+    print(ConvexHull([i.get_location() for i in atoms]).area)
     def CalculateDihedral(atom1,atom2,atom3,atom4):
         p0=atom1.get_location()
         p1=atom2.get_location()
@@ -386,15 +389,15 @@ def RotateHingeBonds(atoms,PredictedHinges):
         phi=[]
         for numj,j in enumerate(Backbone):
             try:    
-                #print Backbone[numj].get_name()+'-'+Backbone[numj+1].get_name()+'-'+Backbone[numj+2].get_name()+'-'+Backbone[numj+3].get_name()
+                #print(Backbone[numj].get_name()+'-'+Backbone[numj+1].get_name()+'-'+Backbone[numj+2].get_name()+'-'+Backbone[numj+3].get_name())
                 if(Backbone[numj+1].get_name()+'-'+Backbone[numj+2].get_name()=='N-CA'):
                     phi.append(CalculateDihedral(Backbone[numj],Backbone[numj+1],Backbone[numj+2],Backbone[numj+3]))
                 if(Backbone[numj+1].get_name()+'-'+Backbone[numj+2].get_name()=='CA-C'):
                     psi.append(CalculateDihedral(Backbone[numj],Backbone[numj+1],Backbone[numj+2],Backbone[numj+3]))
             except IndexError:
                 break
-        print 'PSI:',numpy.mean(psi)
-        print 'PHI:',numpy.mean(phi),'\n<<<<'
+        print('PSI:',numpy.mean(psi))
+        print('PHI:',numpy.mean(phi),'\n<<<<')
     return True
 
 '''
@@ -461,7 +464,7 @@ def main():
             urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
 
     except Exception:
-
+        print(traceback.print_exc())
         if args.nodeid is not None:
             urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
     
