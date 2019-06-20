@@ -139,14 +139,152 @@ class Atom():
         """
         return numpy.linalg.norm(self.__Coordinates-another_atom.get_location())
 
+class HetAtom():
+    """
+    This class contains the information about the HetAtom.
+    """
+    def __init__(self,id,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,parent):
+        self.__id=id
+        self.__AtomName=AtomName
+        self.__AlternateLocationIndicator=None #remove it later
+        self.__parent=parent
+        self.__Coordinates=Coordinates
+        self.__Occupancy=Occupancy
+        self.__bfactor=bfactor
+        self.__SegmentIdentifier=None
+        self.__Element=Element
+
+    #Get Functions
+    def get_id(self):
+        """
+        :returns: ID of an 'Atom' object
+        """
+        return self.__id
+    
+    def get_name(self):
+        """
+        :returns: Name of an 'Atom' object
+        """
+        return self.__AtomName
+    
+    def get_alternatelocationindicator(self):
+        """
+        :returns: Alternate Location Indicator
+        """
+        return self.__AlternateLocationIndicator
+
+    def get_parent(self):
+        """
+        :returns: Parent residue of an 'Atom' Object. (If available)
+        """
+        return self.__parent
+    
+    def get_location(self):
+        """
+        :returns: Cartesian Coordinates of an 'Atom'
+        """
+        return self.__Coordinates
+    
+    def get_occupancy(self):
+        """
+        :returns: Occupancy of an 'Atom'
+        """
+        return self.__Occupancy
+    
+    def get_bfactor(self):
+        """
+        :returns: B-Factor value of an 'Atom'
+        """
+        return self.__bfactor
+    
+    def get_segmentidentifier(self):
+        """
+        :returns: Segment Identifier of an 'Atom'
+        """
+        return self.__SegmentIdentifier
+    
+    def get_elment(self):
+        """
+        :returns: Element of an 'Atom'
+        """
+        return self.__Element
+
+    #Set Functions
+    def set_id(self,new_id):
+        """
+        :param new_id: New ID to be assigned
+        """
+        self.__id=new_id
+    
+    def set_name(self,new_name):
+        """
+        :param new_name: New name to be assigned
+        """
+        self.__AtomName=new_name
+    
+    def set_alternatelocationindicator(self,new_alternatelocationindicator):
+        """
+        :param new_alternatelocationindicator: New Alternate Location Indicator to be assigned
+        """
+        self.__AlternateLocationIndicator=new_alternatelocationindicator
+
+    def set_parent(self,new_parent):
+        """
+        :param new_parent: New parent to be assigned
+        """
+        self.__parent=new_parent
+    
+    def set_location(self,new_location):
+        """
+        :param new_location: New Cartesian Coordinates to be assigned
+        """
+        self.__Coordinates=new_location
+    
+    def set_occupancy(self,new_occupancy):
+        """
+        :param new_occupancy: New occupancy value to be assigned
+        """
+        self.__Occupancy=new_occupancy
+    
+    def set_bfactor(self,new_bfactor):
+        """
+        :param new_bfactor: New B-Factor to be assigned
+        """
+        self.__bfactor=new_bfactor
+    
+    def set_segmentidentifier(self,new_segmentidentifier):
+        """
+        :param new_segmentidentifier: New Segment Identifier to be assigned
+        """
+        self.__SegmentIdentifier=new_segmentidentifier
+    
+    def set_elment(self,new_element):
+        """
+        :param new_element: New element to be assigned
+        """
+        self.__Element=new_element
+
+    #Calculation Functions
+    def calc_dist(self,another_atom):
+        """
+        :param another_atom: 'Atom' object to which the distance should be calculated.
+        """
+        return numpy.linalg.norm(self.__Coordinates-another_atom.get_location())
+
     
 
 class Residue():
+    '''
+    Domain Identifiers: (Obtained after running PACKMAN)
+    FL: Flexible Linkers (Hinges); Followed by a number
+    DM: Domain; Followed by a number
+    '''
     def __init__(self,id,name,parent):
         self.__id=id
         self.__name=name
         self.__parent=parent
         self.__Atoms=None
+        self.__domain_id=None
     
     def __setitem__(self,id,Atom):
         try:
@@ -180,6 +318,9 @@ class Residue():
         """
         for i in sorted(self.__Atoms.keys()):yield self.__Atoms[i]
     
+    def get_domain_id(self):
+        return self.__domain_id
+    
     #Set Functions
     def set_id(self,new_id):
         """
@@ -198,6 +339,9 @@ class Residue():
         :param new_parent: New parent to be assigned
         """
         self.__parent=new_parent
+
+    def set_domain_id(self):
+        return self.__domain_id
 
     #Calculation Functions
     def get_calpha(self):
@@ -248,20 +392,111 @@ class Residue():
         return TipofAA
 
 
+
+class HetMol():
+    def __init__(self,id,name,parent):
+        self.__id=id
+        self.__name=name
+        self.__parent=parent
+        self.__Atoms=None
+    
+    def __setitem__(self,id,Atom):
+        try:
+            self.__Atoms[id]=Atom
+        except:
+            self.__Atoms={}
+            self.__Atoms[id]=Atom
+    
+    #Get Functions
+    def get_id(self):
+        """
+        :returns: ID of an 'Residue' object
+        """
+        return self.__id
+    
+    def get_name(self):
+        """
+        :returns: Name of an 'Residue' object
+        """
+        return self.__name
+
+    def get_parent(self):
+        """
+        :returns: Parent residue of an 'Residue' Object. (If available)
+        """
+        return self.__parent
+    
+    def get_hetatoms(self):
+        """
+        :returns: Generator yielding all the 'Atom' objects in a residue.
+        """
+        for i in sorted(self.__Atoms.keys()):yield self.__Atoms[i]
+    
+    #Set Functions
+    def set_id(self,new_id):
+        """
+        :param new_id: New ID to be assigned
+        """
+        self.__id=new_id
+    
+    def set_name(self,new_name):
+        """
+        :param new_name: New name to be assigned
+        """
+        self.__name=new_name
+    
+    def set_parent(self,new_parent):
+        """
+        :param new_parent: New parent to be assigned
+        """
+        self.__parent=new_parent
+
+    def get_centerofgravity(self):
+        """
+        NOTE: Yet to add the atomic masses.
+        :returns: Cartesian Coordinates of the centre of the gravity.
+        """
+        atoms=self.get_hetatoms()
+        AtomicMass=1
+        XYZ_M=[0,0,0]
+        MassofAA=0
+        for i in atoms:
+            XYZ_M[0]+=i.Coordinates[0]*AtomicMass
+            XYZ_M[1]+=i.Coordinates[1]*AtomicMass
+            XYZ_M[2]+=i.Coordinates[2]*AtomicMass
+            MassofAA=MassofAA+AtomicMass
+        return numpy.array([i/MassofAA for i in XYZ_M])
+
+
+
 class Chain():
+    '''
+    Warning: right now, iterating over chain only fetches the residues not the hetero atoms
+    '''
     def __init__(self,id):
         self.__id=id
         self.__Residues=None
+        self.__HetMols=None
     
-    def __setitem__(self,ResidueNumber,Residue):
-        try:
-            self.__Residues[ResidueNumber]=Residue
-        except:
-            self.__Residues={}
-            self.__Residues[ResidueNumber]=Residue
+    def __setitem__(self,Number,Entity,Type):
+        if(Type=='Residue'):
+            try:
+                self.__Residues[Number]=Entity
+            except:
+                self.__Residues={}
+                self.__Residues[Number]=Entity
+        elif(Type=='HetMol'):
+            try:
+                self.__HetMols[Number]=Entity
+            except:
+                self.__HetMols={}
+                self.__HetMols[Number]=Entity
 
-    def __getitem__(self,ResidueNumber):
-        return self.__Residues[ResidueNumber]
+    def __getitem__(self,Number,Type=None):
+        try:
+            return self.__Residues[Number]
+        except:
+            return self.__HetMols[Number]
     
     #Get Functions
     def get_id(self):
@@ -275,6 +510,13 @@ class Chain():
         :returns: Generator yielding all the 'Residue' objects in a Chain.
         """
         for i in sorted(self.__Residues.keys()):yield self.__Residues[i]
+    
+    def get_hetmols(self):
+        """
+        :returns: Generator yielding all the 'HetMol' objects in a Chain.
+        """
+        for i in sorted(self.__HetMols.keys()):yield self.__HetMols[i]
+
     
     #Set Functions
     def set_id(self,new_id):
@@ -293,11 +535,13 @@ class Chain():
     
 
 class Model():
-    def __init__(self,id,AllAtoms,AllResidues,AllChains):
+    def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):
         self.__id=id
         self.__AllAtoms=AllAtoms
         self.__AllResidues=AllResidues
         self.__AllChains=AllChains
+        self.__AllHetAtoms=AllHetAtoms
+        self.__AllHetMols=AllHetMols
 
     def __getitem__(self,ChainID):
         return self.__AllChains[ChainID]
@@ -340,6 +584,18 @@ class Model():
         """
         return self.__AllAtoms[query_atom_id]
     
+    def get_hetmols(self):
+        """
+        :returns: Generator yielding all the 'HetMol' objects in a Model
+        """
+        for i in sorted(self.__AllHetMols.keys()):yield self.__AllHetMols[i]
+     
+    def get_hetatoms(self):
+        """
+        :returns: Generator yielding all the 'HetAtom' objects in a Model
+        """
+        for i in sorted(self.__AllHetAtoms.keys()):yield self.__AllHetAtoms[i]
+    
     #Set Functions
     def set_id(self,new_id):
         """
@@ -359,6 +615,7 @@ class Model():
         :returns: All 'Backbone' atoms as an 'Atom object.'
         """
         return [i.get_backbone() for i in self.get_residues()]
+
 
 class Protein():
     def __init__(self,id,name,Models):
@@ -387,6 +644,9 @@ def LoadPDB(filename):
         AllResidues={}
         AllChains={}
 
+        AllHetAtoms={}
+        AllHetMols={}
+
         lines=frame.split('\n')   
         for _ in lines:
             if(_[0:4]=='ATOM'):
@@ -401,7 +661,7 @@ def LoadPDB(filename):
                 if(str(ResidueNumber)+ChainID not in AllResidues.keys()):AllResidues[str(ResidueNumber)+ChainID]=Residue(ResidueNumber,ResidueName,AllChains[ChainID])
 
                 #Residue Added to the chain
-                AllChains[ChainID].__setitem__(ResidueNumber,AllResidues[str(ResidueNumber)+ChainID])
+                AllChains[ChainID].__setitem__(ResidueNumber,AllResidues[str(ResidueNumber)+ChainID],Type='Residue')
 
                 #Atom Defined
                 id=int(_[6:11])
@@ -420,12 +680,42 @@ def LoadPDB(filename):
                 AlternateLocationIndicator=_[16]
                 CodeForInsertions=_[26]
                 SegmentIdentifier=_[72:76]
+            elif(_[0:6]=='HETATM'):
+                ChainID=_[21]
+                if(ChainID not in AllChains.keys()):AllChains[ChainID]=Chain(ChainID)
+
+                #HetMol Defined
+                HetMolNumber=int(_[22:26].strip())
+                HetMolName=_[17:20]
+                if(str(HetMolNumber)+ChainID not in AllHetMols.keys()):AllHetMols[str(HetMolNumber)+ChainID]=HetMol(HetMolNumber,HetMolName,AllChains[ChainID])
+
+                #HetMol Added to the chain
+                AllChains[ChainID].__setitem__(HetMolNumber,AllHetMols[str(HetMolNumber)+ChainID],Type='HetMol')
+
+                #HetAtom Defined
+                id=int(_[6:11])
+                AtomName=_[12:16].strip()
+                Coordinates=numpy.array([float(_[30:38]),float(_[38:46]),float(_[46:54])])
+                Occupancy=float(_[54:60])
+                bfactor=float(_[60:66])
+                Element=_[76:78].strip()
+                Charge=_[78:80]
+                AllHetAtoms[id]=HetAtom(id,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,AllHetMols[str(HetMolNumber)+ChainID])
+                
+                #Atom added to the residue
+                AllHetMols[str(HetMolNumber)+ChainID].__setitem__(id,AllHetAtoms[id])
+
+                #What to do with these?
+                AlternateLocationIndicator=_[16]
+                CodeForInsertions=_[26]
+                SegmentIdentifier=_[72:76]
+
         #print
-        Models.append(Model(FrameNumber,AllAtoms,AllResidues,AllChains))
+        Models.append(Model(FrameNumber,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols))
 
     if(len(Models)>1):
         #NMR DETECTED
-        print "Caution: NMR Structure"
+        print("Caution: NMR Structure")
         warnings.warn('Multiple models are detected. B-Factor field is turned to a calculated parameter.',UserWarning)
         All_Coords=[]
         for i in Models:
@@ -452,8 +742,8 @@ def DownloadPDB(pdbid,save_name='Download.pdb'):
     '''
     INFO: This class is used to download a PDB stucture from RCSB PDB
     '''
-    import urllib
-    response=urllib.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb')
+    import urllib.request as ur
+    response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb')
     try:
         open(save_name,'w').write(response.read())
     except(IOError):
@@ -471,7 +761,7 @@ def IO():
 
 
 def main():
-    print "NOTE: Use this mode as a"
+    print("NOTE: Use this mode as a")
     return True
 
 if(__name__=='__main__'):
