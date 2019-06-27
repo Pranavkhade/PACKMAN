@@ -1,4 +1,6 @@
 # PACKMAN: PACKing and Motion ANalysis.
+<img src="https://github.com/Pranavkhade/PACKMAN/blob/master/logo.gif" width="250">
+
 Description
 
 ### Prerequisites:
@@ -40,7 +42,7 @@ pip install PACKMAN
 OR
 ```
 pip install git+git://github.com/Pranavkhade/PACKMAN
-```
+```   
 -->
 
 ### Files and instructions
