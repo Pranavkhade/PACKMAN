@@ -77,7 +77,7 @@ class Atom():
         """
         return self.__SegmentIdentifier
     
-    def get_elment(self):
+    def get_element(self):
         """
         :returns: Element of an 'Atom'
         """
@@ -779,7 +779,11 @@ def LoadPDB(filename):
     return Protein(filename,None,Models)
 
 
-#####-----#####-----#####-----#####-----#####-----
+'''
+##################################################################################################
+#                                   Download and Write                                           #
+##################################################################################################
+'''
 
 def DownloadPDB(pdbid,save_name='Download.pdb'):
     '''
@@ -792,6 +796,22 @@ def DownloadPDB(pdbid,save_name='Download.pdb'):
     except(IOError):
         None
     return True
+
+def WritePDB(molecule,filename):
+    #sys.stdout.write("%-6s %-50s %-25s\n" % (code, name, industry))
+    open(filename,'w').write('')
+    fh=open(filename,'a')
+    for _ in molecule:
+        fh.write("[Model]\n")
+        for i in _.get_atoms():
+            fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(i.get_id(),i.get_name(),i.get_parent().get_name(),i.get_parent().get_parent().get_id(),i.get_parent().get_id(),i.get_location()[0],i.get_location()[1],i.get_location()[2],i.get_occupancy(),i.get_bfactor(),'',i.get_element(),''))
+    return True
+
+'''
+##################################################################################################
+#                                         Interface                                              #
+##################################################################################################
+'''
 
 def IO():
     '''
