@@ -7,6 +7,12 @@ import argparse
 import os
 import warnings
 
+'''
+##################################################################################################
+#                                     Molecule Objects                                           #
+##################################################################################################
+'''
+
 class Atom():
     """
     This class contains the information about the Atom.
@@ -340,8 +346,8 @@ class Residue():
         """
         self.__parent=new_parent
 
-    def set_domain_id(self):
-        return self.__domain_id
+    def set_domain_id(self,new_domain_id):
+        self.__domain_id=new_domain_id
 
     #Calculation Functions
     def get_calpha(self):
@@ -471,7 +477,9 @@ class HetMol():
 
 class Chain():
     '''
-    Warning: right now, iterating over chain only fetches the residues not the hetero atoms
+    NOTE1: As of now, iterating over chain only fetches the residues not the hetero atoms
+    NOTE2: The object fetches the atoms and residues which are not in order as they appear in the PDB. Find a way to fix this
+    NOTE3: Chain has no get parent as of now
     '''
     def __init__(self,id):
         self.__id=id
@@ -532,7 +540,7 @@ class Chain():
         """
         return [i.get_backbone() for i in self.get_residues()]
 
-    
+
 
 class Model():
     def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):
@@ -625,6 +633,41 @@ class Protein():
     
     def __getitem__(self,ModelNumber):
         return self.Models[ModelNumber]
+
+'''
+##################################################################################################
+#                                 Structural Super Elements                                      #
+##################################################################################################
+'''
+
+class Hinge():
+    '''
+    Information about the hinge is stored here
+    '''
+    def __init__(self,hid,elements,stats,p):
+        self.__id=hid
+        self.__elements=elements
+        self.__stats=stats
+        self.__p=p
+
+    #Get functions
+    def get_id(self):
+        return self.__id
+
+    def get_elements(self):
+        return self.__elements
+
+    def get_stats(self):
+        return self.__stats
+
+    def get_pvalue(self):
+        return self.__p
+
+'''
+##################################################################################################
+#                                          File Load                                             #
+##################################################################################################
+'''
 
 def LoadPDB(filename):
     Models=[]
