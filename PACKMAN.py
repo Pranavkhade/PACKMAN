@@ -500,7 +500,6 @@ def main():
 
         if(args.generateobj is not None):
             args.generateobj.flush()
-        Molecule.WritePDB(mol,'test.pdb')
     return True
 
 '''
