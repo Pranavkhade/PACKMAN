@@ -805,6 +805,7 @@ def WritePDB(molecule,filename):
         fh.write("[Model]\n")
         for i in _.get_atoms():
             fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(i.get_id(),i.get_name(),i.get_parent().get_name(),i.get_parent().get_parent().get_id(),i.get_parent().get_id(),i.get_location()[0],i.get_location()[1],i.get_location()[2],i.get_occupancy(),i.get_bfactor(),'',i.get_element(),''))
+        fh.write("ENDMDL\n")
     return True
 
 '''
