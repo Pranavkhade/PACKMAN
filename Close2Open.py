@@ -4,6 +4,9 @@ import numpy
 import copy
 import scipy
 import functools
+import random
+
+from scipy import optimize
 
 def get_leastsquareplane(HingeResidues):
     """
@@ -91,7 +94,6 @@ def get_leastsquareplane(HingeResidues):
     projected=project_points(hinge_xs,hinge_ys,hinge_zs,a,b,c)
     Difference=0
     for numi,i in enumerate(hinge_points):Difference+=numpy.linalg.norm(hinge_points[numi]-projected[numi])
-    print(Difference)
     return Difference
 
 
@@ -170,26 +172,52 @@ def get_torsion_angles(Backbone):
     return omega,phi,psi
 
 
-def Close2Open(model,hinge):
-    HingeBackbone=[item for sublist in [i.get_backbone() for i in hinge.get_elements()] for item in sublist if item.get_name()!='O']
+#GLOBAL VARIABLES
+lowest_diff=float('Inf')
+models=[]
+native_clashes=None
+
+def SetAngles(features,model,angles):
+    omega,phi,psi=angles
+    phipsi=phi+psi
+    for numi,i in enumerate(phipsi):
+        rotate_bond(i[0],i[1],i[2],i[3],model,features[numi])
+        #print('angle:',features[numi])
+    Difference=get_leastsquareplane(model['A'].get_hinges()[0].get_elements())
+    global lowest_diff,native_clashes
+    if(model.check_clashes()>native_clashes):
+        Difference=Difference*2
+    if(Difference<lowest_diff):
+        models.append(copy.deepcopy(model))
+        lowest_diff=Difference
+    print(Difference)
+    return Difference
+
+
+def Close2Open(model,chain='A',hinge_number=0):
+    HingeBackbone=[item for sublist in [i.get_backbone() for i in model[chain].get_hinges()[0].get_elements()] for item in sublist if item.get_name()!='O']
     omega,phi,psi=get_torsion_angles(HingeBackbone)
 
-    get_leastsquareplane(hinge.get_elements())
-    #models=[]
-    #for i in range(0,361,10):
-    #    models.append(rotate_bond(phi[10][0],phi[10][1],phi[10][2],phi[10][3],copy.deepcopy(model),i))
-    
-    #new_mol=Molecule.Protein('test','testname',models)
-    #Molecule.WritePDB(new_mol,'test.pdb')
+    numberofparameters=len(phi)+len(psi)
+    RandomFeatureValues=[]
+    for _ in range(0,numberofparameters):RandomFeatureValues.append(random.randrange(-180,180,10))
+    ranges=list(zip([-180]*numberofparameters,[180]*numberofparameters))
+    result=optimize.minimize(SetAngles,x0=RandomFeatureValues,args=(model,[omega,phi,psi]),bounds=ranges,method='L-BFGS-B')
+    #,options={'maxiter':1}
 
+    new_mol=Molecule.Protein('test','testname',models)
+    Molecule.WritePDB(new_mol,'test.pdb')
     return True
 
 
 def main():
     mol=Molecule.LoadPDB('1prw.pdb')
     Backbone = [item for sublist in mol[0].get_backbone() for item in sublist]
-    SelectedTesselations, PredictedHinges=PACKMAN.HingePredict(Backbone,open('test.txt','w'),Alpha=2.8)
-    Close2Open(mol[0],PredictedHinges[0])
+    SelectedTesselations=PACKMAN.HingePredict(Backbone,open('test.txt','w'),Alpha=2.8)
+    global native_clashes
+    native_clashes=mol[0].check_clashes()
+    print(native_clashes)
+    Close2Open(mol[0])
     return True
 
 

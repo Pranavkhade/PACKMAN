@@ -273,12 +273,13 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
             elif(i.get_domain_id()[:2]=='FL' and flag):
                 DomainNumber+=1
                 flag=False
-
+        
+        AllChainResidues[0].get_parent().set_hinges(Hinges)
 
         if(GenerateKirchoff):
-            return AlphaKirchoff,SelectedTesselations,Hinges
+            return AlphaKirchoff,SelectedTesselations
         else:
-            return SelectedTesselations,Hinges
+            return SelectedTesselations
 
 
 '''
@@ -476,13 +477,13 @@ def main():
 
         if(args.chain):
             Backbone = [item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
-            SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+            SelectedTesselations= HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
             if(args.generateobj is not None):
                 WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
         else:
             for i in mol[0].get_chains():
                 Backbone = [item for sublist in mol[0].get_backbone() for item in sublist]
-                SelectedTesselations, PredictedHinges = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+                SelectedTesselations = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
         
         if args.nodeid is not None:
             urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")

@@ -479,12 +479,15 @@ class Chain():
     '''
     NOTE1: As of now, iterating over chain only fetches the residues not the hetero atoms
     NOTE2: The object fetches the atoms and residues which are not in order as they appear in the PDB. Find a way to fix this
-    NOTE3: Chain has no get parent as of now
+    NOTE3: Chain has no get parent as of now | Resolved
     '''
     def __init__(self,id):
         self.__id=id
         self.__Residues=None
         self.__HetMols=None
+        self.__parent=None
+        #More Features
+        self.__Hinges=[]
     
     def __setitem__(self,Number,Entity,Type):
         if(Type=='Residue'):
@@ -526,12 +529,33 @@ class Chain():
         for i in sorted(self.__HetMols.keys()):yield self.__HetMols[i]
 
     
+    def get_hinges(self):
+        """
+        :returns: The hinge residues
+        """
+        return self.__Hinges
+    
+    def get_parent(self):
+        """
+        """
+        return self.__parent
+
     #Set Functions
     def set_id(self,new_id):
         """
         :param new_id: New ID to be assigned
         """
         self.__id=new_id
+    
+    def set_hinges(self,new_hinges):
+        """
+        """
+        self.__Hinges=self.__Hinges+new_hinges
+    
+    def set_parent(self,parent):
+        """
+        """
+        self.__parent=parent
     
     #Compute Functions
     def get_backbone(self):
@@ -623,6 +647,13 @@ class Model():
         :returns: All 'Backbone' atoms as an 'Atom object.'
         """
         return [i.get_backbone() for i in self.get_residues()]
+    
+    #Check Function
+    def check_clashes(self,distance=0.77):
+        from scipy.spatial import KDTree
+        all_atoms=[i for i in self.get_atoms()]
+        T=KDTree([i.get_location() for i in all_atoms])
+        return len(T.query_pairs(distance))
 
 
 class Protein():
@@ -755,6 +786,7 @@ def LoadPDB(filename):
 
         #print
         Models.append(Model(FrameNumber,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols))
+        for i in AllChains:AllChains[i].set_parent(Models[FrameNumber])
 
     if(len(Models)>1):
         #NMR DETECTED
@@ -801,8 +833,8 @@ def WritePDB(molecule,filename):
     #sys.stdout.write("%-6s %-50s %-25s\n" % (code, name, industry))
     open(filename,'w').write('')
     fh=open(filename,'a')
-    for _ in molecule:
-        fh.write("[Model]\n")
+    for num_,_ in enumerate(molecule):
+        fh.write("Model\t"+str(num_)+'\n')
         for i in _.get_atoms():
             fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(i.get_id(),i.get_name(),i.get_parent().get_name(),i.get_parent().get_parent().get_id(),i.get_parent().get_id(),i.get_location()[0],i.get_location()[1],i.get_location()[2],i.get_occupancy(),i.get_bfactor(),'',i.get_element(),''))
         fh.write("ENDMDL\n")
