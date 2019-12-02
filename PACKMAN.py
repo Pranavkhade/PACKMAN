@@ -245,7 +245,8 @@ def HingePredict(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gener
 
         #Print part
         Hinges=[]
-        outputfile.write('Filename= '+str(filename)+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
+        Chains=','.join(list(set([i.get_parent().get_id() for i in SortedHingeResidues])))
+        outputfile.write('Filename= '+str(filename)+'\t| Chain(s)= '+Chains+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
         outputfile.write('Hindge Residues(Predicted):\n')
         for numi,i in enumerate(PredictedHinges):
             #Assigning domain IDs
@@ -482,7 +483,7 @@ def main():
                 WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
         else:
             for i in mol[0].get_chains():
-                Backbone = [item for sublist in mol[0].get_backbone() for item in sublist]
+                Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
                 SelectedTesselations = HingePredict(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
         
         if args.nodeid is not None:
