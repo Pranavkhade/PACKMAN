@@ -7,7 +7,7 @@ PACKAGES=['packman',
           ]
 
 
-SCRIPTS=['packman=packman.bin.PACKMAN:main']
+SCRIPTS=['packman=packman.bin']
 
 
 setup(name='py-packman',
@@ -18,13 +18,14 @@ setup(name='py-packman',
       author_email='pranavk@iastate.edu',
       license='MIT',
       packages=PACKAGES,
-      keywords=('protein, dynamics, protein packing'),
+      keywords=('protein, dynamics, protein packing, protein domain, protein hinge'),
       classifiers=[
               'Intended Audience :: Education',
               'Intended Audience :: Science/Research',
               'License :: OSI Approved :: MIT License',
               'Operating System :: MacOS',
               'Operating System :: Microsoft :: Windows',
+              'Operating System :: POSIX',
               'Programming Language :: Python',
               'Programming Language :: Python :: 2',
               'Programming Language :: Python :: 3',
