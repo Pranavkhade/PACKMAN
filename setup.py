@@ -7,11 +7,11 @@ PACKAGES=['packman',
           ]
 
 
-SCRIPTS=['packman=packman.bin']
+SCRIPTS=['packman=packman.bin.PACKMAN:main']
 
 
 setup(name='py-packman',
-      version='1.0',
+      version='1.0.0',
       description='A software package for molecular PACKing and Motion ANalysis (PACKMAN)',
       url='https://github.com/Pranavkhade/PACKMAN',
       author='Pranav Khade',
@@ -30,8 +30,8 @@ setup(name='py-packman',
               'Programming Language :: Python :: 2',
               'Programming Language :: Python :: 3',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Topic :: Scientific/Engineering :: Structural Biology',
-              'Topic :: Scientific/Engineering :: Chemistry'
+              'Topic :: Scientific/Engineering :: Chemistry',
+              'Topic :: Scientific/Engineering :: Mathematics'
                 ],
       entry_points = {
               'console_scripts': SCRIPTS,
