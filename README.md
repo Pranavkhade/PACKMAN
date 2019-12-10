@@ -26,8 +26,6 @@ If you wish to visualize the plane of the hinge, please refer to the following a
 
 
 ### Installation
-Description
-
 
 Installing from source
 ```
