@@ -49,7 +49,7 @@ pip install git+git://github.com/Pranavkhade/PACKMAN
 Description
 
 ```
-usage: PACKMAN.py [-h] [-pdbid PDB_ID]
+usage: packman [-h] [-pdbid PDB_ID]
                   [--e_clusters NumberOfEccentricityClusters]
                   [--minhnglen MinimumHingeLength] [--chain CHAIN]
                   [--generateobj GENERATEOBJ] [--outputfile OUTPUTFILE]
