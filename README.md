@@ -1,12 +1,35 @@
-# PACKMAN: PACKing and Motion ANalysis.
+PACKMAN: PACKing and Motion ANalysis
+------------------------------------
 <img src="https://github.com/Pranavkhade/PACKMAN/blob/master/logo.gif" width="250">
 
-Description
+PACKMAN is a multiutility tool to study protein packing and its effect on protein dynamics. It currently has the functionality to identify the protein hinges (separating the domains). It can also be used to read, write, manipulate and analyze protein molecules and it's properties through its API.
 
-### Prerequisites:
-#### Required modules. 
+DOCUMENTATION
+-------------
+* [Web Server](https://packman.bb.iastate.edu/)
+* [Reference Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
 
-Modules are available in most GNU/Linux distributions, or from their respective websites.
+INSTALLATION
+------------
+
+1. Installing from source
+```
+git clone https://github.com/Pranavkhade/PACKMAN
+cd PACKMAN
+python setup.py install
+```
+
+2. Installing with pip
+```
+pip install py-packman
+```
+OR
+```
+pip install git+git://github.com/Pranavkhade/PACKMAN
+```
+
+PREREQUISITES
+-------------
 
 * [numpy](http://www.numpy.org/)
 
@@ -18,38 +41,18 @@ Modules are available in most GNU/Linux distributions, or from their respective 
 
 * [sklearn](https://scikit-learn.org/stable/)
 
-#### Hinge Plane Visualization
+OPTIONAL
+---------
 
 If you wish to visualize the plane of the hinge, please refer to the following article: 
 
 * [Plane Wizard (PyMOL wiki)](https://pymolwiki.org/index.php/Plane_Wizard)
 
-
-### Installation
-Description
-<!--
-Installing from source
-```
-git clone https://github.com/Pranavkhade/PACKMAN
-cd PACKMAN
-python setup.py install
-```
-
-Installing with pip
-```
-pip install PACKMAN
-```
-OR
-```
-pip install git+git://github.com/Pranavkhade/PACKMAN
-```   
--->
-
-### Files and instructions
-Description
+INSTRUCTIONS
+------------
 
 ```
-usage: PACKMAN.py [-h] [-pdbid PDB_ID]
+usage: packman [-h] [-pdbid PDB_ID]
                   [--e_clusters NumberOfEccentricityClusters]
                   [--minhnglen MinimumHingeLength] [--chain CHAIN]
                   [--generateobj GENERATEOBJ] [--outputfile OUTPUTFILE]
@@ -93,11 +96,17 @@ Web server parameters:
                         Drupal.
 
 ```
-### Examples
 
-1. `python PPACKMAN.py --pdbid 1prw 2.8 1prw.pdb`
+EXAMPLES
+--------
+
+1. `python -m packman --pdbid 1prw 2.8 1prw.pdb`
+OR
+`packman --pdbid 1prw 2.8 1prw.pdb`
 for --pdbid, the parameter is the PDB ID the user submits to download a corresponding PDB file. First positional parameter 2.8 is the alpha value parameter which can be changed. and second is the name of the file you wish to save the downloaded PDB file.
 
 
-2. `python PPACKMAN.py 2.8 1prw.pdb`
+2. `python -m packman 2.8 1prw.pdb`
+OR
+`python packman 2.8 1prw.pdb`
 First parameter 2.8 is the alpha value parameter which can be changed. second parameter is the parameter is location and name of the PDB file.
