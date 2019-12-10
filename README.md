@@ -27,7 +27,8 @@ If you wish to visualize the plane of the hinge, please refer to the following a
 
 ### Installation
 Description
-<!--
+
+
 Installing from source
 ```
 git clone https://github.com/Pranavkhade/PACKMAN
@@ -37,13 +38,12 @@ python setup.py install
 
 Installing with pip
 ```
-pip install PACKMAN
+pip install py-packman
 ```
 OR
 ```
 pip install git+git://github.com/Pranavkhade/PACKMAN
-```   
--->
+```
 
 ### Files and instructions
 Description
@@ -96,8 +96,12 @@ Web server parameters:
 ### Examples
 
 1. `python -m packman --pdbid 1prw 2.8 1prw.pdb`
+OR
+`packman --pdbid 1prw 2.8 1prw.pdb`
 for --pdbid, the parameter is the PDB ID the user submits to download a corresponding PDB file. First positional parameter 2.8 is the alpha value parameter which can be changed. and second is the name of the file you wish to save the downloaded PDB file.
 
 
 2. `python -m packman 2.8 1prw.pdb`
+OR
+`python packman 2.8 1prw.pdb`
 First parameter 2.8 is the alpha value parameter which can be changed. second parameter is the parameter is location and name of the PDB file.
