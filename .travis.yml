@@ -9,5 +9,5 @@ before_install:
   - conda update --yes conda
 install:
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
-  - conda install --yes numpy scipy networkx mlxtend sklearn pip nose
+  - conda install --yes numpy scipy networkx mlxtend sklearn
   - python setup.py build install
