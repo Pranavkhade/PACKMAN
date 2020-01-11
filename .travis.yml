@@ -10,5 +10,5 @@ before_install:
 install:
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - conda install --yes numpy scipy networkx scikit-learn
-  - pip install mlxtend
+  - conda install --yes -c conda-forge mlxtend
   - python setup.py build install
