@@ -1,5 +1,7 @@
 sudo: false
 language: python
+python:
+  - 3.7
 
 before_install:
   - travis_retry wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
