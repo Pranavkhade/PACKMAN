@@ -13,4 +13,4 @@ install:
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - conda install --yes numpy scipy networkx scikit-learn
   - conda install --yes -c conda-forge mlxtend
-  - python setup.py build install
+  - python setup.py install
