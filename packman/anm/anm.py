@@ -48,9 +48,6 @@ class ANM:
     
     def get_fluctuations(self):
         return self.fluctuations
-        
-    def get_fluctuations(self):
-        return self.fluctuations
     
     def get_stiffness_map(self):
         return self.stiffness_map
@@ -103,10 +100,10 @@ class ANM:
     def calculate_fluctuations(self,endmode=None):
         '''
         '''
-        self.eigen_vectors=self.eigen_vectors.T
+        EVec=self.eigen_vectors.T
         mode_bfactors=[]
         for numi,i in enumerate(self.eigen_values[6:]):
-            evec_row=self.eigen_vectors[numi+6]
+            evec_row=EVec[numi+6]
             mode_bfactors.append([ float(evec_row[j]**2 + evec_row[j+1]**2 + evec_row[j+2]**2)/i for j in range(0,len(self.eigen_values),3)])
             
         mode_bfactors=numpy.array(mode_bfactors)
@@ -117,8 +114,8 @@ class ANM:
     def calculate_stiffness_compliance(self):
         '''
         '''
-
-        hessian_inv=  numpy.matmul(  numpy.matmul( self.get_eigenvectors()[6:].transpose() , numpy.diag(1/self.get_eigenvalues()[6:]) )  , self.get_eigenvectors()[6:]  )
+        EVec=self.eigen_vectors.T
+        hessian_inv= numpy.matmul(  numpy.matmul( EVec[6:].transpose() , numpy.diag(1/self.get_eigenvalues()[6:]) )  , EVec[6:]  )
         compliance_map=numpy.zeros((len(self.coords),len(self.coords)))
         stiffness_map=numpy.zeros((len(self.coords),len(self.coords)))
 
