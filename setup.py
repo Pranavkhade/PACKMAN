@@ -2,6 +2,7 @@ from setuptools import setup
 
 PACKAGES=['packman',
           'packman.molecule',
+          'packman.anm',
           'packman.apps',
           'packman.bin'
           ]
@@ -11,7 +12,7 @@ SCRIPTS=['packman=packman.bin.PACKMAN:main']
 
 
 setup(name='py-packman',
-      version='1.0.0',
+      version='1.1.0',
       description='A software package for molecular PACKing and Motion ANalysis (PACKMAN)',
       url='https://github.com/Pranavkhade/PACKMAN',
       author='Pranav Khade',
@@ -36,5 +37,5 @@ setup(name='py-packman',
       entry_points = {
               'console_scripts': SCRIPTS,
                 },
-    install_requires=['numpy', 'scipy', 'networkx', 'mlxtend', 'sklearn'],
+    install_requires=['numpy', 'scipy', 'networkx', 'mlxtend', 'scikit-learn'],
       )
