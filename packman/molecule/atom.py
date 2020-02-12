@@ -28,70 +28,60 @@ class Atom():
         self.__Element=Element
 
     #Get Functions
-    @property
     def get_id(self):
         """
         :returns: ID of an 'packman.molecule.atom.Atom' object
         """
         return self.__id
     
-    @property
     def get_name(self):
         """
         :returns: Name of an 'Atom' object
         """
         return self.__AtomName
     
-    @property
     def get_alternatelocationindicator(self):
         """
         :returns: Alternate Location Indicator
         """
         return self.__AlternateLocationIndicator
 
-    @property
     def get_parent(self):
         """
         :returns: Parent residue of an 'Atom' Object. (If available)
         """
         return self.__parent
     
-    @property
     def get_location(self):
         """
         :returns: Cartesian Coordinates of an 'Atom'
         """
         return self.__Coordinates
     
-    @property
     def get_occupancy(self):
         """
         :returns: Occupancy of an 'Atom'
         """
         return self.__Occupancy
     
-    @property
     def get_bfactor(self):
         """
         :returns: B-Factor value of an 'Atom'
         """
         return self.__bfactor
     
-    @property
     def get_segmentidentifier(self):
         """
         :returns: Segment Identifier of an 'Atom'
         """
         return self.__SegmentIdentifier
     
-    @property
     def get_element(self):
         """
         :returns: Element of an 'Atom'
         """
         return self.__Element
     
-    @property
     def get_domain_id(self):
         """
         :returns: Domain ID of the parent Residue
