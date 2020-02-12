@@ -2,4 +2,4 @@ numpy
 scipy
 networkx
 mlxtend
-sklearn
+scikit-learn
