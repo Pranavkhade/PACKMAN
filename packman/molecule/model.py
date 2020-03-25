@@ -1,12 +1,54 @@
-'''
-Author: Pranav Khade(pranavk@iastate.edu)
-'''
+# -*- coding: utf-8 -*-
+"""The 'Model' object host file.
+
+This is file information, not the class information. This information is only for the API developers.
+Please read the 'Model' object documentation for details. [ help(packman.molecule.model.Model) ]
+
+Example:
+    >>>from packman.molecule import model.Model
+    >>>help( Model )
+    OR
+
+    >>>from packman import molecule
+    >>>help( molecule.Model )
+
+Note:
+    * The models are nothing but frames of the PDB file.
+    
+Todo:
+    * Finish writing up the documentation.
+    * Finish error handling.
+    * Finish optimizing the performance.
+
+Authors:
+    * Pranav Khade(https://github.com/Pranavkhade)
+"""
+
 
 import numpy
 
 
 class Model():
-    def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):
+    """This class contains the information about the 'Chain' object (packman.molecule.Chain).
+
+        This class contains all the information available about the Chain and stores the corresponding 'Residue' and 'Hetmol' objects in itself. The Chain class is the third lowest in the hierarchy of the 'molecule' API classes.
+        the order of hierarchy being: Protein> Model> Chain> Residue> Atom. This class is also the component of the 'molecule' module API.
+        Please read the Tutorials and Documentation for more details.
+
+        Notes:
+            * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
+        
+        Args:
+            id (int)                                : Model ID from the PDB file ordered from first to the last. Each Model in a PDB file has unique ID. (essential)
+            AllAtoms ({packman.molecule.Atom})      : Dictionary of all the 'Atom' in the given model.
+            AllResidues ({packman.molecule.Residue}): Dictionary of all the 'Residue' in the given model.
+            AllChains ({packman.molecule.Chain})    : Dictionary of all the 'Chain' in the given model.
+            AllHetAtoms ({packman.molecule.HetAtom}): Dictionary of all the 'HetAtom' in the given model.
+            AllHetMols ({packman.molecule.HetMol})  : Dictionary of all the 'HetMol' in the given model.
+
+        """
+        
+    def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):                
         self.__id=id
         self.__AllAtoms=AllAtoms
         self.__AllResidues=AllResidues
@@ -19,39 +61,50 @@ class Model():
     
     #Get Functions
     def get_id(self):
-        """
-        :returns: ID of an 'Model' object
+        """Get the ID of the 'Model'
+
+        Returns:
+            int if successful, None otherwise.
         """
         return self.__id
 
     def get_chains(self):
-        """
-        :returns: Constructer for all the chains as a 'Chain' object
+        """Get the list of corresponding 'Chain' objects of the 'Model'
+
+        Returns:
+            [packman.molecule.Chain] if successful, None otherwise.
         """
         for i in sorted(self.__AllChains.keys()):yield self.__AllChains[i]
 
     def get_residues(self):
-        """
-        :returns: Generator yielding all the 'Residue' objects in a Model
+        """Get the generator of corresponding 'Residue' objects of the 'Model'
+
+        Returns:
+            generator of 'Residue' objects if successful, None otherwise.
         """
         return [j for i in self.__AllChains.keys() for j in self.__AllChains[i].get_residues()]
     
     def get_atoms(self):
-        """
-        :returns: Generator yielding all the 'Atom' objects in a Model
+        """Get the generator of corresponding 'Atom' objects of the 'Model'
+
+        Returns:
+            generator of 'Atom' objects if successful, None otherwise.
         """
         for i in sorted(self.__AllAtoms.keys()):yield self.__AllAtoms[i]
     
     def get_chain(self,ChainID):
-        """
-        :returns: All chains as a 'Chain' objects in a Model
+        """Get the corresponding 'Chain' object
+
+        Returns:
+            'Chain' object if successful, None otherwise.
         """
         return self.__AllChains[ChainID]
     
     def get_atom_byid(self,query_atom_id):
-        """
-        :param query_atom_id: ID of the atom to be returned
-        :returns: Atom in from of 'Atom'.
+        """Get the 'Atom' with corresponding 'Atom' ID
+
+        Returns:
+            'packman.molecule.Atom' object if successful, None otherwise.
         """
         return self.__AllAtoms[query_atom_id]
     

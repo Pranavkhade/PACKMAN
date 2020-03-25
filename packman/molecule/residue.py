@@ -2,7 +2,7 @@
 """The 'Residue' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Res' object documentation for details. [ help(packman.molecule.atoms.Atom) ]
+Please read the 'Residue' object documentation for details. [ help(packman.molecule.residue.Residue) ]
 
 Example:
     >>>from packman.molecule import residue.Residue
