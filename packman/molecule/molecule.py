@@ -98,7 +98,7 @@ def load_structure(filename):
                 Charge=_[78:80]
                 AllHetAtoms[id]=HetAtom(id,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,AllHetMols[str(HetMolNumber)+ChainID])
                 
-                #Atom added to the residue
+                #HetAtom added to the residue
                 AllHetMols[str(HetMolNumber)+ChainID].__setitem__(id,AllHetAtoms[id])
 
                 #What to do with these?
