@@ -23,7 +23,13 @@ import urllib
 '''
 
 def WriteOBJ(atoms,faces, fh):
-    """
+    """Write the .obj file to visualize the obtain alpha shape tesselations.
+    
+    Args:
+        atoms (packman.molecule.Atom): Atoms (Just for the node records)
+        faces ([float])              : SelectedTesselations (See the packman.apps.predict_hinge)
+        fh (file)                    : Output file with .obj extension
+    
     """
     NewIDs={i.get_id():numi+1 for numi,i in enumerate(atoms)}
     fh.write('mtllib master.mtl\ng\n'.encode())
@@ -55,8 +61,13 @@ def WriteOBJ(atoms,faces, fh):
 '''
 
 def IO():
-    """
-    INFO: Argument parser to the program for now.
+    """User interface for the user to provide the parameters
+
+    Todo:
+        * Make sure iterative alpha shape search over the values are accomodated in this interface
+    
+    Returns:
+        Namespace: Various arguments in various formats
     """
     parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)')
 
@@ -87,7 +98,13 @@ def IO():
 '''
 
 def main():
-    """
+    """Main Function for PACKMAN.
+
+    Kernel of the PACKMAN interface.
+
+    Todo:
+        * Change the main() to accomodate iterative alpha shape search
+    
     """
     args=IO()
 
@@ -130,6 +147,11 @@ def main():
 ##################################################################################################
 '''
 def print_footnotes(outputfile):
+    """Add footnotes to the output file.
+    
+    Args:
+        outputfile (file): The file to which the footnotes will be written.
+    """
     outputfile.write('Footnotes:\n\nSTATISTICS Section Legend:\nN: Number of residues\nMin: Minimum B-factor value\nMax: Maximum B-factor value\nMean: Mean B-factor value\nMode: Mode B-factor value\nMedian: Median B-factor value\nSTDDev: Standard Deviation of the B-factor values\n')
     outputfile.write('\nRMSF Plane Visualization:\nDownload plane.py file from https://pymolwiki.org/index.php/Plane_Wizard and place it in the PyMol working directory if the RMSF plane needs to be visualized.\n')
     return True
