@@ -12,7 +12,7 @@ SCRIPTS=['packman=packman.bin.PACKMAN:main']
 
 
 setup(name='py-packman',
-      version='1.1.1',
+      version='1.1.2',
       description='A software package for molecular PACKing and Motion ANalysis (PACKMAN)',
       url='https://github.com/Pranavkhade/PACKMAN',
       author='Pranav Khade',
