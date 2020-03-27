@@ -21,6 +21,4 @@ Todo:
     * Add Tutorial Link
 
 """
-
-from .predict_hinge import predict_hinge
 from .anm import ANM
