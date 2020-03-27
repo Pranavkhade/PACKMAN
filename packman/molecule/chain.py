@@ -37,7 +37,8 @@ class Chain():
     Please read the Tutorials and Documentation for more details.
 
     Note:
-        - Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
+        * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
+        * Add get_atoms()
     
     Args:
         id (str): Chain ID from the PDB file as it is. Each Chain in a PDB file Model/Frame has unique ID. (essential)

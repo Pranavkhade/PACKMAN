@@ -1,5 +1,6 @@
 '''
 Author: Pranav Khade(pranavk@iastate.edu)
+NOTE: Add set_domain_id(), get_domain_id()
 '''
 
 import numpy
