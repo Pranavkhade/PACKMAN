@@ -1,11 +1,6 @@
 packman.molecule package
 ========================
 
-.. automodule:: packman.molecule
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -20,3 +15,11 @@ Submodules
    packman.molecule.molecule
    packman.molecule.protein
    packman.molecule.residue
+
+Module contents
+---------------
+
+.. automodule:: packman.molecule
+   :members:
+   :undoc-members:
+   :show-inheritance:
