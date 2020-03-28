@@ -1,7 +1,26 @@
-'''
-Author: Pranav Khade(pranavk@iastate.edu)
-SourceofInformation: https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html
-'''
+# -*- coding: utf-8 -*-
+"""The 'Molecule' object host file.
+
+This is file information, not the class information. This information is only for the API developers.
+Please read the 'Model' object documentation for details. [ help(packman.molecule) ]
+
+Example:
+    >>>from packman.molecule import molecule
+    >>>help( Model )
+    OR
+
+    >>>from packman import molecule
+    >>>help( molecule )
+    
+Todo:
+    * Finish writing up the documentation.
+    * Finish error handling.
+    * Finish optimizing the performance.
+
+Authors:
+    * Pranav Khade(https://github.com/Pranavkhade)
+"""
+
 import numpy
 import warnings
 
@@ -23,6 +42,24 @@ from .hetatom import HetAtom
 '''
 
 def load_structure(filename):
+    """This class helps user to load the 3D structure of the protein onto a packman.molecule.Protein object.
+
+    This file is basis for all the PACKMAN API. Loading file is the first thing user does.
+
+    Example:
+
+        To Load the file    
+        >>>from packman import molecule
+        >>>molecule.download_structure('1prw','1prw.pdb')
+        >>>molecule.load_structure('1prw.pdb')
+        <packman.molecule.protein.Protein object at Memory>
+
+    Args:
+        filename (str)          : Name of the input file
+    
+    Returns:
+        packman.molecule.Protein: Protein object containing all the information about the Protein
+    """
     Models=[]
     start=0
 
@@ -98,7 +135,7 @@ def load_structure(filename):
                 Charge=_[78:80]
                 AllHetAtoms[id]=HetAtom(id,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,AllHetMols[str(HetMolNumber)+ChainID])
                 
-                #Atom added to the residue
+                #HetAtom added to the residue
                 AllHetMols[str(HetMolNumber)+ChainID].__setitem__(id,AllHetAtoms[id])
 
                 #What to do with these?
@@ -111,9 +148,8 @@ def load_structure(filename):
         for i in AllChains:AllChains[i].set_parent(Models[FrameNumber])
 
     if(len(Models)>1):
-        #NMR DETECTED
-        print("Caution: NMR Structure")
-        warnings.warn('Multiple models are detected. B-Factor field is turned to a calculated parameter.',UserWarning)
+        #NMR
+        warnings.warn('Multiple models/frames are detected (B-Factor field is turned to a calculated parameter)',UserWarning)
         All_Coords=[]
         for i in Models:
             All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))
@@ -139,10 +175,19 @@ def load_structure(filename):
 ##################################################################################################
 '''
 
-def download_structure(pdbid,save_name='Download.pdb'):
-    '''
-    INFO: This class is used to download a PDB stucture from RCSB PDB
-    '''
+def download_structure(pdbid,save_name):
+    """This class helps user to download the 3D structure of the protein and save it on a disk.
+
+    Example:
+
+        To Download the file    
+        >>>from packman import molecule
+        >>>molecule.download_structure('1prw','1prw.pdb')
+
+    Args:
+        pdbid (str)    : A Unique 4 Letter PDB ID (eg.. 1PRW) 
+        save_name (str): Save name of the downloaded file (Don't forget the extension). (eg... 1PRW.pdb)
+    """
     import urllib.request as ur
     response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb')
     try:

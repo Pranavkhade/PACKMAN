@@ -1,4 +1,5 @@
 '''
+NOTE: This class will be deleted in the next update. (packman.molecule.Atom can replace this function)
 Author: Pranav Khade(pranavk@iastate.edu)
 '''
 
