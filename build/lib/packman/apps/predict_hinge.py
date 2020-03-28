@@ -1,6 +1,26 @@
-'''
-Author: Pranav Khade(pranavk@iastate.edu)
-'''
+# -*- coding: utf-8 -*-
+"""The 'predict_hinge' object host file.
+
+This is file information, not the class information. This information is only for the API developers.
+Please read the 'predict_hinge' object documentation for details. [ help(packman.apps.predict_hinge) ]
+
+Example:
+
+    >>>from packman import apps
+    >>>help( apps.predict_hinge )
+
+Todo:
+    * Finish writing up the documentation.
+    * Finish error handling.
+    * Move the marked functions to the geometry module
+    * Clear and annotate the subclasses properly
+    * Annotate 'error', 'cross'
+    * Finish optimizing the performance.
+    * Convert GetExample() functions to get_example() to make it uniform with rest of the API.
+
+Authors:
+    * Pranav Khade(https://github.com/Pranavkhade)
+"""
 
 import numpy
 import functools
@@ -21,10 +41,56 @@ from ..molecule import Hinge
 
 
 def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5,nclusters=4):
-    """
+    """This function is used to carry out hinge prediction given the parameters.
+
+    Notes:
+        * The packman.bin.PACKMAN uses this function
+
+        * Ideally, the alpha values should be scanned from 0 to 10 to obtain conclusively repetative hinges (Use '' for this purpose) 
+
+        * Please refer to the following paper for the details on the algorithm and citation:
+            Pranav M. Khade, Ambuj Kumar, Robert L. Jernigan, Characterizing and Predicting Protein Hinges for Mechanistic Insight,
+            Journal of Molecular Biology, Volume 432, Issue 2, 2020, Pages 508-522, ISSN 0022-2836, https://doi.org/10.1016/j.jmb.2019.11.018.
+            (http://www.sciencedirect.com/science/article/pii/S0022283619306837)
+        
+        * Tutorial Link:
+
+        * The predicted hinges are stored in packman.molecule.Chain object as an packman.molecule.Hinge object.
+
+    Todo:
+        * Add reference to the function in the description which scans multiple alpha values for conclusive hinges.
+        * Remove GenerateKirchoff parameter and sections
+    
+    Args:
+        atoms ([packman.molecule.Atom])   : PACKMAN uses backbone atoms of the protein. However, any number and type of atoms can be used (Alpha value range will change)
+        outputfile (file)                 : Output File.
+        Alpha (float, optional)           : Please refer to the paper for this parameter. Defaults to float('Inf').
+        method (str, optional)            : Please refer to the paper for this parameter. Defaults to 'AlphaShape'.
+        GenerateKirchoff (bool, optional) : Soon to be removed. Defaults to False.
+        filename (str, optional)          : Please refer to the paper for this parameter. Defaults to 'Output.pdb'.
+        MinimumHingeLength (int, optional): Please refer to the paper for this parameter. Defaults to 5.
+        nclusters (int, optional)         : Please refer to the paper for this parameter. Defaults to 4.
+    
+    Returns:
+        SelectedTesselations              : The Alpha Shape (Subset of Delaunay Tesselations) 
     """
     if(method=='AlphaShape'):
         def GetCircumsphere(Tetrahydron):
+            """Get the Circumsphere of the set of four points.
+            
+            Given any four three dimentional points, this function calculates the features of the circumsphere having the given four points on it's surface.
+            
+            Notes:
+                * Function level: 1 (1 being top)
+                * DistanceToSurface will be removed in future.
+                * Possible to move this to geometrical package in future. 
+
+            Args:
+                Tetrahydron ([type]): [description]
+            
+            Returns:
+                [Centre, Radius, DistanceToSurface] (float): The 3D coordinates of the geometrical center of the given four points, Radius of the circumsphere made up of given four points, Distance to the center (in that order)
+            """
             alpha_mat,gamma_mat,Dx_mat,Dy_mat,Dz_mat=[],[],[],[],[]
             for i in Tetrahydron:
                 temp_coords=i.get_location()
@@ -44,8 +110,28 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             return Centre,Radius,DistanceToSurface
 
         def AlphaTest(atoms,Alpha,Centre,CircumRadius,DistanceToSurface,Tree=None):
-            """
-            NOTE: Confirm is sphere hollowness should be checked or it is covered by tesselations.
+            """Alpha Test as per the paper.
+            
+            Notes:
+                * Function level: 1 (1 being top)
+                * Confirm is sphere hollowness should be checked or it is covered by tesselations.
+                * For more information on the alpha shape, read the following paper:
+                    EdelsbrunnerandE. P. M ̈ucke.Three-dimensional alpha shapes.
+                    Manuscript UIUCDCS-R-92-1734, Dept.Comput.Sci. ,Univ.Illinois, Urbana-Champaign, IL, 1992.
+
+            Todo:
+                * Remove multiple unused parameters
+
+            Args:
+                atoms ([packman.molecule.Atom]): Set of atoms.                     (Read parent method description)
+                Alpha (float)                  : Alpha.                            (Read parent method description)
+                Centre ([float])               : Centre of the circumsphere.       (Read parent method description)
+                CircumRadius ([float])         : Circumradius of the circumsphere. (Read parent method description)
+                DistanceToSurface ([float])    : Distance to the surface                (Will be removed)
+                Tree ([scipy.KDTree], optional): KDTree of the atoms. Defaults to None. (Will be removed)
+            
+            Returns:
+                bool: True if alpha test is passed. False otherwise.
             """
             if(CircumRadius<Alpha):
                 return True
@@ -53,8 +139,20 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
                 return False
         
         def GetStats(atoms,SelectedHingeResidues,filename='Output'):
-            '''
-            '''
+            """This sub-method is used to get the statistical data on the hinges and print it into a file.
+            
+            Notes:
+                * * Function level: 1 (1 being top)
+                * Do something about the output file
+
+            Args:
+                atoms ([packman.molecule.Atom])                   : Set of atoms. (Read parent method description)
+                SelectedHingeResidues ([packman.molecule.Residue]): Predicted hinge residues. 
+                filename (str, optional)                          : Output file name. Defaults to 'Output'.
+            
+            Returns:
+                [p-value, stats] (float): p-value of the predicted hinge, statistics of the hinge (in that order)
+            """
             hinge_atoms=[i.get_backbone() for i in SelectedHingeResidues]
             hinge_atoms=[item for sublist in hinge_atoms for item in sublist]
             non_hinge_atoms=list(set([i for i in atoms])-set(hinge_atoms))
@@ -79,7 +177,25 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
         
 
         def GetLeastSquarePlane(atoms,HingeResidues,HingePlane):
-            """
+            """This sub-function gives the Least Square Plane equation of the given atoms.
+
+            This plane is currently gives us an idea about the possible direction of the movement of the hinge residues (See figures in the publication)
+            
+            Todo:
+                * Change the name of the parameter HingePlane (It is misleading)
+
+            Notes:
+                * Function level: 1 (1 being top)
+                * Possibly will be moved to geometry module later.
+                * Check the output file for this equation. The instructions to visualize this plane are given at the end of the file.
+
+            Args:
+                atoms ([packman.molecule.Atom])           : Set of atoms. (Read parent method description)
+                HingeResidues ([packman.molecule.Residue]): Predicted hinge residues. 
+                HingePlane (int)                          : Index of the HingePlane
+            
+            Returns:
+                [a,b,c,d]: Four coefficients essential to define the plane in 3D space.
             """
             hinge_points=[item.get_location() for sublist in [i.get_backbone() for i in HingeResidues] for item in sublist]
             HingeAtoms=[item for sublist in [i.get_backbone() for i in HingeResidues] for item in sublist]
@@ -90,9 +206,28 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             XS,YS,ZS=zip(*NonHingeAtoms)
 
             def project_points(x, y, z, a, b, c):
-                """
+                """Project the points on a given plane
+
                 Projects the points with coordinates x, y, z onto the plane
                 defined by a*x + b*y + c*z = 1
+
+                Todo:
+                    * Explain the returning variables properly
+
+                Notes:
+                    * Function level: 2 (1 being top)
+                    * Possibly will be moved to the geometry module
+                
+                Args:
+                    x (float): X-coordinate of the point to be projected on the plane.
+                    y (float): Y-coordinate of the point to be projected on the plane.
+                    z (float): Z-coordinate of the point to be projected on the plane.
+                    a (float): X-component of the plane.
+                    b (float): Y-component of the plane.
+                    c (float): Z-component of the plane.
+                
+                Returns:
+                    Neccesary information to project the points on the given plane.
                 """
                 vector_norm = a*a + b*b + c*c
                 normal_vector = numpy.array([a, b, c]) / numpy.sqrt(vector_norm)
@@ -104,10 +239,29 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
                 return point_in_plane + proj_onto_plane
             
             def FitPlane(points):
-                """
+                """Plane fitting algorithm given the points.
+
+                Notes:
+                    * Function level: 2 (1 being top)
+                
+                Args:
+                    points ([float]): Two dimentional array of 3D points
+                
+                Returns:
+                    [a,b,c,d] (float) : Numbers essential to define the Least Square Plane equation
                 """
                 xs,ys,zs = zip(*points)
                 def plane(x, y, params):
+                    """Plane Object
+                    
+                    Args:
+                        x ([type]): [description]
+                        y ([type]): [description]
+                        params ([type]): [description]
+                    
+                    Returns:
+                        [float]: Equation of the plane
+                    """
                     a = params[0]
                     b = params[1]
                     c = params[2]
@@ -115,6 +269,15 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
                     return z
 
                 def error(params, points):
+                    """Get the error
+                    
+                    Args:
+                        params ([type]): [description]
+                        points ([type]): [description]
+                    
+                    Returns:
+                        [type]: [description]
+                    """
                     result = 0
                     for (x,y,z) in points:
                         plane_z = plane(x, y, params)
@@ -123,6 +286,15 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
                     return result
 
                 def cross(a, b):
+                    """Get cross
+                    
+                    Args:
+                        a ([type]): [description]
+                        b ([type]): [description]
+                    
+                    Returns:
+                        [type]: [description]
+                    """
                     return [a[1]*b[2] - a[2]*b[1],
                             a[2]*b[0] - a[0]*b[2],
                             a[0]*b[1] - a[1]*b[0]]
