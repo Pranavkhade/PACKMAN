@@ -1,11 +1,6 @@
 packman package
 ===============
 
-.. automodule:: packman
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Subpackages
 -----------
 
@@ -15,3 +10,11 @@ Subpackages
    packman.apps
    packman.bin
    packman.molecule
+
+Module contents
+---------------
+
+.. automodule:: packman
+   :members:
+   :undoc-members:
+   :show-inheritance:
