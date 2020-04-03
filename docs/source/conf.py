@@ -66,7 +66,7 @@ def run_apidoc(_):
         "-e",
         "-M",
         "-o", "source",
-        "../packman"
+        "../../packman"
     ] + ignore_paths
 
     apidoc.main(argv)
