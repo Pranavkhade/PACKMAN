@@ -9,6 +9,7 @@ DOCUMENTATION
 * [Web Server](https://packman.bb.iastate.edu/)
 * [Reference for Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
 * [Reference for Compliance](coming_soon)
+* [Reference for RD-ANM](coming_soon)
 
 INSTALLATION
 ------------
