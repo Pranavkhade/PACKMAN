@@ -2,6 +2,7 @@ import argparse
 
 from packman import molecule
 from packman.anm import RDANM
+from packman.constants import amino_acid_molecular_weight
 '''
 ##################################################################################################
 #                                          Interface                                             #
@@ -63,14 +64,14 @@ def main():
 
     
     Model=RDANM(calpha,dr=dr,power=power,HNGinfo=HNGinfo)
-    Model.calculate_coarse_grained_hessian()
+    #Model.calculate_coarse_grained_hessian(mass_type='unit')
+    #Model.calculate_coarse_grained_hessian(mass_type='atom')
+    Model.calculate_coarse_grained_hessian(mass_type='residue')
     Model.calculate_decomposition()
     
     for i in range(6,7,1):
         Model.calculate_movie(i,scale=0.5,n=20)
 
-
-    print(amino_acid_molecular_weight['ALA'])
 
     #Model.calculate_fluctuations()
 
