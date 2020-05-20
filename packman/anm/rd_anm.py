@@ -5,13 +5,14 @@ Author: Pranav Khade(pranavk@iastate.edu)
 '''
 
 from packman import molecule
+from packman.constants import amino_acid_molecular_weight
+from packman.constants import atomic_weight
 
-import argparse
 import numpy
 import scipy
 import copy
+import itertools
 
-from scipy.stats import pearsonr
 from scipy.linalg import eig as scipy_eig
 '''
 ##################################################################################################
@@ -113,7 +114,7 @@ class RDANM:
         all_mass_types=['unit','atom','residue']
         #Error Handling
         if(mass_type not in all_mass_types):
-            print('Provide correct 'mass_type' parameter. See help for more details')
+            print('Provide correct \'mass_type\' parameter. See help for more details')
 
 
         for i in self.atoms:
@@ -123,7 +124,7 @@ class RDANM:
                 if( HNGrange[0] <= i.get_parent().get_id() <= HNGrange[1] and IDs[1] == i.get_parent().get_parent().get_id() ):
                     i.get_parent().set_domain_id( IDs[-1] )
         
-
+        #Domain groups stores the atom index(of self.atoms) with Domain ID as a key (D5: [1,2] domain 5 with atom index 1 and 2 )
         DomainGroups={}
         for numi,i in enumerate(self.atoms):
             try:
@@ -210,20 +211,36 @@ class RDANM:
         M=numpy.zeros((H_new.shape))
 
         #MHH
-        if(mass_type='unit'):
+        if(mass_type == 'unit'):
             M[6*len(Domains):,6*len(Domains):]=numpy.identity(len(HingeAtoms)*3)
-        elif(mass_type='atom'):
-            #Change
-            M[6*len(Domains):,6*len(Domains):]=numpy.identity(len(HingeAtoms)*3)
-        elif(mass_type='residue'):
-            #Change
-            M[6*len(Domains):,6*len(Domains):]=numpy.identity(len(HingeAtoms)*3)
+        elif(mass_type == 'atom'):
+            try:
+                lst= [atomic_weight[self.atoms[i].get_element()] for i in HingeAtoms]
+                lst= list(itertools.chain.from_iterable(itertools.repeat(x, 3) for x in lst))
+                numpy.fill_diagonal( M[6*len(Domains):,6*len(Domains):] , lst )
+            except:
+                print('Unknown atom or the atomic weight not available in packman.constants')
+        elif(mass_type == 'residue'):
+            try:
+                lst= [amino_acid_molecular_weight[self.atoms[i].get_parent().get_name()] for i in HingeAtoms]
+                lst= list(itertools.chain.from_iterable(itertools.repeat(x, 3) for x in lst))
+                numpy.fill_diagonal( M[6*len(Domains):,6*len(Domains):] , lst )
+            except:
+                print('Unknown Amino Acid encountered or molecular weight not available in packman.constants')
 
         #MDD
         for numd,d in enumerate(Domains):
             #F-Delta
             domain_block=numpy.zeros((6,6))
-            numpy.fill_diagonal( domain_block[0:3,0:3] , len(DomainGroups[d]) )
+            if(mass_type == 'unit'):
+                numpy.fill_diagonal( domain_block[0:3,0:3] , len(DomainGroups[d]) )
+            elif(mass_type == 'atom'):
+                DomainMass = numpy.sum( [atomic_weight[self.atoms[i].get_element()] for i in DomainGroups[d]] )
+                numpy.fill_diagonal( domain_block[0:3,0:3] , DomainMass )
+            elif(mass_type == 'residue'):
+                DomainMass = numpy.sum( [amino_acid_molecular_weight[self.atoms[i].get_parent().get_name()] for i in DomainGroups[d]] )
+                numpy.fill_diagonal( domain_block[0:3,0:3] , DomainMass )
+
             #Torque_Phi
             COM=DomainInfo[d][1]
             for numi,i in enumerate(DomainGroups[d]):
@@ -233,7 +250,17 @@ class RDANM:
                         [ -(self.coords[i][1]-COM[1])*(self.coords[i][0]-COM[0])        ,   (self.coords[i][2]-COM[2])**2+(self.coords[i][0]-COM[0])**2  ,  -(self.coords[i][1]-COM[1])*(self.coords[i][2]-COM[2])        ],
                         [ -(self.coords[i][0]-COM[0])*(self.coords[i][2]-COM[2])        ,  -(self.coords[i][1]-COM[1])*(self.coords[i][2]-COM[2])        ,   (self.coords[i][0]-COM[0])**2+(self.coords[i][1]-COM[1])**2  ],
                     ])
-                domain_block[3:,3:]=numpy.add(domain_block[3:,3:],MDdDd_local)
+                
+                #Maybe remove if conditions later, create separate functions for improving the speed
+                if(mass_type == 'unit'):
+                    domain_block[3:,3:]=numpy.add(domain_block[3:,3:],MDdDd_local)
+                elif(mass_type == 'atom'):
+                    MDdDd_local = MDdDd_local * atomic_weight[self.atoms[i].get_element()]
+                    domain_block[3:,3:]=numpy.add(domain_block[3:,3:],MDdDd_local)
+                elif(mass_type == 'residue'):
+                    MDdDd_local = MDdDd_local * amino_acid_molecular_weight[self.atoms[i].get_parent().get_name()]
+                    domain_block[3:,3:]=numpy.add(domain_block[3:,3:],MDdDd_local)
+
             M[numd*6:(numd*6)+6 , numd*6:(numd*6)+6]=domain_block
 
         self.domain_hessian, self.domain_mass_matrix, self.domain_info= H_new, M, DomainInfo #DomainInfo is saved to check the sequence in which H_new is formed
