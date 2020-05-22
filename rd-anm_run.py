@@ -69,7 +69,7 @@ def main():
     Model.calculate_coarse_grained_hessian(mass_type='residue')
     Model.calculate_decomposition()
     
-    for i in range(6,7,1):
+    for i in range(6,17,1):
         Model.calculate_movie(i,scale=0.5,n=20)
 
 
