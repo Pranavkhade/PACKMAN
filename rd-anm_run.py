@@ -44,8 +44,8 @@ def main():
     #Load the Hinge Information
     filename = ARGS.filename
     chain    = ARGS.chain
-    dr       = ARGS.dr
-    power    = ARGS.power
+    dr       = float(ARGS.dr)
+    power    = float(ARGS.power)
 
 
     HNGinfo={}
@@ -70,7 +70,7 @@ def main():
     Model.calculate_decomposition()
     
     for i in range(6,17,1):
-        Model.calculate_movie(i,scale=0.5,n=20)
+        Model.calculate_movie(i,scale=20,n=5)
 
 
     #Model.calculate_fluctuations()
