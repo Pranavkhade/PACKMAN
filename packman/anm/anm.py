@@ -18,6 +18,7 @@ Todo:
     * Finish error handling.
     * Finish optimizing the performance.
     * Add publication details in the Notes
+    * Make sure that parameter to the ANM is changed from [float] to packman.molecule.atom
 
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
@@ -57,12 +58,13 @@ class ANM:
             Exception: [description]
         """
     
-    def __init__(self, coords , gamma=1.0, dr=15.0, power=0, pf=None):
+    def __init__(self, coords , atoms=None, gamma=1.0, dr=15.0, power=0, pf=None):
         self.gamma   = gamma
         self.dr      = dr
         self.power   = power
         self.pf      = pf
         self.coords  = numpy.array(coords)
+        self.atoms   = atoms
         if self.pf != None and self.pf <= 0:
             raise Exception("pf value cannot be zero or negative")
         if self.gamma <= 0:
@@ -218,7 +220,8 @@ class ANM:
         The fluctualtions/ theoretical b-factors are calculated using this method.
         
         Note:
-            Fluctuations are calculated. use ANM().get_fluctuations() to obtain the fluctuations.
+            - Fluctuations are calculated. use ANM().get_fluctuations() to obtain the fluctuations.
+            - Endmode needs to be put in the code if and when required.
         """
         EVec=self.eigen_vectors.T
         mode_bfactors=[]
@@ -233,6 +236,11 @@ class ANM:
     
     def calculate_stiffness_compliance(self):
         """Carry out the Stiffness and Compliance analysis of the ANM model.
+
+        Citation:
+        Scaramozzino, D., Khade, P.M., Jernigan, R.L., Lacidogna, G. and Carpinteri, A.
+        (2020), Structural Compliance ‐ A New Metric for Protein Flexibility. Proteins. Accepted Author Manuscript.
+        doi:10.1002/prot.25968
         
         Note:
             * Obtain the following properties by using functions followed by it:
@@ -268,4 +276,27 @@ class ANM:
         self.compliance_map     = compliance_map
         self.stiffness_profile  = [numpy.nanmean(i) for i in stiffness_map]
         self.compliance_profile = [numpy.nanmean(i) for i in compliance_map]
+        return True
+    
+    def calculate_movie(self,mode_number,scale=1.5,n=10):
+        """Get the movie of the obtained LINEAR modes.
+
+        Note:
+            -Do something about the get_atoms section because it changes compliance code tutorial
+        """
+        x0=self.coords
+        new_coords=[]
+        with open('ANM_'+str(mode_number)+'.pdb','w') as fh:
+            for j in [k for k in range(n)]+[k for k in range(n)[::-1]]:
+                for numi,i in enumerate(x0):
+                    new_x=i[0]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+0]
+                    new_y=i[1]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+1]
+                    new_z=i[2]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+2]
+                    new_coords.append([new_x,new_y,new_z])
+                    try:
+                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),self.atoms[numi].get_bfactor(),'',self.atoms[numi].get_element(),''))
+                    except:
+                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(numi,'CA','UNK','A',numi,round(new_x,3),round(new_y,3),round(new_z,3),1,0,'','C',''))
+                fh.write('ENDMDL')
+            
         return True

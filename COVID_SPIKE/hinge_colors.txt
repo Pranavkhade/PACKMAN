@@ -1,0 +1,20 @@
+color white
+color blue, resi 28:62
+color red, resi 197:202
+color green, resi 209:230
+color orange, resi 283:323
+color cyan, resi 641:676
+color purple, resi 690:723
+color yellow, resi 905:919
+color cyan, resi 949:979
+color pink, resi 1002:1011
+color brown, resi 1066:1083
+color grey, resi 1085:1138
+
+set_view (\
+     0.940052330,    0.337611914,    0.048152376,\
+    -0.340564638,    0.936729908,    0.080943182,\
+    -0.017778449,   -0.092489913,    0.995554328,\
+     0.000000000,    0.000000000, -503.232727051,\
+   158.834686279,  158.841415405,  161.153503418,\
+   396.752502441,  609.712951660,  -20.000000000 )

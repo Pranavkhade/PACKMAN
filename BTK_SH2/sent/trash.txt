@@ -1,0 +1,2 @@
+Filename= Output.pdb	| Chain(s)= B	| AlphaValue= 9.9	| MinimumHingeLength= 5	| EccentricityClusters= 4
+Hindge Residues(Predicted):
