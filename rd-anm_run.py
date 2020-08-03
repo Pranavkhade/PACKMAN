@@ -70,7 +70,7 @@ def main():
     Model.calculate_decomposition()
     
     for i in range(6,17,1):
-        Model.calculate_movie(i,scale=20,n=5)
+        Model.calculate_new_movie(i,scale=2,n=20)
 
 
     #Model.calculate_fluctuations()

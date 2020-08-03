@@ -38,7 +38,7 @@ def main():
     mol2=load_structure(filename2)
 
     #Chain Change
-    R,T=superimporse(mol1[0][chain1],mol2[0][chain2],use='backbone')
+    R,T=superimporse(mol1[0][chain1],mol2[0][chain2],use='calpha')
 
     #Change Hinge
     hng_info=load_hinges(hngfile)
@@ -92,8 +92,10 @@ def main():
     
     EIGVEC=MODEL.get_eigenvectors()
     EIGVAL=MODEL.get_eigenvalues()
-    MODEL.calculate_movie(0)
+    MODEL.calculate_movie(4)
 
+    numpy.savetxt('EVEC.txt',EIGVEC[:,5:9])
+    numpy.savetxt('OVRLP.txt',compare)
 
     score=[]
     for numi,i in enumerate(EIGVEC.T):
