@@ -58,9 +58,9 @@ def main():
     mol=molecule.load_structure(filename)
 
     if(chain is not None):
-        calpha=[i for i in mol[0][chain].get_calpha()]
+        calpha=[i for i in mol[0][chain].get_calpha() if i is not None]
     else:
-        calpha=[i for i in mol[0].get_calpha()]
+        calpha=[i for i in mol[0].get_calpha()  if i is not None]
 
     
     Model=RDANM(calpha,dr=dr,power=power,HNGinfo=HNGinfo)
@@ -70,7 +70,7 @@ def main():
     Model.calculate_decomposition()
     
     for i in range(6,17,1):
-        Model.calculate_new_movie(i,scale=2,n=20)
+        Model.calculate_new_movie(i,scale=4,n=20)
 
 
     #Model.calculate_fluctuations()

@@ -116,14 +116,14 @@ def main():
 
     if(chain==None):
         for i in [i.get_id() for i in mol[0].get_chains()]:
-            backbone = [k for j in mol[0][i].get_backbone() for k in j]
+            backbone = [k for j in mol[0][i].get_backbone() for k in j if k is not None]
             output=hinge_scanner(backbone,filename,alpha_start,alpha_stop,step_size)
             for j in output:output_file.write(j)
         
     else:
-        backbone = [j for i in mol[0][chain].get_backbone() for j in i]
+        backbone = [j for i in mol[0][chain].get_backbone() for j in i if j is not None]
         for i in output:output_file.write(i)
-
+        
     output_file.flush()
     output_file.close()
     
