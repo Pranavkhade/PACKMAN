@@ -81,3 +81,36 @@ def superimporse(reference,target,use='calpha',ids=[],change_target=True):
         None
     
     return R, t
+
+def RMSD(group1,group2,use='calpha',ids=[]):
+    """
+    """
+    if(use=='calpha'):
+        atoms1=[i for i in group1.get_calpha() ]
+        atoms2=[i for i in group2.get_calpha() ]
+    if(use=='backbone'):
+        atoms1=[j for i in group1.get_backbone() for j in i]
+        atoms2=[j for i in group2.get_backbone() for j in i ]    
+
+    #Finding common residues to align
+    res1=[i.get_parent().get_id() for i in atoms1]
+    res2=[i.get_parent().get_id() for i in atoms2]
+
+    if(ids==[]):
+        common_residues=list(set(res1).intersection(res2))
+    else:
+        common_residues=list( set(res1).intersection(res2).intersection(ids) )
+
+    atoms1=[i for i in atoms1 if i.get_parent().get_id() in common_residues]
+    atoms2=[i for i in atoms2 if i.get_parent().get_id() in common_residues]
+
+    atoms1_location=[i.get_location() for i in atoms1]
+    atoms2_location=[i.get_location() for i in atoms2]
+
+    R,t = superimporse(group1,group2,use,ids,change_target=False)
+
+    for i in range(0,len(atoms2_location)):
+        atoms2_location[i] = numpy.dot(R , atoms2_location[i]) + t
+        atoms2_location[i] = numpy.array(atoms2_location[i].tolist()[0])
+    
+    return numpy.mean( [numpy.abs( numpy.linalg.norm(atoms1_location[i]-atoms2_location[i]) ) for i in range(0,len(atoms1_location))] )
