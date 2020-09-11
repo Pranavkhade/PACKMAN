@@ -287,7 +287,7 @@ class ANM:
         x0=self.coords
         new_coords=[]
         with open('ANM_'+str(mode_number)+'.pdb','w') as fh:
-            for j in [k for k in range(n)]+[k for k in range(n)[::-1]]:
+            for j in [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]:
                 for numi,i in enumerate(x0):
                     new_x=i[0]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+0]
                     new_y=i[1]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+1]

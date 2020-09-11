@@ -1,5 +1,0 @@
-import modevectors
-split_states  9, 1, 1
-split_states  9, 20, 20
-select resi 455+482:486+493+494+501
-modevectors  9_0001,  9_0020 , atom=CA, cutoff=1.5, head=1.5, headrgb=(1.0,0.0,0.0)

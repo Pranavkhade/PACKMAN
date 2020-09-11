@@ -309,7 +309,7 @@ class RDANM:
         d0=[i.get_domain_id() for i in self.atoms]
         new_coords=[]
         with open(str(mode_number)+'.pdb','w') as fh:
-            for j in [k for k in range(n)]+[k for k in range(n)[::-1]]:
+            for j in [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]:
                 HingeResidue=0
                 for numi,i in enumerate(x0):
                     if(d0[numi][0]=='D'):
@@ -331,12 +331,18 @@ class RDANM:
                 fh.write('ENDMDL')
         return True
 
-    def calculate_new_movie(self,mode_number,scale=1.5,n=10):
+    def calculate_new_movie(self,mode_number,scale=1.5,n=10,direction="both"):
         x0=numpy.array([i.get_location() for i in self.atoms])
         d0=[i.get_domain_id() for i in self.atoms]
         new_coords=[]
         with open(str(mode_number)+'.pdb','w') as fh:
-            for j in [k for k in range(n)]+[k for k in range(n)[::-1]]:
+            if(direction=="both"):
+                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
+            elif(direction=="+"):
+                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
+            elif(direction=="-"):
+                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+            for j in movement:
                 HingeResidue=0
                 for numi,i in enumerate(x0):
                     if(d0[numi][0]=='D'):
