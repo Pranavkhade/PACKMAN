@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'PACKing and Motion ANalysis (PACKMAN)'
+project = 'py-PACKMAN'
 copyright = '2020, Pranav Khade(https://github.com/Pranavkhade)'
 author = 'Pranav Khade(https://github.com/Pranavkhade)'
 
