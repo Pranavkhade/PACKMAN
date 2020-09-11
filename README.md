@@ -6,10 +6,11 @@ PACKMAN is a multiutility tool to study protein packing and its effect on protei
 
 DOCUMENTATION
 -------------
-* [Web Server](https://packman.bb.iastate.edu/)
+* [Hinge Prediction Web Server](https://packman.bb.iastate.edu/)
+* [hd-ANM Web Server](coming_soon)
 * [Reference for Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
-* [Reference for Compliance](coming_soon)
-* [Reference for RD-ANM](coming_soon)
+* [Reference for Compliance](https://doi.org/10.1002/prot.25968)
+* [Reference for hd-ANM](coming_soon)
 
 INSTALLATION
 ------------
