@@ -1,8 +1,27 @@
-'''
-Copyright Pranav Khade
+# -*- coding: utf-8 -*-
+"""The 'hdANM' object host file.
 
-Author: Pranav Khade(pranavk@iastate.edu)
-'''
+This is file information, not the class information. This information is only for the API developers.
+Please read the 'hdANM' object documentation for details. [ help(packman.anm.hdANM) ]
+
+Example:
+
+    >>>from packman.anm import hdANM
+    >>>help( hdANM )
+
+Notes:
+    * Tutorial:
+
+Todo:
+    * Finish writing up the documentation.
+    * Finish error handling.
+    * Finish optimizing the performance.
+    * Add publication details in the Notes
+    * Make sure that parameter to the ANM is changed from [float] to packman.molecule.atom
+
+Authors:
+    * Pranav Khade(https://github.com/Pranavkhade)
+"""
 
 from packman import molecule
 from packman.constants import amino_acid_molecular_weight
@@ -14,11 +33,11 @@ import itertools
 from scipy.linalg import eig as scipy_eig
 '''
 ##################################################################################################
-#                                            RD-ANM                                              #
+#                                            hd-ANM                                              #
 ##################################################################################################
 '''
 
-class RDANM:
+class hdANM:
     def __init__(self, atoms , gamma=1.0, dr=15.0, power=0, pf=None, HNGinfo=None):
         """
         Author: Pranav Khade
@@ -42,27 +61,71 @@ class RDANM:
 
     '''Get Functions'''
     def get_hessian(self):
+        """Get the Hessian Matrix of the hd-ANM model.
+
+        Notes:
+            * Make sure that the hdANM().calculate_hessian() is called before calling this function. (will return None otherwise)
+        
+        Returns:
+            numpy.ndarray: Hessian matrix if successful; None otherwise
+        """
         return self.hessian
     
     def get_eigenvalues(self):
+        """Get the Eigenvalues obtained by decomposing the Hessian Matrix of the hd-ANM model.
+        
+        Notes:
+            * Make sure that the hdANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
+
+        Returns:
+            numpy.ndarray: Eigenvalues if successful; None otherwise
+        """
         return self.eigen_values
     
     def get_eigenvectors(self):
+        """Get the Eigenvectors obtained by decomposing the Hessian Matrix of the hd-ANM model.
+        
+        Notes:
+            * Make sure that the hdANM().calculate_hessian() and hdANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
+
+        Returns:
+            numpy.ndarray: Eigenvectors if successful; None otherwise
+        """
         return self.eigen_vectors
     
     def get_fluctuations(self):
+        """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
+        
+        Notes:
+            * Make sure that the hdANM().calculate_hessian(), hdANM().calculate_decomposition() and hdANM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
+
+        Returns:
+            numpy.ndarray: Eigenvectors if successful; None otherwise
+        """
         return self.fluctuations
     
     def get_hessian_block(self,Index1,Index2):
-        #To demonstrate how index selection works
-        #toy_example=numpy.reshape( numpy.arange(0,81,1), (9,9))
-        #print(toy_example,'\n',toy_example[Index1*3:Index1*3+3,Index2*3:Index2*3+3])
+        """Pick up the block from ANM hessian matrix given the 2D residue index in an array.
+
+        Notes:
+            * To demonstrate how index selection works, code:
+            >>>toy_example=numpy.reshape( numpy.arange(0,81,1), (9,9))
+            >>>print(toy_example,'\n',toy_example[Index1*3:Index1*3+3,Index2*3:Index2*3+3])
+
+        Returns:
+            numpy.ndarray: Eigenvectors if successful; None otherwise
+        """
         return self.get_hessian()[Index1*3:Index1*3+3,Index2*3:Index2*3+3]
 
 
     '''Calculate Functions'''
     def calculate_hessian(self):
-        """
+        """Build the Hessian Matrix of the ANM model.
+
+        This is an essential step for hdANM
+        
+        Notes:
+            * Hessian matrix is built; use ANM().get_hessian() to obtain the hessian matrix.
         """
         n_atoms=len(self.coords)
         hessian=numpy.zeros((n_atoms*3, n_atoms*3), float)
@@ -93,7 +156,18 @@ class RDANM:
         return True
     
     def calculate_decomposition(self, include_mass=True):
-        """
+        """Decompose the Hessian Matrix of the hdANM model.
+
+        Args:
+            include_mass (bool): Amino Acid Residue mass/Atomic mass should be (True) or shouldn't be (False) included for the decomposition. Defaults to True
+        
+        Note:
+            - Eigen values and Eigen Vectors are calculated. use hdANM().get_eigenvalues() and hdANM().get_eigenvectors() to obtain them.
+            - Currently only molecular weight is included in case of Amino Acid Residue(coarse grained) mass.
+            - Mass of the Amino Acid Residues can be found in /packman/constants/Constants.py 
+            ie...
+            from packman.constants import amino_acid_molecular_weight
+            from packman.constants import atomic_weigh
         """
         if(include_mass):
             self.eigen_values, self.eigen_vectors= scipy_eig(self.domain_hessian,self.domain_mass_matrix)
@@ -107,7 +181,12 @@ class RDANM:
     
     
     def calculate_coarse_grained_hessian(self,mass_type='unit'):
-        """
+        """Build the Hessian Matrix of the hdANM model.
+
+        This is the most essential step for hdANM. It picks up blocks from ANM hessian matrix and puts it in the format described in the paper.
+        
+        Notes:
+            * use hdANM().domain_hessian, hdANM().domain_mass_matrix and hdANM().domain_info to access output of this function
         """
         all_mass_types=['unit','atom','residue']
         #Error Handling
@@ -146,7 +225,7 @@ class RDANM:
                 HHH[numi*3:numi*3+3,numj*3:numj*3+3]=self.get_hessian_block(i,j)
         
         
-        #HHD
+        #HHD (Scheduled to be paralalysed)
         DomainInfo={}
         HHD=numpy.zeros((len(HingeAtoms)*3,len(Domains)*6))
         for numd,d in enumerate(Domains):
@@ -168,7 +247,7 @@ class RDANM:
         #HDH
         HDH=HHD.T
 
-        #HDD
+        #HDD (To be paralalysed)
         HDD=numpy.zeros((6*len(Domains),6*len(Domains)))
         for numd,Dd in enumerate(Domains):
             for nume,De in enumerate(Domains):
@@ -226,7 +305,7 @@ class RDANM:
             except:
                 print('Unknown Amino Acid encountered or molecular weight not available in packman.constants')
 
-        #MDD
+        #MDD (Scheduled to be paralalysed)
         for numd,d in enumerate(Domains):
             #F-Delta
             domain_block=numpy.zeros((6,6))
@@ -261,13 +340,20 @@ class RDANM:
 
             M[numd*6:(numd*6)+6 , numd*6:(numd*6)+6]=domain_block
 
-        self.domain_hessian, self.domain_mass_matrix, self.domain_info= H_new, M, DomainInfo #DomainInfo is saved to check the sequence in which H_new is formed
+        self.domain_hessian, self.domain_mass_matrix, self.domain_info = H_new, M, DomainInfo #DomainInfo is saved to check the sequence in which H_new is formed
         return True
     
 
     def calculate_fluctuations(self):
-        '''
-        '''
+        """Calculate the Fluctuations of the hd-ANM model.
+
+        The fluctualtions/ theoretical b-factors are calculated using this method.
+        
+        Note:
+            - Fluctuations are calculated. use hdANM().get_fluctuations() to obtain the fluctuations.
+            - Endmode needs to be put in the code if and when required.
+            - hdANM().fluctuations() stores the output of this function
+        """
         x0=numpy.array([i.get_location() for i in self.atoms])
         d0=[i.get_domain_id() for i in self.atoms]
         
@@ -304,80 +390,102 @@ class RDANM:
         return True
     
 
-    def calculate_movie(self,mode_number,scale=1.5,n=10):
+    def calculate_movie(self,mode_number,scale=1.5,n=10, extrapolation="curvilinear", direction="both"):
+        """This function generates the dynamic 3D projection of the normal modes obtained using hd-ANM. The 3D projection can be linearly extrapolated or curvilinearly extrapolated depending on the choices.
+
+        Args:
+            mode_number (int)                   : Mode number. (first non-rigid mode is 6th)
+            scale (float)                       : Multiplier; extent to which mode will be extrapolated. Defaults to 1.5.
+            n (int)                             : Number of frames in output                             Defaults to 10
+            extrapolation (linear/curvilinear)  : Extrapolation method                                   Defaults to "curvilinear"
+            direction (both/+/-)                : Explore specific direcrion of the motion.              Defaults to "both"
+
+        Note:
+            - Scale and n parameters should be redesigned.
+            - direction is the variable which be allow user to explore only positive or only negative direction of the modes.
+
+        Returns:
+            True if successful; false otherwise.
+        """
+
         x0=numpy.array([i.get_location() for i in self.atoms])
         d0=[i.get_domain_id() for i in self.atoms]
         new_coords=[]
-        with open(str(mode_number)+'.pdb','w') as fh:
-            for j in [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]:
-                HingeResidue=0
-                for numi,i in enumerate(x0):
-                    if(d0[numi][0]=='D'):
-                        D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
-                        D_COM=self.domain_info[d0[numi]][1]
-                        new_x=i[0]+scale*j* ( D_delta_phi[0] + (D_delta_phi[4]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[1]-D_COM[1])) )
-                        new_y=i[1]+scale*j* ( D_delta_phi[1] + (D_delta_phi[3]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[0]-D_COM[0])) )
-                        new_z=i[2]+scale*j* ( D_delta_phi[2] + (D_delta_phi[3]*(i[1]-D_COM[1])) - (D_delta_phi[4]*(i[0]-D_COM[0])) )
-                    if(d0[numi][0]=='H'):
-                        delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
-                        new_x=i[0]+scale*j*delta[0]
-                        new_y=i[1]+scale*j*delta[1]
-                        new_z=i[2]+scale*j*delta[2]
-                        HingeResidue+=1
-                    new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
-                    new_coords.append([new_x,new_y,new_z])
-                    fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),self.atoms[numi].get_bfactor(),'',self.atoms[numi].get_element(),''))
-                    
-                fh.write('ENDMDL')
-        return True
 
-    def calculate_new_movie(self,mode_number,scale=1.5,n=10,direction="both"):
-        x0=numpy.array([i.get_location() for i in self.atoms])
-        d0=[i.get_domain_id() for i in self.atoms]
-        new_coords=[]
-        with open(str(mode_number)+'.pdb','w') as fh:
-            if(direction=="both"):
-                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
-            elif(direction=="+"):
-                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
-            elif(direction=="-"):
-                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
-            for j in movement:
-                HingeResidue=0
-                for numi,i in enumerate(x0):
-                    if(d0[numi][0]=='D'):
-                        D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
-                        #D_mu= D_delta_phi[3:]
-                        Q_D_n=numpy.linalg.norm(D_delta_phi[3:])
-                        D_mu=D_delta_phi[3:] / Q_D_n
-                        D_COM=self.domain_info[d0[numi]][1]
-                        #D_delta_phi[0] is questionable ; D_delta_phi[3:] is also questionable
-                        new_x= D_COM[0]+ scale*j*D_delta_phi[0] \
-                        + ( numpy.cos(scale*j*Q_D_n)+ D_mu[0]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (i[0] -D_COM[0]) \
-                        + ( D_mu[0]*D_mu[1]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[2]*numpy.sin(scale*j*Q_D_n) ) * (i[1] -D_COM[1]) \
-                        + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (i[2] -D_COM[2])
+        if(extrapolation=="linear"):
+            with open(str(mode_number)+'.pdb','w') as fh:
+                if(direction=="both"):
+                    movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
+                elif(direction=="+"):
+                    movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
+                elif(direction=="-"):
+                    movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+                for j in movement:
+                    HingeResidue=0
+                    for numi,i in enumerate(x0):
+                        if(d0[numi][0]=='D'):
+                            D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
+                            D_COM=self.domain_info[d0[numi]][1]
+                            new_x=i[0]+scale*j* ( D_delta_phi[0] + (D_delta_phi[4]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[1]-D_COM[1])) )
+                            new_y=i[1]+scale*j* ( D_delta_phi[1] + (D_delta_phi[3]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[0]-D_COM[0])) )
+                            new_z=i[2]+scale*j* ( D_delta_phi[2] + (D_delta_phi[3]*(i[1]-D_COM[1])) - (D_delta_phi[4]*(i[0]-D_COM[0])) )
+                        if(d0[numi][0]=='H'):
+                            delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
+                            new_x=i[0]+scale*j*delta[0]
+                            new_y=i[1]+scale*j*delta[1]
+                            new_z=i[2]+scale*j*delta[2]
+                            HingeResidue+=1
+                        new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
+                        new_coords.append([new_x,new_y,new_z])
+                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),self.atoms[numi].get_bfactor(),'',self.atoms[numi].get_element(),''))
                         
-                        new_y= D_COM[1]+ scale*j*D_delta_phi[1] \
-                        + ( D_mu[0]*D_mu[1]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[2]*numpy.sin(scale*j*Q_D_n) ) * (i[0] -D_COM[0]) \
-                        + ( numpy.cos(scale*j*Q_D_n)+D_mu[1]**2 * (1-numpy.cos(scale*j*Q_D_n)) )              * (i[1] -D_COM[1]) \
-                        + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (i[2] -D_COM[2])
+                    fh.write('ENDMDL')
 
-                        new_z= D_COM[2]+ scale*j*D_delta_phi[2] \
-                        + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (i[0] -D_COM[0]) \
-                        + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (i[1] -D_COM[1]) \
-                        + ( numpy.cos(scale*j*Q_D_n)+ D_mu[2]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (i[2] -D_COM[2])
+        elif(extrapolation=="curvilinear"):
+            with open(str(mode_number)+'.pdb','w') as fh:
+                if(direction=="both"):
+                    movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
+                elif(direction=="+"):
+                    movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
+                elif(direction=="-"):
+                    movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+                for j in movement:
+                    HingeResidue=0
+                    for numi,i in enumerate(x0):
+                        if(d0[numi][0]=='D'):
+                            D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
+                            #D_mu= D_delta_phi[3:]
+                            Q_D_n=numpy.linalg.norm(D_delta_phi[3:])
+                            D_mu=D_delta_phi[3:] / Q_D_n
+                            D_COM=self.domain_info[d0[numi]][1]
+                            #D_delta_phi[0] is questionable ; D_delta_phi[3:] is also questionable
+                            new_x= D_COM[0]+ scale*j*D_delta_phi[0] \
+                            + ( numpy.cos(scale*j*Q_D_n)+ D_mu[0]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (i[0] -D_COM[0]) \
+                            + ( D_mu[0]*D_mu[1]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[2]*numpy.sin(scale*j*Q_D_n) ) * (i[1] -D_COM[1]) \
+                            + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (i[2] -D_COM[2])
+                            
+                            new_y= D_COM[1]+ scale*j*D_delta_phi[1] \
+                            + ( D_mu[0]*D_mu[1]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[2]*numpy.sin(scale*j*Q_D_n) ) * (i[0] -D_COM[0]) \
+                            + ( numpy.cos(scale*j*Q_D_n)+D_mu[1]**2 * (1-numpy.cos(scale*j*Q_D_n)) )              * (i[1] -D_COM[1]) \
+                            + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (i[2] -D_COM[2])
+
+                            new_z= D_COM[2]+ scale*j*D_delta_phi[2] \
+                            + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (i[0] -D_COM[0]) \
+                            + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (i[1] -D_COM[1]) \
+                            + ( numpy.cos(scale*j*Q_D_n)+ D_mu[2]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (i[2] -D_COM[2])
+                            
+
+
+                        if(d0[numi][0]=='H'):
+                            delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
+                            new_x=i[0]+scale*j*delta[0]
+                            new_y=i[1]+scale*j*delta[1]
+                            new_z=i[2]+scale*j*delta[2]
+                            HingeResidue+=1
+                        new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
+                        new_coords.append([new_x,new_y,new_z])
+                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),self.atoms[numi].get_bfactor(),'',self.atoms[numi].get_element(),''))
                         
-
-
-                    if(d0[numi][0]=='H'):
-                        delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
-                        new_x=i[0]+scale*j*delta[0]
-                        new_y=i[1]+scale*j*delta[1]
-                        new_z=i[2]+scale*j*delta[2]
-                        HingeResidue+=1
-                    new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
-                    new_coords.append([new_x,new_y,new_z])
-                    fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),self.atoms[numi].get_bfactor(),'',self.atoms[numi].get_element(),''))
-                    
-                fh.write('ENDMDL')
+                    fh.write('ENDMDL')
+            
         return True

@@ -11,13 +11,12 @@ Example:
 
 Notes:
     * Tutorial: https://jerniganlab.github.io/Software/PACKMAN/Tutorials/compliance
-    * For more details about the parameters for compliance, or to site this, read the following paper:
+    * For more details about the parameters for compliance, or to site this, read the following paper: https://doi.org/10.1002/prot.25968
 
 Todo:
     * Finish writing up the documentation.
     * Finish error handling.
     * Finish optimizing the performance.
-    * Add publication details in the Notes
     * Make sure that parameter to the ANM is changed from [float] to packman.molecule.atom
 
 Authors:
@@ -278,16 +277,32 @@ class ANM:
         self.compliance_profile = [numpy.nanmean(i) for i in compliance_map]
         return True
     
-    def calculate_movie(self,mode_number,scale=1.5,n=10):
+    def calculate_movie(self,mode_number,scale=1.5,n=10, direction="both"):
         """Get the movie of the obtained LINEAR modes.
 
+        Args:
+            mode_number (int)                   : Mode number. (first non-rigid mode is 6th)
+            scale (float)                       : Multiplier; extent to which mode will be extrapolated. Defaults to 1.5.
+            n (int)                             : Number of frames in output                             Defaults to 10
+            direction (both/+/-)                : Explore specific direcrion of the motion.              Defaults to "both"
+
         Note:
-            -Do something about the get_atoms section because it changes compliance code tutorial
+            - Scale and n parameters should be redesigned.
+            - direction is the variable which be allow user to explore only positive or only negative direction of the modes.
+
+        Returns:
+            True if successful; false otherwise.
         """
         x0=self.coords
         new_coords=[]
         with open('ANM_'+str(mode_number)+'.pdb','w') as fh:
-            for j in [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]:
+            if(direction=="both"):
+                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
+            elif(direction=="+"):
+                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
+            elif(direction=="-"):
+                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+            for j in movement:
                 for numi,i in enumerate(x0):
                     new_x=i[0]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+0]
                     new_y=i[1]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+1]
