@@ -1,7 +1,7 @@
 import argparse
 
 from packman import molecule
-from packman.anm import RDANM
+from packman.anm import hdANM
 from packman.constants import amino_acid_molecular_weight
 '''
 ##################################################################################################
@@ -48,29 +48,24 @@ def main():
     power    = float(ARGS.power)
 
 
-    HNGinfo={}
-    for i in open(ARGS.hngfile):
-        line=i.strip().split()
-        HNGinfo[ line[0]+'_'+line[1] ]=[float(j) for j in line[2].split(':')]
-
-
     #File loading 
     mol=molecule.load_structure(filename)
 
+    #Chain, if specified, if not, default (Box)
     if(chain is not None):
         calpha=[i for i in mol[0][chain].get_calpha() if i is not None]
     else:
         calpha=[i for i in mol[0].get_calpha()  if i is not None]
 
     
-    Model=RDANM(calpha,dr=dr,power=power,HNGinfo=HNGinfo)
+    Model=hdANM(calpha,dr=dr,power=power,hng_file=ARGS.hngfile)
     #Model.calculate_coarse_grained_hessian(mass_type='unit')
     #Model.calculate_coarse_grained_hessian(mass_type='atom')
     Model.calculate_coarse_grained_hessian(mass_type='residue')
     Model.calculate_decomposition()
     
     for i in range(6,17,1):
-        Model.calculate_new_movie(i,scale=10,n=4,direction="+")
+        Model.calculate_movie(i,scale=10,n=4)
 
 
     #Model.calculate_fluctuations()

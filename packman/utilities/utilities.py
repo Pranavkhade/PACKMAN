@@ -2,8 +2,6 @@
 
 
 """
-#delete
-from packman.molecule import Protein
 
 import numpy
 
@@ -114,3 +112,34 @@ def RMSD(group1,group2,use='calpha',ids=[]):
         atoms2_location[i] = numpy.array(atoms2_location[i].tolist()[0])
     
     return numpy.mean( [numpy.abs( numpy.linalg.norm(atoms1_location[i]-atoms2_location[i]) ) for i in range(0,len(atoms1_location))] )
+
+def load_hinge(filename):
+    """Load the hinge information neccessary for the hd-ANM and other methods.
+
+    About .hng File:
+    - hdANM requires the information about hinges and domains in the .hng format.
+    - Each column in the .hng file is tab delimited.
+    - Each row in the .hng file follows collowing pattern: 
+
+    Filename_ChainID    Domain/HingeId   ResidueStartPosition:ResidueEndPosition
+
+    Example of .hng file for PDBID 1EXR
+
+    1EXR_A  D1  1:70
+    1EXR_A  H1  70:90
+    1EXR_A  D2  90:148
+
+    Above format means that there are two domains (D1 and D2) separated by a hinge (H1). D1 stretches from residue 1 to 70; D2 stretches from 90 to 148 and hinge H1 is in the middle.
+
+
+    Args:
+        filename (string) : filepath and name of the .hng file
+    
+    Returns:
+        HNGinfo (dictionary) : residue based hinge and domain information.
+    """
+    HNGinfo={}
+    for i in open(filename):
+        line=i.strip().split()
+        HNGinfo[ line[0]+'_'+line[1] ]=[float(j) for j in line[2].split(':')]
+    return HNGinfo
