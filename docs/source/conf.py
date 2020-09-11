@@ -17,12 +17,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'PACKing and Motion ANalysis (PACKMAN)'
+project = 'py-PACKMAN'
 copyright = '2020, Pranav Khade(https://github.com/Pranavkhade)'
 author = 'Pranav Khade(https://github.com/Pranavkhade)'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1.4'
+release = '1.2.0'
 
 
 # -- General configuration ---------------------------------------------------
