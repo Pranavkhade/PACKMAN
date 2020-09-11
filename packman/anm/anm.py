@@ -41,6 +41,7 @@ class ANM:
         * For more details about the parameters for compliance, or to site this, read the following paper:
 
         Todo:
+            * fix init; coords to atoms
             * Change the pf in such a way that it is not confusing
             * Add set_ functions
         

@@ -4,6 +4,23 @@
 This is file information, not the class information. This information is only for the API developers.
 Please read the 'hdANM' object documentation for details. [ help(packman.anm.hdANM) ]
 
+About .hng File:
+- hdANM requires the information about hinges and domains in the .hng format.
+- Each column in the .hng file is tab delimited.
+- Each row in the .hng file follows collowing pattern: 
+
+Filename_ChainID    Domain/HingeId   ResidueStartPosition:ResidueEndPosition
+
+Example of .hng file for PDBID 1EXR
+
+1EXR_A  D1  1:70
+1EXR_A  H1  70:90
+1EXR_A  D2  90:148
+
+Above format means that there are two domains (D1 and D2) separated by a hinge (H1). D1 stretches from residue 1 to 70; D2 stretches from 90 to 148 and hinge H1 is in the middle.
+
+
+
 Example:
 
     >>>from packman.anm import hdANM
@@ -26,6 +43,7 @@ Authors:
 from packman import molecule
 from packman.constants import amino_acid_molecular_weight
 from packman.constants import atomic_weight
+from packman.utilities import load_hinge
 
 import numpy
 import itertools
@@ -38,16 +56,36 @@ from scipy.linalg import eig as scipy_eig
 '''
 
 class hdANM:
-    def __init__(self, atoms , gamma=1.0, dr=15.0, power=0, pf=None, HNGinfo=None):
+    """This class contains the functions essential to carry out the Hinge-Domain-Anisotropic Network Model and Compliance analysis.
+
+        Notes:
+        * Tutorial: 
+        * For more details about the parameters for compliance, or to site this, read the following paper:
+
+        Todo:
+            * Read individual functions to know
+        
+        Args:
+            atoms ([packman.molecule.Atom]) : Two dimentional array of atoms.
+            hng_file (string)               : .hng filename and path. (Contains the information about hinge and domains on the protein)
+            gamma (float, optional)         : Spring Constant Value.                                      Defaults to 1.0.
+            dr (float, optional)            : Distance Cutoff.                                            Defaults to 15.0.
+            power (int, optional)           : Power of distance (mainly useful in non-parametric mode).   Defaults to 0.
+            pf (None, optional)             : Parameter free model?.                                      Defaults to None.
+        
+        Raises:
+            Exception: [description]
+            Exception: [description]
+            Exception: [description]
         """
-        Author: Pranav Khade
-        """
+    
+    def __init__(self, atoms , hng_file , gamma=1.0, dr=15.0, power=0, pf=None):
         self.gamma   = gamma
         self.dr      = dr
         self.power   = power
         self.pf      = pf
         self.atoms   = atoms
-        self.HNGinfo = HNGinfo
+        self.HNGinfo = load_hinge(hng_file)
         self.coords  = numpy.array([i.get_location() for i in atoms])
         if self.pf != None and self.pf <= 0:
             raise Exception("pf value cannot be zero or negative")
@@ -164,7 +202,7 @@ class hdANM:
         Note:
             - Eigen values and Eigen Vectors are calculated. use hdANM().get_eigenvalues() and hdANM().get_eigenvectors() to obtain them.
             - Currently only molecular weight is included in case of Amino Acid Residue(coarse grained) mass.
-            - Mass of the Amino Acid Residues can be found in /packman/constants/Constants.py 
+            - Mass of the Amino Acid Residues/Atoms can be found in /packman/constants/Constants.py 
             ie...
             from packman.constants import amino_acid_molecular_weight
             from packman.constants import atomic_weigh
@@ -184,9 +222,17 @@ class hdANM:
         """Build the Hessian Matrix of the hdANM model.
 
         This is the most essential step for hdANM. It picks up blocks from ANM hessian matrix and puts it in the format described in the paper.
+
+        Args:
+            mass_type (unit/atom/residue): Whether to use unit (1), atomic weights or residue mass for the mass matrix.
         
         Notes:
+            * Possible argument removal for the decomposition function
             * use hdANM().domain_hessian, hdANM().domain_mass_matrix and hdANM().domain_info to access output of this function
+            * Mass of the Amino Acid Residues/Atoms can be found in /packman/constants/Constants.py
+            ie...
+            from packman.constants import amino_acid_molecular_weight
+            from packman.constants import atomic_weigh
         """
         all_mass_types=['unit','atom','residue']
         #Error Handling
