@@ -1,3 +1,5 @@
+.. _Tutorials:
+
 Welcome to PACKMAN tutorials
 ============================
 
