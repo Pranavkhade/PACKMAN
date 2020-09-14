@@ -86,6 +86,7 @@ class hdANM:
         self.pf      = pf
         self.atoms   = atoms
         self.HNGinfo = load_hinge(hng_file)
+        #Coords are in the same order as the atoms
         self.coords  = numpy.array([i.get_location() for i in atoms])
         if self.pf != None and self.pf <= 0:
             raise Exception("pf value cannot be zero or negative")
@@ -94,7 +95,8 @@ class hdANM:
         if self.dr <= 0:
             raise Exception("distance cutoff value cannot be zero or negative")
         
-        self.calculate_hessian()
+        ##To Verify that the hessian is same as ANM (Part 1/2)
+        #self.calculate_hessian()
 
 
     '''Get Functions'''
@@ -138,22 +140,47 @@ class hdANM:
             * Make sure that the hdANM().calculate_hessian(), hdANM().calculate_decomposition() and hdANM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
-            numpy.ndarray: Eigenvectors if successful; None otherwise
+            numpy.ndarray: Fluctuations if successful; None otherwise
         """
         return self.fluctuations
     
     def get_hessian_block(self,Index1,Index2):
-        """Pick up the block from ANM hessian matrix given the 2D residue index in an array.
+        """Calculate Hij (Hessian matrix component) using equation . ()
 
         Notes:
-            * To demonstrate how index selection works, code:
-            >>>toy_example=numpy.reshape( numpy.arange(0,81,1), (9,9))
-            >>>print(toy_example,'\n',toy_example[Index1*3:Index1*3+3,Index2*3:Index2*3+3])
-
+            
         Returns:
-            numpy.ndarray: Eigenvectors if successful; None otherwise
+            numpy.ndarray: Hij if successful; None otherwise
         """
-        return self.get_hessian()[Index1*3:Index1*3+3,Index2*3:Index2*3+3]
+        i=self.coords[Index1]
+        j=self.coords[Index2]
+        dist_ij = numpy.linalg.norm(j-i)
+
+        if(Index1!=Index2 and dist_ij<=self.dr):
+            return numpy.array(
+            [  [ (j[0]-i[0])*(j[0]-i[0]) , (j[0]-i[0])*(j[1]-i[1]) , (j[0]-i[0])*(j[2]-i[2]) ]  , 
+            [ (j[1]-i[1])*(j[0]-i[0]) , (j[1]-i[1])*(j[1]-i[1]) , (j[1]-i[1])*(j[2]-i[2]) ]  ,
+            [ (j[2]-i[2])*(j[0]-i[0]) , (j[2]-i[2])*(j[1]-i[1]) , (j[2]-i[2])*(j[2]-i[2]) ]  ]
+            ) * ( -self.gamma/(dist_ij**2) )
+        elif(Index1!=Index2 and dist_ij>self.dr):
+            return numpy.zeros((3,3))
+        elif(Index1==Index2):
+            diag = numpy.zeros((3,3))
+            for numk,k in enumerate(self.coords):
+                dist_ik = numpy.linalg.norm(k-i)
+                if(dist_ik<=self.dr and Index1!=numk):
+                    diag=numpy.add(diag, 
+                        numpy.array(
+                        [  [ (k[0]-i[0])*(k[0]-i[0]) , (k[0]-i[0])*(k[1]-i[1]) , (k[0]-i[0])*(k[2]-i[2]) ]  , 
+                        [ (k[1]-i[1])*(k[0]-i[0]) , (k[1]-i[1])*(k[1]-i[1]) , (k[1]-i[1])*(k[2]-i[2]) ]  ,
+                        [ (k[2]-i[2])*(k[0]-i[0]) , (k[2]-i[2])*(k[1]-i[1]) , (k[2]-i[2])*(k[2]-i[2]) ]  ]
+                        ) * ( -self.gamma/(dist_ik**2) )
+                    )
+            return -diag
+
+        #To Verify that the hessian is same as ANM (Part 2/2)
+        #print(Index1,Index2,dist_ij,'\n',self.get_hessian()[Index1*3:Index1*3+3,Index2*3:Index2*3+3],"\n####\n")
+        #return self.get_hessian()[Index1*3:Index1*3+3,Index2*3:Index2*3+3]
 
 
     '''Calculate Functions'''
