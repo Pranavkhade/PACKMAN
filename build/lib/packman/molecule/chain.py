@@ -99,6 +99,19 @@ class Chain():
         return self.__Hinges
     
     #Calculation Functions
+    def get_atoms(self):
+        """Get the generator of corresponding 'atom' objects of the 'Chain'
+
+        Returns:
+            generator of 'atom' objects if successful, None otherwise.
+        
+        Note:
+            find a way to deal with hetatoms
+        """
+        for i in sorted(self.__Residues.keys()):
+            for j in self.__Residues[i].get_atoms():
+                yield j
+
     def get_residues(self):
         """Get the generator of corresponding 'Residue' objects of the 'Chain'
 

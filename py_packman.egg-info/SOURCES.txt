@@ -4,6 +4,7 @@ packman/__init__.py
 packman/__main__.py
 packman/anm/__init__.py
 packman/anm/anm.py
+packman/anm/hd_anm.py
 packman/apps/__init__.py
 packman/apps/predict_hinge.py
 packman/bin/PACKMAN.py

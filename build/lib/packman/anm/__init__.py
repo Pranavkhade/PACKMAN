@@ -22,3 +22,4 @@ Todo:
 
 """
 from .anm import ANM
+from .hd_anm import hdANM
