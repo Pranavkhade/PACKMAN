@@ -150,7 +150,11 @@ class Residue():
         Returns:
             packman.molecule.Atom if successful, None otherwise.
         """
-        return [i for i in self.get_atoms() if i.get_name()=='CA'][0]
+        try:
+            return [i for i in self.get_atoms() if i.get_name()=='CA'][0]
+        except:
+            #Later create warning that C-alpha is missing
+            None
     
     def get_centerofgravity(self):
         """Get the center of gravity of the given 'Residue'
