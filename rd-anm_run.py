@@ -59,9 +59,9 @@ def main():
 
     
     Model=hdANM(calpha,dr=dr,power=power,hng_file=ARGS.hngfile)
-    #Model.calculate_coarse_grained_hessian(mass_type='unit')
-    #Model.calculate_coarse_grained_hessian(mass_type='atom')
-    Model.calculate_coarse_grained_hessian(mass_type='residue')
+    #Model.calculate_hessian(mass_type='unit')
+    #Model.calculate_hessian(mass_type='atom')
+    Model.calculate_hessian(mass_type='residue')
     Model.calculate_decomposition()
     
     for i in range(6,17,1):

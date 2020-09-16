@@ -184,6 +184,8 @@ class hdANM:
 
 
     '''Calculate Functions'''
+    #Discontinued (But kept for testing)
+    '''
     def calculate_hessian(self):
         """Build the Hessian Matrix of the ANM model.
 
@@ -219,6 +221,7 @@ class hdANM:
         #Class Change
         self.hessian=hessian
         return True
+    '''
     
     def calculate_decomposition(self, include_mass=True):
         """Decompose the Hessian Matrix of the hdANM model.
@@ -245,7 +248,7 @@ class hdANM:
         return True
     
     
-    def calculate_coarse_grained_hessian(self,mass_type='unit'):
+    def calculate_hessian(self,mass_type='unit'):
         """Build the Hessian Matrix of the hdANM model.
 
         This is the most essential step for hdANM. It picks up blocks from ANM hessian matrix and puts it in the format described in the paper.
