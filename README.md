@@ -1,6 +1,6 @@
 PACKMAN: PACKing and Motion ANalysis
 ------------------------------------
-<img src="https://github.com/Pranavkhade/PACKMAN/blob/docs/docs/_static/gallary/logo.gif" width="250">
+<img src="https://github.com/Pranavkhade/PACKMAN/blob/master/docs/_static/gallary/logo.gif" width="250">
 
 PACKMAN is a multiutility tool to study protein packing and its effect on protein dynamics. It currently has the functionality to identify the protein hinges (separating the domains). It can also be used to read, write, manipulate and analyze protein molecules and it's properties through its API.
 
