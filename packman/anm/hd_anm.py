@@ -40,10 +40,10 @@ Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
 
-from packman import molecule
-from packman.constants import amino_acid_molecular_weight
-from packman.constants import atomic_weight
-from packman.utilities import load_hinge
+from .. import molecule
+from ..constants import amino_acid_molecular_weight
+from ..constants import atomic_weight
+from ...utilities import load_hinge
 
 import numpy
 import itertools

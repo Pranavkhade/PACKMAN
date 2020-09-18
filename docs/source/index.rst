@@ -10,6 +10,7 @@ py-PACKMAN Documentation
    :maxdepth: 2
    :caption: Contents:
 
+This package focuses on studying molecular structures and their dynamics using a simple yet informative property known as Protein Packing. Over the last few years, we have worked on several techniques to capture and quantify the protein packing, resulting in a few publications. This package has all the code to repeat and further develop these techniques.
 
 ************
 Useful Links
@@ -26,7 +27,7 @@ Web Servers
 --------------
 
 * Hinge Prediction (https://packman.bb.iastate.edu/)
-* rdANM (coming_soon)
+* hdANM (coming_soon)
 
 Publications
 ---------------
@@ -34,12 +35,6 @@ Publications
 * Hinge Prediction (https://doi.org/10.1016/j.jmb.2019.11.018)
 * Structural Compliance (https://doi.org/10.1002/prot.25968)
 
-
-************
-Introduction
-************
-
-This package focuses on studying molecular structures and their dynamics using a simple yet informative property known as Protein Packing. Over the last few years, we have worked on several techniques to capture and quantify the protein packing, resulting in a few publications. This package has all the code to repeat and further develop these techniques.
 
 ************
 Project Goal
