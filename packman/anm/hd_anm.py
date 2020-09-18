@@ -43,7 +43,7 @@ Authors:
 from .. import molecule
 from ..constants import amino_acid_molecular_weight
 from ..constants import atomic_weight
-from ...utilities import load_hinge
+from ..utilities import load_hinge
 
 import numpy
 import itertools

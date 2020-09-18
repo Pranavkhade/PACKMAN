@@ -4,7 +4,9 @@ PACKAGES=['packman',
           'packman.molecule',
           'packman.anm',
           'packman.apps',
-          'packman.bin'
+          'packman.bin',
+          'packman.constants',
+          'packman.utilities'
           ]
 
 
@@ -12,7 +14,7 @@ SCRIPTS=['packman=packman.bin.PACKMAN:main']
 
 
 setup(name='py-packman',
-      version='1.2.1',
+      version='1.2.3',
       description='A software package for molecular PACKing and Motion ANalysis (PACKMAN)',
       url='https://github.com/Pranavkhade/PACKMAN',
       author='Pranav Khade',
