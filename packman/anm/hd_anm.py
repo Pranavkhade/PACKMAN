@@ -49,6 +49,12 @@ import numpy
 import itertools
 
 from scipy.linalg import eig as scipy_eig
+
+#Multiprocessing
+from itertools import product as iter_prod
+from functools import partial
+from multiprocessing import Pool
+from multiprocessing import cpu_count
 '''
 ##################################################################################################
 #                                            hd-ANM                                              #
@@ -222,7 +228,28 @@ class hdANM:
         self.hessian=hessian
         return True
     '''
-    
+    def calculate_HDdDe_iter(self, Dd_COM, De_COM, i, j):
+        """
+        This function exist only because HDdDe (HDD) is paralaysed.
+        """
+        HDDij=self.get_hessian_block(i,j)
+        HDdDe_iter=numpy.zeros((6,6))
+        #F_Delta
+        HDdDe_iter[0:3,0:3]=HDDij
+        #F_Phi
+        HDdDe_iter[0,3:]= [  -HDDij[0][1]*(self.coords[j][2]-De_COM[2]) + HDDij[0][2]*(self.coords[j][1]-De_COM[1])  ,  HDDij[0][0]*(self.coords[j][2]-De_COM[2]) - HDDij[0][2]*(self.coords[j][0]-De_COM[0])  ,  -HDDij[0][0]*(self.coords[j][1]-De_COM[1]) + HDDij[0][1]*(self.coords[j][0]-De_COM[0])]
+        HDdDe_iter[1,3:]= [  -HDDij[1][1]*(self.coords[j][2]-De_COM[2]) + HDDij[1][2]*(self.coords[j][1]-De_COM[1])  ,  HDDij[1][0]*(self.coords[j][2]-De_COM[2]) - HDDij[1][2]*(self.coords[j][0]-De_COM[0])  ,  -HDDij[1][0]*(self.coords[j][1]-De_COM[1]) + HDDij[1][1]*(self.coords[j][0]-De_COM[0])]
+        HDdDe_iter[2,3:]= [  -HDDij[2][1]*(self.coords[j][2]-De_COM[2]) + HDDij[2][2]*(self.coords[j][1]-De_COM[1])  ,  HDDij[2][0]*(self.coords[j][2]-De_COM[2]) - HDDij[2][2]*(self.coords[j][0]-De_COM[0])  ,  -HDDij[2][0]*(self.coords[j][1]-De_COM[1]) + HDDij[2][1]*(self.coords[j][0]-De_COM[0])]
+        #Torque_Delta
+        HDdDe_iter[3,0:3]= [  -HDDij[1][0]*(self.coords[i][2]-Dd_COM[2]) + HDDij[2][0]*(self.coords[i][1]-Dd_COM[1])  ,  -HDDij[1][1]*(self.coords[i][2]-Dd_COM[2]) + HDDij[2][1]*(self.coords[i][1]-Dd_COM[1])  ,  -HDDij[1][2]*(self.coords[i][2]-Dd_COM[2]) + HDDij[2][2]*(self.coords[i][1]-Dd_COM[1])]
+        HDdDe_iter[4,0:3]= [   HDDij[0][0]*(self.coords[i][2]-Dd_COM[2]) - HDDij[2][0]*(self.coords[i][0]-Dd_COM[0])  ,   HDDij[0][1]*(self.coords[i][2]-Dd_COM[2]) - HDDij[2][1]*(self.coords[i][0]-Dd_COM[0])  ,   HDDij[0][2]*(self.coords[i][2]-Dd_COM[2]) - HDDij[2][2]*(self.coords[i][0]-Dd_COM[0])]
+        HDdDe_iter[5,0:3]= [  -HDDij[0][0]*(self.coords[i][1]-Dd_COM[1]) + HDDij[1][0]*(self.coords[i][0]-Dd_COM[0])  ,  -HDDij[0][1]*(self.coords[i][1]-Dd_COM[1]) + HDDij[1][1]*(self.coords[i][0]-Dd_COM[0])  ,  -HDDij[0][2]*(self.coords[i][1]-Dd_COM[1]) + HDDij[1][2]*(self.coords[i][0]-Dd_COM[0])]
+        #Torque_Phi
+        HDdDe_iter[3,3:]= [   HDDij[1][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) - HDDij[1][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) - HDDij[2][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) + HDDij[2][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1])  ,  -HDDij[1][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) + HDDij[1][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) + HDDij[2][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) - HDDij[2][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0])  ,   HDDij[1][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) - HDDij[1][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) - HDDij[2][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1]) + HDDij[2][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0])  ]
+        HDdDe_iter[4,3:]=[  -HDDij[0][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) + HDDij[0][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) + HDDij[2][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) - HDDij[2][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1])  ,   HDDij[0][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) - HDDij[0][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) - HDDij[2][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) + HDDij[2][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ,  -HDDij[0][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) + HDDij[0][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) + HDDij[2][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1]) - HDDij[2][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ]
+        HDdDe_iter[5,3:]=[   HDDij[0][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) - HDDij[0][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1]) - HDDij[1][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) + HDDij[1][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1])  ,  -HDDij[0][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) + HDDij[0][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0]) + HDDij[1][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) - HDDij[1][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ,   HDDij[0][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1]) - HDDij[0][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0]) - HDDij[1][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1]) + HDDij[1][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ]
+        return HDdDe_iter
+        
     def calculate_decomposition(self, include_mass=True):
         """Decompose the Hessian Matrix of the hdANM model.
 
@@ -323,33 +350,26 @@ class hdANM:
         #HDH
         HDH=HHD.T
 
-        #HDD (To be paralalysed)
+        #HDD
         HDD=numpy.zeros((6*len(Domains),6*len(Domains)))
         for numd,Dd in enumerate(Domains):
             for nume,De in enumerate(Domains):
                 HDdDe=numpy.zeros((6,6))
                 Dd_COM=numpy.average([self.coords[i] for i in DomainGroups[Dd]] , 0)
                 De_COM=numpy.average([self.coords[i] for i in DomainGroups[De]] , 0)
-                for i in DomainGroups[Dd]:
-                    for j in DomainGroups[De]:
-                        HDDij=self.get_hessian_block(i,j)
-                        HDdDe_iter=numpy.zeros((6,6))
-                        #F_Delta
-                        HDdDe_iter[0:3,0:3]=HDDij
-                        #F_Phi
-                        HDdDe_iter[0,3:]= [  -HDDij[0][1]*(self.coords[j][2]-De_COM[2]) + HDDij[0][2]*(self.coords[j][1]-De_COM[1])  ,  HDDij[0][0]*(self.coords[j][2]-De_COM[2]) - HDDij[0][2]*(self.coords[j][0]-De_COM[0])  ,  -HDDij[0][0]*(self.coords[j][1]-De_COM[1]) + HDDij[0][1]*(self.coords[j][0]-De_COM[0])]
-                        HDdDe_iter[1,3:]= [  -HDDij[1][1]*(self.coords[j][2]-De_COM[2]) + HDDij[1][2]*(self.coords[j][1]-De_COM[1])  ,  HDDij[1][0]*(self.coords[j][2]-De_COM[2]) - HDDij[1][2]*(self.coords[j][0]-De_COM[0])  ,  -HDDij[1][0]*(self.coords[j][1]-De_COM[1]) + HDDij[1][1]*(self.coords[j][0]-De_COM[0])]
-                        HDdDe_iter[2,3:]= [  -HDDij[2][1]*(self.coords[j][2]-De_COM[2]) + HDDij[2][2]*(self.coords[j][1]-De_COM[1])  ,  HDDij[2][0]*(self.coords[j][2]-De_COM[2]) - HDDij[2][2]*(self.coords[j][0]-De_COM[0])  ,  -HDDij[2][0]*(self.coords[j][1]-De_COM[1]) + HDDij[2][1]*(self.coords[j][0]-De_COM[0])]
-                        #Torque_Delta
-                        HDdDe_iter[3,0:3]= [  -HDDij[1][0]*(self.coords[i][2]-Dd_COM[2]) + HDDij[2][0]*(self.coords[i][1]-Dd_COM[1])  ,  -HDDij[1][1]*(self.coords[i][2]-Dd_COM[2]) + HDDij[2][1]*(self.coords[i][1]-Dd_COM[1])  ,  -HDDij[1][2]*(self.coords[i][2]-Dd_COM[2]) + HDDij[2][2]*(self.coords[i][1]-Dd_COM[1])]
-                        HDdDe_iter[4,0:3]= [   HDDij[0][0]*(self.coords[i][2]-Dd_COM[2]) - HDDij[2][0]*(self.coords[i][0]-Dd_COM[0])  ,   HDDij[0][1]*(self.coords[i][2]-Dd_COM[2]) - HDDij[2][1]*(self.coords[i][0]-Dd_COM[0])  ,   HDDij[0][2]*(self.coords[i][2]-Dd_COM[2]) - HDDij[2][2]*(self.coords[i][0]-Dd_COM[0])]
-                        HDdDe_iter[5,0:3]= [  -HDDij[0][0]*(self.coords[i][1]-Dd_COM[1]) + HDDij[1][0]*(self.coords[i][0]-Dd_COM[0])  ,  -HDDij[0][1]*(self.coords[i][1]-Dd_COM[1]) + HDDij[1][1]*(self.coords[i][0]-Dd_COM[0])  ,  -HDDij[0][2]*(self.coords[i][1]-Dd_COM[1]) + HDDij[1][2]*(self.coords[i][0]-Dd_COM[0])]
-                        #Torque_Phi
-                        HDdDe_iter[3,3:]= [   HDDij[1][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) - HDDij[1][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) - HDDij[2][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) + HDDij[2][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1])  ,  -HDDij[1][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) + HDDij[1][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) + HDDij[2][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) - HDDij[2][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0])  ,   HDDij[1][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) - HDDij[1][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) - HDDij[2][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1]) + HDDij[2][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0])  ]
-                        HDdDe_iter[4,3:]=[  -HDDij[0][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) + HDDij[0][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) + HDDij[2][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) - HDDij[2][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1])  ,   HDDij[0][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][2]-De_COM[2]) - HDDij[0][2]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) - HDDij[2][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) + HDDij[2][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ,  -HDDij[0][0]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][1]-De_COM[1]) + HDDij[0][1]*(self.coords[i][2]-Dd_COM[2])*(self.coords[j][0]-De_COM[0]) + HDDij[2][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1]) - HDDij[2][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ]
-                        HDdDe_iter[5,3:]=[   HDDij[0][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) - HDDij[0][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1]) - HDDij[1][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) + HDDij[1][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1])  ,  -HDDij[0][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][2]-De_COM[2]) + HDDij[0][2]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0]) + HDDij[1][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][2]-De_COM[2]) - HDDij[1][2]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ,   HDDij[0][0]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][1]-De_COM[1]) - HDDij[0][1]*(self.coords[i][1]-Dd_COM[1])*(self.coords[j][0]-De_COM[0]) - HDDij[1][0]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][1]-De_COM[1]) + HDDij[1][1]*(self.coords[i][0]-Dd_COM[0])*(self.coords[j][0]-De_COM[0])  ]
-                        HDdDe=numpy.add(HDdDe,HDdDe_iter)
-                HDD[numd*6:(numd*6)+6 , nume*6:(nume*6)+6]=HDdDe
+                #for i in DomainGroups[Dd]:
+                #    for j in DomainGroups[De]:
+                #        print(i,j)
+                print('Number of CPU cores available: '+str(cpu_count()))
+                
+                with Pool( processes=cpu_count() ) as pool:
+                    func = partial(self.calculate_HDdDe_iter, Dd_COM, De_COM)
+                    results = pool.starmap( func, list(iter_prod(DomainGroups[Dd],DomainGroups[De])) )
+                
+                for i in results:
+                    HDdDe=numpy.add(HDdDe,i)
+                
+                HDD[numd*6:(numd*6)+6 , nume*6:(nume*6)+6] = HDdDe
         
         
         #Reconstruction
