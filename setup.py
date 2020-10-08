@@ -1,3 +1,4 @@
+import packman
 from setuptools import setup
 
 PACKAGES=['packman',
@@ -14,7 +15,7 @@ SCRIPTS=['packman=packman.bin.PACKMAN:main']
 
 
 setup(name='py-packman',
-      version='1.2.3',
+      version=packman.__version__,
       description='A software package for molecular PACKing and Motion ANalysis (PACKMAN)',
       url='https://github.com/Pranavkhade/PACKMAN',
       author='Pranav Khade',
