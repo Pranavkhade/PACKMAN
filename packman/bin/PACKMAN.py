@@ -13,7 +13,10 @@ import argparse
 import os
 import sys
 
-import urllib
+try:
+    from urllib.request import urlopen
+except Exception:
+    from urllib2 import urlopen
 
 
 '''
@@ -83,8 +86,8 @@ def IO():
 
     # web server parameters
     web_server_group = parser.add_argument_group('Web server parameters', 'Used by the web form')
-    web_server_group.add_argument('--outputfile', type=argparse.FileType('wb', 0), default=sys.stdout, help='Path and filename write output to')
-    web_server_group.add_argument('--logfile', type=argparse.FileType('wb', 0), default=sys.stderr, help='Path and filename write log messages to')
+    web_server_group.add_argument('--outputfile', type=argparse.FileType('w', 1), default=sys.stdout, help='Path and filename write output to')
+    web_server_group.add_argument('--logfile', type=argparse.FileType('w', 1), default=sys.stderr, help='Path and filename write log messages to')
     web_server_group.add_argument('--callbackurl', type=str, help='Optional callback url if this script was called from Drupal.')
     web_server_group.add_argument('--nodeid', type=int, help='Optional node id if this script was called from Drupal.')
     
@@ -125,12 +128,12 @@ def main():
                 SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
         
         if args.nodeid is not None:
-            urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
+            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
 
     except Exception:
         print(traceback.print_exc())
         if args.nodeid is not None:
-            urllib.urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
+            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
     
     finally:
         print_footnotes(args.outputfile)
