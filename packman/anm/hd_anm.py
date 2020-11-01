@@ -323,7 +323,7 @@ class hdANM:
         #HDH
         HDH=HHD.T
 
-        #HDD (To be paralalysed)
+        #HDD
         HDD=numpy.zeros((6*len(Domains),6*len(Domains)))
         for numd,Dd in enumerate(Domains):
             for nume,De in enumerate(Domains):

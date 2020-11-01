@@ -15,6 +15,13 @@ How to cite::
 Note: If PACKMAN is not installed, please follow the link: https://github.com/Pranavkhade/PACKMAN
 
 
+QUICK ALGORITHM OVERVIEW
+------------------------
+.. image:: ../../_static/gallary/hinge_prediction_algorithm_method1.jpg
+
+Please visit the following for the 15 minute video about the algorithm: https://youtu.be/3ALOxMqR1EA
+
+
 Step 1: Loading Structure
 -------------------------
 

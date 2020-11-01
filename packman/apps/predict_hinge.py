@@ -415,7 +415,7 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             GetLeastSquarePlane(atoms,i,numi+1)
             outputfile.write("#--------------------------------------------------#\n")
             #HingeObject
-            Hinges.append( Hinge(numi,i,hstats,p_value))
+            Hinges.append( Hinge(numi,Alpha,i,hstats,p_value))
         
         #Assigning domain IDs
         AllChainResidues=[i for i in HingeResidues[0].get_parent().get_residues()]

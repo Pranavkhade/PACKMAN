@@ -13,7 +13,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
+import packman
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +22,7 @@ copyright = '2020, Pranav Khade(https://github.com/Pranavkhade)'
 author = 'Pranav Khade(https://github.com/Pranavkhade)'
 
 # The full version, including alpha/beta/rc tags
-release = '1.2.3'
+release = packman.__version__
 
 
 # -- General configuration ---------------------------------------------------
