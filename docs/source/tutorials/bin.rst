@@ -1,17 +1,13 @@
 .. _tutorials_hinge_prediction:
 
-Hinge Prediction using Alpha Shape (Commandline)
-================================================
+Hinge Prediction using Alpha Shape (Beginners start here; After installation)
+=============================================================================
 
-This tutorial familiarises users with the command line interface of the Hinge Prediction algorithm using Alpha Shapes. The same functionality is also available in the PACKMAN API ( :ref:`tutorials_predict_hinge` ).
+This tutorial familiarises users with the both Command-line Interface (CLI) and Graphical User Interface (GUI) of the Hinge Prediction algorithm using Alpha Shapes. The same functionality is also available in the PACKMAN API ( :ref:`tutorials_predict_hinge` ).
 
-Web Server: https://packman.bb.iastate.edu/
+Please note that there are webservers available for majority of publications in this package before running either User Interface (UI). Example:
 
-How to cite::
-
-    Pranav M. Khade, Ambuj Kumar, Robert L. Jernigan, Characterizing and Predicting Protein Hinges for 
-    Mechanistic Insight, Journal of Molecular Biology, Volume 432, Issue 2, 2020, Pages 508-522,
-    ISSN 0022-2836, https://doi.org/10.1016/j.jmb.2019.11.018.
+PACKMAN Hinge Prediction Web Server: https://packman.bb.iastate.edu/
 
 QUICK ALGORITHM OVERVIEW
 ------------------------
@@ -19,8 +15,23 @@ QUICK ALGORITHM OVERVIEW
 
 Please visit the following for the 15 minute video about the algorithm: https://youtu.be/3ALOxMqR1EA
 
-INSTRUCTIONS
-------------
+GUI INSTRUCTIONS
+----------------
+
+The PACKMAN GUI is one place for all the components in the PACKMAN including hdANM. It also helps user to generate .hng files without any hassle (Please follow the instructions in the GUI).
+
+Run the following command in the terminal where python along with py-packman is installed. (See tutorial section for the installation section)::
+
+    python -m packman gui
+
+After this, GUI is made extremely simple and easy to follow (Follow section specific instructions on the GUI). Click away!
+
+Video Tutorial (coming soon)
+
+CLI INSTRUCTIONS
+----------------
+
+CLI Currently covers only hinge prediction. If you need to run compliance analysis, please use the Application User Interface (API) section in the tutorials.
 
 Following is the PACKMAN interface description::
 

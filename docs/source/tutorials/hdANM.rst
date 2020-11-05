@@ -50,7 +50,7 @@ The first column in the .hng file is Filename_ChainID, the second column is Doma
 Code Example::
 
     from packman.anm import hdANM
-    Model=hdANM(calpha,dr=dr,power=power,hng_file='1exr.pdb.hng')
+    Model=hdANM(calpha,dr=15,power=0,hng_file='1exr.pdb.hng')
 
 Step 3: Calculating Hessian Matrix
 ----------------------------------
@@ -100,3 +100,24 @@ Code Example::
     Model.calculate_movie(6,scale=2,n=10)
 
 The '6.pdb' file will be saved on the present working directory containing the motion for the 7th (First Non Rigid) Mode.
+
+
+Step 6: Getting hdANM output matrices (Hessian Pseudoinverse / Cross-Correlation Matrix)
+----------------------------------------------------------------------------------------
+
+This step can be done before generating movies as well. In order to get the hdANM output matrices such as Hessian Pseudoinverse / Cross-Correlation Matrix/ Reverse Transformed Eigenvectors. Please read the paper for more details about the theory and importance of these matrices.
+
+Note: Reverse Transformed Eigenvectors has dimension: 3N x 6D+3H (N= Number of atoms, D= Number of domains & H= Number of hinge Atoms)
+
+Code Example::
+
+    #Here, 'n_modes' variable is number of first non-rigid modes to get the result matrices
+
+    #For the Hessian Pseudoinverse,
+    Model.get_hessian_pseudoinverse(n_modes)
+
+    #For the Correlation Matrix,
+    Model.get_crosscorrelation_matrix(n_modes=10)
+
+    #For the Reverse Transformed Eigenvectors,
+    Model.get_RT_eigen_vectors()

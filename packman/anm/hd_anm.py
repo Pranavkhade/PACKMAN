@@ -86,6 +86,8 @@ class hdANM:
         self.pf      = pf
         self.atoms   = atoms
         self.HNGinfo = load_hinge(hng_file)
+        self.RT_eigen_vectors = None
+
         #Coords are in the same order as the atoms
         self.coords  = numpy.array([i.get_location() for i in atoms])
         if self.pf != None and self.pf <= 0:
@@ -133,6 +135,19 @@ class hdANM:
         """
         return self.eigen_vectors
     
+    def get_RT_eigen_vectors(self):
+        """Get the Reverse Transformed vectors from the hdANM eigenvectors. 
+    
+        Reverse transformed means that the hdANM eigenvector of dimension: 6D+3H x 6D+3H  (D: Number of domains; H: Number of hinge atoms) are converted to 3N x 6D+3H (N: Number of atoms)
+
+        Note:
+            - It was refered as 'exploded vector' utill version 1.3.3
+    
+        Returns:
+            numpy.ndarray: Reverse Transformed Vector if successful; None otherwise
+        """
+        return self.RT_eigen_vectors
+    
     def get_fluctuations(self):
         """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
         
@@ -143,6 +158,25 @@ class hdANM:
             numpy.ndarray: Fluctuations if successful; None otherwise
         """
         return self.fluctuations
+    
+    def get_hessian_pseudoinverse(self,n_modes="all"):
+        """Get the Pseudoinverse of the hdANM model.
+
+        Returns:
+            numpy.ndarray: Pseudoinverse if successul; None otherwise
+        """
+        try:
+            return self.hessian_pseudoinverse
+        except:
+            self.calculate_hessian_pseudoinverse(n_modes=n_modes)
+            return self.hessian_pseudoinverse
+    
+    def get_crosscorrelation_matrix(self,n_modes="all"):
+        try:
+            return self.crosscorrelation_matrix
+        except:
+            self.calculate_cross_correlation(n_modes=n_modes)
+            return self.crosscorrelation_matrix
     
     def get_hessian_block(self,Index1,Index2):
         """Calculate Hij (Hessian matrix component) using equation . ()
@@ -419,19 +453,16 @@ class hdANM:
         self.domain_hessian, self.domain_mass_matrix, self.domain_info = H_new, M, DomainInfo #DomainInfo is saved to check the sequence in which H_new is formed
         return True
     
+    def calculate_RT_eigen_vectors(self):
+        """Calculate the reverse transformed vectors from the hdANM eigenvectors. 
+    
+        Reverse transformed means that the hdANM eigenvector of dimension: 6D+3H x 6D+3H  (D: Number of domains; H: Number of hinge atoms) are converted to 3N x 6D+3H (N: Number of atoms)
 
-    def calculate_fluctuations(self):
-        """Calculate the Fluctuations of the hd-ANM model.
-
-        The fluctualtions/ theoretical b-factors are calculated using this method.
-        
         Note:
-            - Fluctuations are calculated. use hdANM().get_fluctuations() to obtain the fluctuations.
-            - Endmode needs to be put in the code if and when required.
-            - hdANM().fluctuations() stores the output of this function
+            - It was refered as 'exploded vector' utill version 1.3.3
         """
-        x0=numpy.array([i.get_location() for i in self.atoms])
-        d0=[i.get_domain_id() for i in self.atoms]
+        x0 = numpy.array([i.get_location() for i in self.atoms])
+        d0 = [i.get_domain_id() for i in self.atoms]
         
         exploded_vectors=numpy.zeros((len(x0)*3, len(self.eigen_values) ))
 
@@ -454,8 +485,27 @@ class hdANM:
                 new_column.extend([new_x,new_y,new_z])
             exploded_vectors[:,mode_number]=numpy.array(new_column)
         
-        numpy.savetxt('Explooded.txt',exploded_vectors)
-        exploded_vectors=exploded_vectors.T
+        self.RT_eigen_vectors = exploded_vectors
+        return True
+
+    def calculate_fluctuations(self):
+        """Calculate the Fluctuations of the hd-ANM model.
+
+        The fluctualtions/ theoretical b-factors are calculated using this method.
+        
+        Note:
+            - Fluctuations are calculated. use hdANM().get_fluctuations() to obtain the fluctuations.
+            - Endmode needs to be put in the code if and when required.
+            - hdANM().fluctuations stores the output of this function.
+        """
+        x0 = numpy.array([i.get_location() for i in self.atoms])
+
+        if(self.RT_eigen_vectors == None):
+            self.calculate_RT_eigen_vectors()
+        
+        exploded_vectors = self.RT_eigen_vectors
+        exploded_vectors = exploded_vectors.T
+
         mode_bfactors=[]
         for numi,i in enumerate(self.eigen_values[6:]):
             evec_row=exploded_vectors[numi+6]
@@ -465,6 +515,42 @@ class hdANM:
         self.fluctuations = [numpy.sum(i) for i in mode_bfactors.T]
         return True
     
+    def calculate_hessian_pseudoinverse(self, n_modes="all"):
+        """Calculate the hessian pseudoinverse for the hd-ANM modes
+
+        Pseudoinverse is calculated using this methd. Please note that first 6 rigid modes are eliminated in this calculation.
+
+        Note:
+            - Can be called on demand or can be called from get method automatically (Needs thinking)
+        """
+        
+            
+        if(self.RT_eigen_vectors == None):
+            self.calculate_RT_eigen_vectors()
+        EVec=self.get_RT_eigen_vectors().T
+        if(n_modes=="all"):
+            self.hessian_pseudoinverse = numpy.matmul(  numpy.matmul( EVec[6:].transpose() , numpy.diag(1/self.get_eigenvalues()[6:]) )  , EVec[6:]  )
+        else:
+            self.hessian_pseudoinverse = numpy.matmul(  numpy.matmul( EVec[6:6+n_modes].transpose() , numpy.diag(1/self.get_eigenvalues()[6:6+n_modes]) )  , EVec[6:6+n_modes]  )
+    
+    def calculate_cross_correlation( self, n_modes = "all" ):
+        """Calculate the cross correlation matrix for the hdANM modes.
+
+        Crosscorrelation matrix is generated for all modes by default. Please change the n_modes parameter to restrict modes.
+
+        Args:
+            -   n_modes (int): Number of modes that need to be considered to calculate the cross correlation matrix. 
+        """
+        self.calculate_hessian_pseudoinverse(n_modes=n_modes)
+        
+        self.crosscorrelation_matrix = numpy.zeros( (len(self.atoms), len(self.atoms)) )
+        for i in range(0,len(self.atoms)):
+            for j in range(0,len(self.atoms)):
+                trace_H_inv_ij = numpy.trace( self.get_hessian_pseudoinverse()[i*3:i*3+3,j*3:j*3+3] )
+                trace_H_inv_ii = numpy.trace( self.get_hessian_pseudoinverse()[i*3:i*3+3,i*3:i*3+3] )
+                trace_H_inv_jj = numpy.trace( self.get_hessian_pseudoinverse()[j*3:j*3+3,j*3:j*3+3] )
+
+                self.crosscorrelation_matrix[i][j] = trace_H_inv_ij / numpy.sqrt( trace_H_inv_ii*trace_H_inv_jj )
 
     def calculate_movie(self,mode_number,scale=1.5,n=10, extrapolation="curvilinear", direction="both"):
         """This function generates the dynamic 3D projection of the normal modes obtained using hd-ANM. The 3D projection can be linearly extrapolated or curvilinearly extrapolated depending on the choices.

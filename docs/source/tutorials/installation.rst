@@ -20,15 +20,12 @@ PREREQUISITES
 INSTALLATION
 ------------
 
-1. Installing from source::
+1. Installing with pip (Recommended)::
+
+    pip install py-packman
+    
+2. Installing from source::
 
     git clone https://github.com/Pranavkhade/PACKMAN
     cd PACKMAN
     python setup.py install
-
-
-2. Installing with pip::
-
-    pip install py-packman
-    #OR
-    pip install git+git://github.com/Pranavkhade/PACKMAN
