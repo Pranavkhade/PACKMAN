@@ -1,12 +1,14 @@
 Metadata-Version: 1.1
 Name: py-packman
-Version: 1.2.3
+Version: 1.2.5
 Summary: A software package for molecular PACKing and Motion ANalysis (PACKMAN)
 Home-page: https://github.com/Pranavkhade/PACKMAN
 Author: Pranav Khade
 Author-email: pranavk@iastate.edu
 License: MIT
-Description: UNKNOWN
+Description: This package focuses on studying molecular structures and their dynamics using a simple yet informative property known as Protein Packing. Over the last few years, we have worked on several techniques to capture and quantify the protein packing, resulting in a few publications. This package has all the code to repeat and further develop these techniques.
+        
+        Please visit for more details: https://github.com/Pranavkhade/PACKMAN
 Keywords: protein,dynamics,protein packing,protein domain,protein hinge
 Platform: UNKNOWN
 Classifier: Intended Audience :: Education

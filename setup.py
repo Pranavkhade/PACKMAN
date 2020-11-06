@@ -22,6 +22,7 @@ setup(name='py-packman',
       author_email='pranavk@iastate.edu',
       license='MIT',
       packages=PACKAGES,
+      long_description = 'This package focuses on studying molecular structures and their dynamics using a simple yet informative property known as Protein Packing. Over the last few years, we have worked on several techniques to capture and quantify the protein packing, resulting in a few publications. This package has all the code to repeat and further develop these techniques.\n\nPlease visit for more details: https://github.com/Pranavkhade/PACKMAN',
       keywords=('protein, dynamics, protein packing, protein domain, protein hinge'),
       classifiers=[
               'Intended Audience :: Education',

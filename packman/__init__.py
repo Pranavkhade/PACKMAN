@@ -15,4 +15,4 @@ from .utilities import *
 
 
 #VERSION CHANGE HERE CHANGES IT IN docs AND setup.py; STILL NEED TO CHANGE IT IN requirement.txt
-__version__='1.1.4'
+__version__='1.2.5'

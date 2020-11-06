@@ -35,12 +35,14 @@ class Hinge():
 
     Args:
         hid (int)                          : Unique Hinge ID
+        alpha_value (float)                : The hinge prediction algorithm parameter (Alpha Value) of the Hinge.
         elements (packman.molecule.Residue): The elements defining the current hinge (Currently residue objects)
         stats ([float])                    : Everything about the statistics (mean/median/mode of B-factors)
         p (float)                          : p-value obtained from the permutation test (Please read the paper for more details)
     """
-    def __init__(self,hid,elements,stats,p):
+    def __init__(self,hid,alpha_value,elements,stats,p):
         self.__id=hid
+        self.__alpha_value=alpha_value
         self.__elements=elements
         self.__stats=stats
         self.__p=p
@@ -53,6 +55,14 @@ class Hinge():
             int if successful, None otherwise.
         """
         return self.__id
+    
+    def get_alpha_value(self):
+        """Get the hinge prediction algorithm parameter (Alpha Value) of the 'Hinge'.
+
+        Returns:
+            float if successful, None otherwise
+        """
+        return self.__alpha_value
 
     def get_elements(self):
         """Get the elements (Currently residue objects) of the 'Hinge'

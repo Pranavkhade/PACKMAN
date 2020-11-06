@@ -104,11 +104,11 @@ def IO():
 
 '''
 ##################################################################################################
-#                                             Main                                               #
+#                                             CLI                                                #
 ##################################################################################################
 '''
 
-def main():
+def load_cli():
     """Main Function for PACKMAN.
 
     Kernel of the PACKMAN interface.
@@ -675,11 +675,18 @@ def load_gui():
     app.mainloop()
 
 
-if(__name__ == '__main__'):
+def main():
+    """Gatewayto CLI and GUI
+    """
     GUI_OPTION = False
     try:
         if(sys.argv[1] == "gui"):GUI_OPTION = True
     except:
-        main()
+        load_cli()
     
     if(GUI_OPTION):load_gui()
+
+
+
+if(__name__ == '__main__'):
+    main()
