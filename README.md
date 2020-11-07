@@ -29,6 +29,22 @@ cd PACKMAN
 python setup.py install
 ```
 
+HOW TO USE
+----------
+
+PACKMAN, along with its components, can be accessed via Graphical User Interface (GUI), Command-line Interface (CLI), and Application programming interface (API).
+
+For the GUI, please run the following command.
+```
+python -m packman gui
+```
+OR
+```
+python3 -m packman gui
+```
+
+For the CLI and API, please read the tutorials & documentation.
+
 PREREQUISITES
 -------------
 

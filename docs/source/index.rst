@@ -27,7 +27,7 @@ Web Servers
 --------------
 
 * Hinge Prediction (https://packman.bb.iastate.edu/)
-* hdANM (coming_soon)
+* hdANM (https://hdanm.bb.iastate.edu/)
 
 Publications
 ---------------
