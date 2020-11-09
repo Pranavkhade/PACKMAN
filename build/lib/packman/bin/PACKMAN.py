@@ -579,19 +579,18 @@ class hdANM_GUI(tk.Frame):
 
         #For checking if the format is right and chain id is right
         try:
-            backbone = [j for i in mol[0][self.Box2.get()].get_backbone() for j in i if j is not None]
+            calpha=[i for i in mol[0][self.Box2.get()].get_calpha() if i is not None]
         except:
             showinfo('Notification','Chain ID is either not specified or not valid. Running hdANM on all the chains.')
             try:
-                backbone = []
+                calpha = []
                 for chain in mol[0].get_chains():
-                    backbone.extend( [j for i in mol[0][chain.get_id()].get_backbone() for j in i if j is not None] )
+                    calpha.extend( [i for i in mol[0][chain.get_id()].get_calpha() if i is not None] )
 
             except:    
                 showerror('Error','Provide valid chain ID or check the PDB file format.')
                 exit()
         
-        calpha=[i for i in mol[0]['A'].get_calpha() if i is not None]
 
         Model=hdANM( calpha,dr=cutoff_value,power=power_of_distance,hng_file=self.Box5.get() )
 
