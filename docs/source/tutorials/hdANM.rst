@@ -23,7 +23,9 @@ Code Example::
     from packman import molecule
 
     #File loading 
-    mol=molecule.load_structure('1exr.pdb')
+    mol=molecule.load_structure('1exr.cif')
+    #OR
+    #mol=molecule.load_structure('1exr.pdb')
 
     #If the c-alpha atoms of the ALL the chains need to be studied,
     #calpha=[i for i in mol[0].get_calpha()  if i is not None]

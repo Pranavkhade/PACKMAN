@@ -57,6 +57,7 @@ class Atom():
         self.__bfactor=bfactor
         self.__SegmentIdentifier=None
         self.__Element=Element
+        self.__Charge=Charge
 
     #Get Functions
     def get_id(self):
@@ -134,6 +135,14 @@ class Atom():
         """
         return self.__Element
     
+    def get_charge(self):
+        """Get the Charge of the given 'Atom'
+
+        Returns:
+            str if successful, None otherwise.
+        """
+        return self.__Charge
+    
     def get_domain_id(self):
         """Get the Domain Identifier of the given 'Atom'. Hinge Prediction is Necessary for this option.
 
@@ -146,7 +155,7 @@ class Atom():
             str if successful, None otherwise.
         """
         return self.get_parent().get_domain_id()
-
+    
     #Set Functions
     def set_id(self,new_id):
         """Set the ID of the given 'Atom'
@@ -219,6 +228,14 @@ class Atom():
             new_element (str): The Element User wishes to assign to the given 'Atom'
         """
         self.__Element=new_element
+    
+    def set_charge(self,new_charge):
+        """Set the Charge of the given 'Atom'
+
+        Args:
+            new_charge (str): The Charge User wishes to assign to the given 'Atom'
+        """
+        self.__Charge=new_charge
 
     #Calculation Functions
     def calc_dist(self,another_atom):

@@ -212,7 +212,7 @@ class Skeleton(tk.Tk):
         self.show_frame(frame_name)
 
         try:
-            self.title_content = "GUI for PACKMAN Version: "+packman.__version__
+            self.title_content = "PACKMAN GUI"
             self.title( self.title_content )
         except:
             self.title_content = "PACKMAN GUI"
@@ -281,14 +281,14 @@ class HingePrediction(tk.Frame):
         self.Text1 =  tk.Text(parent, height=10)
         self.Label1 = tk.Label(parent, text="Hinge Prediction")
         self.Label2 = tk.Label(parent, text="Note: Keep increasing the Alpha Value if hinges do not show up in the results.", borderwidth=2, relief="groove")
-        self.Label3 = tk.Label(parent, text="PDB ID:")
+        self.Label3 = tk.Label(parent, text="Filename:")
         self.Label4 = tk.Label(parent, text="Chain ID:")
         self.Label5 = tk.Label(parent, text="Alpha Value:")
         self.Label6 = tk.Label(parent, text="Number of Eccentricity Clusters:")
         self.Label7 = tk.Label(parent, text="Minimum Hinge Length:")
 
         #Input
-        self.Text1.insert(END,"Interface to the functionality to identify the protein hinges (separating the domains) using PACKMAN. It can also be used to read, write, manipulate and analyze protein molecules and it's properties through its API.\n\nCitation:\n\nKhade PM, Kumar A, Jernigan RL. Characterizing and Predicting Protein Hinges for Mechanistic\nInsight. J Mol Biol. November 2019. doi:10.1016/j.jmb.2019.11.018" )
+        self.Text1.insert(END,"Interface to the functionality to identify the protein hinges (separating the domains) using PACKMAN. It can also be used to read, write, manipulate and analyze protein molecules and it's properties through its API.\n\nCitation:\nKhade PM, Kumar A, Jernigan RL. Characterizing and Predicting Protein Hinges for Mechanistic\nInsight. J Mol Biol. November 2019. doi:10.1016/j.jmb.2019.11.018\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid)" )
         self.Text1.config(state=DISABLED)
         self.Box1 = tk.Entry(parent)
         self.Box2 = tk.Entry(parent)
@@ -334,17 +334,23 @@ class HingePrediction(tk.Frame):
         PACKMAN Hinge Prediction Algorithm
         """
         try:
-            mol = molecule.load_structure(self.Box1.get()+'.pdb')
+            mol = molecule.load_structure(self.Box1.get())
         except:
-            showinfo('Notification','File on found in the folder, downloading it from the PDB.')
+            showinfo('Notification','File not found in the folder, downloading it from the PDB.')
             
             #For file availability
             try:
-                molecule.download_structure(self.Box1.get(), self.Box1.get()+'.pdb')
+                try:
+                    molecule.download_structure(self.Box1.get().split('.')[0], ftype= self.Box1.get().split('.')[1])
+                except:
+                    molecule.download_structure( self.Box1.get() )
             except:
                 showerror('Error','Please check the internet connection or the validity of the PDB ID')
-                exit()
-        mol = molecule.load_structure(self.Box1.get()+'.pdb')
+                exit()        
+        try:
+            mol = molecule.load_structure( self.Box1.get() )
+        except:
+            mol = molecule.load_structure(self.Box1.get()+'.cif')
 
         #Other parameter validity
         try:
@@ -362,8 +368,11 @@ class HingePrediction(tk.Frame):
             showinfo('Notification','Chain ID is either not specified or not valid. Running PACKMAN on all the chains.')
             try:
                 for chain in mol[0].get_chains():
-                    backbone = [j for i in mol[0][chain.get_id()].get_backbone() for j in i if j is not None]
-                    predict_hinge(backbone, Alpha=alpha, nclusters=ecc_clust, MinimumHingeLength=min_length, outputfile=open('output.txt', 'w'))
+                    try:
+                        backbone = [j for i in mol[0][chain.get_id()].get_backbone() for j in i if j is not None]
+                        predict_hinge(backbone, Alpha=alpha, nclusters=ecc_clust, MinimumHingeLength=min_length, outputfile=open('output.txt', 'w'))
+                    except:
+                        None
 
             except:    
                 showerror('Error','Possible Solutions:\n1. Provide valid chain ID or check the PDB file format.\n2. Try changing Alpha Value')
@@ -509,7 +518,7 @@ class hdANM_GUI(tk.Frame):
         self.Label8 = tk.Label(parent, text="Mass of the residue")
 
         #Input
-        self.Text1.insert(END,"hdANM is a comprehensive Elastic Network Model. Please read the paper for more details.\n\nCitation:\n\nPaper Submitted." )
+        self.Text1.insert(END,"hdANM is a comprehensive Elastic Network Model. Please read the paper for more details.\n\nCitation:\n\nPaper Submitted.\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid)" )
         self.Text1.config(state=DISABLED)
         
         self.Box1 = tk.Entry(parent)
@@ -558,17 +567,23 @@ class hdANM_GUI(tk.Frame):
     
     def run_hdANM(self):
         try:
-            mol = molecule.load_structure(self.Box1.get()+'.pdb')
+            mol = molecule.load_structure(self.Box1.get())
         except:
-            showinfo('Notification','File on found in the folder, downloading it from the PDB.')
+            showinfo('Notification','File not found in the folder, downloading it from the PDB.')
             
             #For file availability
             try:
-                molecule.download_structure(self.Box1.get(), self.Box1.get()+'.pdb')
+                try:
+                    molecule.download_structure(self.Box1.get().split('.')[0], ftype= self.Box1.get().split('.')[1])
+                except:
+                    molecule.download_structure( self.Box1.get() )
             except:
                 showerror('Error','Please check the internet connection or the validity of the PDB ID')
                 exit()
-        mol = molecule.load_structure(self.Box1.get()+'.pdb')
+        try:
+            mol = molecule.load_structure( self.Box1.get() )
+        except:
+            mol = molecule.load_structure(self.Box1.get()+'.cif')
 
         #Other parameter validity
         try:
@@ -585,7 +600,10 @@ class hdANM_GUI(tk.Frame):
             try:
                 calpha = []
                 for chain in mol[0].get_chains():
-                    calpha.extend( [i for i in mol[0][chain.get_id()].get_calpha() if i is not None] )
+                    try:
+                        calpha.extend( [i for i in mol[0][chain.get_id()].get_calpha() if i is not None] )
+                    except:
+                        None
 
             except:    
                 showerror('Error','Provide valid chain ID or check the PDB file format.')
@@ -664,7 +682,7 @@ class hdANM_GUI(tk.Frame):
                 Model.calculate_movie(n_mode, n=n_frames,scale=n_scale,extrapolation="curvilinear")
             elif(projection =="Linear"):
                 Model.calculate_movie(n_mode, n=n_frames,scale=n_scale,extrapolation="linear")
-            showinfo('Notification',str(n_mode)+'.pdb movie generated & saved.')
+            showinfo('Notification',str(n_mode)+'.pdb /.cif movie generated & saved.')
             return True
         
         return True
