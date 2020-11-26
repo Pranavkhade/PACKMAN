@@ -461,14 +461,14 @@ class HingePrediction(tk.Frame):
                 try:
                     if(ChainOfHinge != All_Hinges[numi+1].get_elements()[0].get_parent().get_id() ):
                         select_count += 1
-                        fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
+                        fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
                         last_hinge_end = 0
                 except:
                     None
 
             if(last_hinge_end != ALL_RESIDUES[ChainOfHinge][-1]):
                 select_count += 1
-                fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
+                fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
             fh.flush()
             fh.close()
             showinfo('Notification',self.output_filename.get()+' file saved!')

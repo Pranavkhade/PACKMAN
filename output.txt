@@ -2,37 +2,19 @@ Filename= Output.pdb	| Chain(s)= A	| AlphaValue= 2.8	| MinimumHingeLength= 5	| E
 Hindge Residues(Predicted):
 
 Hinge #1
-Residues: MET-72 to GLY-97
+Residues: ASP-64 to GLU-84
 
 STATISTICS
 		N	Min	Max	Mean	Mode	Median	STDDev
-Total   	588	4.33	38.54	14.347091836734695	9.51	13.015	6.39072842013063
-Hinge   	104	6.12	23.26	12.368365384615384	10.79	10.84	4.0529246587582906
-NonHinge	484	4.33	38.54	14.772272727272725	14.49	13.66	6.713088563236094
+Total   	732	5.93	73.63	13.700601092896175	10.13	11.885000000000002	6.3900337718904465
+Hinge   	128	7.71	27.59	16.569921875	18.83	17.22	4.5079702846898275
+NonHinge	604	5.93	73.63	13.09253311258278	10.13	11.32	6.562369143991836
 
-p-value:	0.0004
+p-value:	0.0
 
 Pymol Terminal Commands for Visualizing:
-color blue, resi 72:97
+color blue, resi 64:84
 import plane
-plane.make_plane_points(name='HingePlane1', l1=[39.928, 30.537, 10.730449459153562], l2=[39.928, 20.5, -0.3005573859795305], l3=[55.676, 20.5, 23.668707473399365], center=False, makepseudo=False)
+plane.make_plane_points(name='HingePlane1', l1=[34.143, 14.635, 3.585097956788182], l2=[34.143, -4.245, 24.423839275053922], l3=[44.018, -4.245, 19.506219618752525], center=False, makepseudo=False)
 set cgo_transparency, 0.35, HingePlane1
-#--------------------------------------------------#
-
-Hinge #2
-Residues: PHE-142 to LYS-149
-
-STATISTICS
-		N	Min	Max	Mean	Mode	Median	STDDev
-Total   	588	4.33	38.54	14.347091836734695	9.51	13.015	6.39072842013063
-Hinge   	32	5.94	36.53	15.859375	5.94	14.3	7.76490056983185
-NonHinge	556	4.33	38.54	14.260053956834533	9.51	12.695	6.291474632758414
-
-p-value:	0.1685
-
-Pymol Terminal Commands for Visualizing:
-color blue, resi 142:149
-import plane
-plane.make_plane_points(name='HingePlane2', l1=[51.283, 35.26, 6.924268771369128], l2=[51.283, 29.571, 14.794390482090805], l3=[56.705, 29.571, 18.92068378727337], center=False, makepseudo=False)
-set cgo_transparency, 0.35, HingePlane2
 #--------------------------------------------------#

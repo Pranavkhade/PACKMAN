@@ -101,7 +101,11 @@ Code Example::
     
     Model.calculate_movie(6,scale=2,n=10)
 
-The '6.pdb' file will be saved on the present working directory containing the motion for the 7th (First Non Rigid) Mode.
+OR::
+
+    Model.calculate_movie(6,scale=2,n=10,ftype='pdb')
+
+The '6.cif' / '6.pdb' file will be saved on the present working directory containing the motion for the 7th (First Non Rigid) Mode.
 
 
 Step 6: Getting hdANM output matrices (Hessian Pseudoinverse / Cross-Correlation Matrix)

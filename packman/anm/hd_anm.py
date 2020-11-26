@@ -576,33 +576,42 @@ class hdANM:
         new_coords=[]
 
         if(extrapolation=="linear"):
-            with open(str(mode_number)+'.pdb','w') as fh:
-                if(direction=="both"):
-                    movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
-                elif(direction=="+"):
-                    movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
-                elif(direction=="-"):
-                    movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
-                for j in movement:
-                    HingeResidue=0
-                    for numi,i in enumerate(x0):
-                        if(d0[numi][0]=='D'):
-                            D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
-                            D_COM=self.domain_info[d0[numi]][1]
-                            new_x=i[0]+scale*j* ( D_delta_phi[0] + (D_delta_phi[4]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[1]-D_COM[1])) )
-                            new_y=i[1]+scale*j* ( D_delta_phi[1] + (D_delta_phi[3]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[0]-D_COM[0])) )
-                            new_z=i[2]+scale*j* ( D_delta_phi[2] + (D_delta_phi[3]*(i[1]-D_COM[1])) - (D_delta_phi[4]*(i[0]-D_COM[0])) )
-                        if(d0[numi][0]=='H'):
-                            delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
-                            new_x=i[0]+scale*j*delta[0]
-                            new_y=i[1]+scale*j*delta[1]
-                            new_z=i[2]+scale*j*delta[2]
-                            HingeResidue+=1
-                        new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
-                        new_coords.append([new_x,new_y,new_z])
-                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),round(self.atoms[numi].get_bfactor(),2),'',self.atoms[numi].get_element(),''))
-                        
-                    fh.write('ENDMDL')
+            
+            if(direction=="both"):
+                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
+            elif(direction=="+"):
+                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
+            elif(direction=="-"):
+                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+            ModelsOfTheProtein = []
+            for j in movement:
+                HingeResidue=0
+                AtomsOfTheFrame = {}
+                for numi,i in enumerate(x0):
+                    if(d0[numi][0]=='D'):
+                        D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
+                        D_COM=self.domain_info[d0[numi]][1]
+                        new_x=i[0]+scale*j* ( D_delta_phi[0] + (D_delta_phi[4]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[1]-D_COM[1])) )
+                        new_y=i[1]+scale*j* ( D_delta_phi[1] + (D_delta_phi[3]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[0]-D_COM[0])) )
+                        new_z=i[2]+scale*j* ( D_delta_phi[2] + (D_delta_phi[3]*(i[1]-D_COM[1])) - (D_delta_phi[4]*(i[0]-D_COM[0])) )
+                    if(d0[numi][0]=='H'):
+                        delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
+                        new_x=i[0]+scale*j*delta[0]
+                        new_y=i[1]+scale*j*delta[1]
+                        new_z=i[2]+scale*j*delta[2]
+                        HingeResidue+=1
+                    new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
+                    new_coords.append([new_x,new_y,new_z])
+                    currentatm = Atom(self.atoms[numi].get_id() , self.atoms[numi].get_name(), numpy.array([new_x,new_y,new_z]), self.atoms[numi].get_occupancy(), self.atoms[numi].get_bfactor(), self.atoms[numi].get_element(),self.atoms[numi].get_charge(), self.atoms[numi].get_parent() )
+                    AtomsOfTheFrame[numi] = currentatm
+                
+                ModelsOfTheProtein.append( Model(j, AtomsOfTheFrame, None, None, None, None) )
+            
+            Annotations = self.atoms[0].get_parent().get_parent().get_parent().get_parent().get_data()
+            prot = Protein(str(mode_number), ModelsOfTheProtein)
+            prot.set_data(Annotations)
+            prot.write_structure( str(mode_number)+'.'+ftype )
+            
 
         elif(extrapolation=="curvilinear"):
         
@@ -639,7 +648,6 @@ class hdANM:
                         + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (i[1] -D_COM[1]) \
                         + ( numpy.cos(scale*j*Q_D_n)+ D_mu[2]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (i[2] -D_COM[2])
                         
-
 
                     if(d0[numi][0]=='H'):
                         delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
