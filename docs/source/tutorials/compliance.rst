@@ -23,10 +23,14 @@ Step 1
     from packman import molecule
 
     #Step 1.2
-    molecule.download_structure('1LF7','1LF7.pdb')
+    molecule.download_structure('1LF7')
+    #OR (Default is CIF format; to change it to PDB)
+    #molecule.download_structure('1LF7',ftype = 'pdb')
 
     #Step 1.3
-    mol=molecule.load_structure('1LF7.pdb')
+    mol=molecule.load_structure('1LF7.cif')
+    #OR
+    #mol=molecule.load_structure('1LF7.pdb')
 
 Step 2
 ------

@@ -18,11 +18,15 @@ Downloading & Loading
 Example to download a file from PDB::
 
     from packman import molecule
-    molecule.download_structure('1prw','1prw.pdb')
+    molecule.download_structure('1prw')
+    #OR (Default is CIF format; to change it to PDB)
+    #molecule.download_structure('1prw',ftype = 'pdb')
 
 Example to load a downloaded file into a 'Protein' object (Fig 1)::
 
-    Protein = molecule.load_structure('1prw.pdb')
+    Protein = molecule.load_structure('1prw.cif')
+    #OR
+    #Protein = molecule.load_structure('1prw.pdb')
 
 
 Get Methods

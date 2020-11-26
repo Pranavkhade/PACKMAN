@@ -31,8 +31,10 @@ Code Example::
 
     from packman import molecule
 
-    #File loading 
-    mol=molecule.load_structure('1exr.pdb')
+    #File loading
+    mol=molecule.load_structure('1exr.cif')
+    #OR
+    #mol=molecule.load_structure('1exr.pdb')
 
     #If the backbone atoms of the ALL chains needs to be studied,
     #backbone=[]
