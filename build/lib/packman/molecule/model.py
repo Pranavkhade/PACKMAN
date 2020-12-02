@@ -55,6 +55,7 @@ class Model():
         self.__AllChains=AllChains
         self.__AllHetAtoms=AllHetAtoms
         self.__AllHetMols=AllHetMols
+        self.__parent = None
 
     def __getitem__(self,ChainID):
         return self.__AllChains[ChainID]
@@ -123,6 +124,14 @@ class Model():
             generator of 'packman.molecule.HetAtom' objects if successful, None otherwise.
         """
         for i in sorted(self.__AllHetAtoms.keys()):yield self.__AllHetAtoms[i]
+    
+    def get_parent(self):
+        """Get the 'Protein' parent of the 'Model' object.
+
+        Returns:
+            'packman.molecule.Protein' object if successful, None otherwise.
+        """
+        return self.__parent
         
     #Compute Functions
     def get_calpha(self):
@@ -188,6 +197,14 @@ class Model():
             new_id (int): The ID User wishes to assign to the given 'Model'
         """
         self.__id=new_id
+    
+    def set_parent(self, new_parent):
+        """Set the 'Protein' object as a parent to the 'Model' object.
+
+        Args:
+            new_parent (packman.molecule.Protein): The 'Protein' object as a parent to the given 'Model'
+        """
+        self.__parent = new_parent
     
     def set_torsion(self,Atom1,Atom2,Atom3,Atom4,theta):
         """Set the torsion angle between the two planes defined by four atoms.

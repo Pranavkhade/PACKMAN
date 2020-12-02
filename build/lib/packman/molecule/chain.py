@@ -147,9 +147,6 @@ class Chain():
         """
         return [i.get_backbone() for i in self.get_residues()]
 
-
-    
-
     #Set Functions
     def set_id(self,new_id):
         """Set the ID of the given 'Chain'
