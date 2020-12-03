@@ -1,16 +1,22 @@
-sudo: false
 language: python
-python:
-  - 3.7
 
-before_install:
-  - travis_retry wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b -p $HOME/miniconda
-  - export PATH=$HOME/miniconda/bin:$PATH
-  - conda update --yes conda
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
+
+cache: pip
+
 install:
-  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
-  - conda install --yes numpy scipy networkx scikit-learn
-  - conda install --yes -c conda-forge mlxtend
-  - python3 setup.py install
+  - pip install --user -r numpy
+  - pip install --user -r scipy
+  - pip install --user -r networkx
+  - pip install --user -r mlxtend
+  - pip install --user -r sklearn
+
+script:
+  - python tests/stability_tests.py
