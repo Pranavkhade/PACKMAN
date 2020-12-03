@@ -12,11 +12,11 @@ python:
 cache: pip
 
 install:
-  - pip install --user -r numpy
-  - pip install --user -r scipy
-  - pip install --user -r networkx
-  - pip install --user -r mlxtend
-  - pip install --user -r sklearn
+  - pip install numpy
+  - pip install scipy
+  - pip install networkx
+  - pip install mlxtend
+  - pip install sklearn
 
 script:
   - python tests/stability_tests.py
