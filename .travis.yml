@@ -17,6 +17,7 @@ install:
   - pip install networkx
   - pip install mlxtend
   - pip install sklearn
+  - pip install py-packman
 
 script:
   - python tests/stability_tests.py
