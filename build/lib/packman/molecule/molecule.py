@@ -306,8 +306,25 @@ def load_cif(filename):
         
     AllModels =[]
     for i in range(0,len(AllAtoms)):
-        #Discontinued hetatom
-        AllModels.append( Model(i+1,AllAtoms[i],AllResidues[i],AllChains[i],AllHetAtoms[i],AllHetMols[i]) )
+        #In case protein part is missing
+        try:
+            current_atoms    = AllAtoms[i]
+            current_residues = AllResidues[i]
+            current_chains   = AllChains[i]
+        except:
+            current_atoms    = [None]
+            current_residues = [None]
+            current_chains   = [None]
+
+        #In case the hetatoms are not present at all
+        try:
+            current_hetatms = AllHetAtoms[i]
+            current_hetmols = AllHetMols[i]
+        except:
+            current_hetatms = [None]
+            current_hetmols = [None]
+
+        AllModels.append( Model(i+1, current_atoms, current_residues, current_chains, current_hetatms, current_hetmols) )
         for j in AllModels[i].get_chains(): j.set_parent(AllModels[i])
     
 
