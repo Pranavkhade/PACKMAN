@@ -385,13 +385,26 @@ class HingePrediction(tk.Frame):
         pop_up1 = tk.Toplevel()
         pop_up1.title('PACKMAN Results')
 
-        tk.Label(pop_up1, text = 'NOTE: Please check in front of the hinges you want to keep and click on the "Save HNG file" button to generate input file for hdANM. Please provide a valid filename\n Tip: p-value ideally should be <0.05 ').grid(row=0,columnspan=5)
-        tk.Label(pop_up1, text = 'Hinge ID').grid(row=1,column=0,sticky=N+S+E+W, padx=10, pady=10 )
-        tk.Label(pop_up1, text = 'PDB ID').grid(row=1,column=1,sticky=N+S+E+W, padx=10, pady=10 )
-        tk.Label(pop_up1, text = 'Chain ID').grid(row=1,column=2,sticky=N+S+E+W, padx=10, pady=10 )
-        tk.Label(pop_up1, text = 'Residue IDs').grid(row=1,column=3,sticky=N+S+E+W, padx=10, pady=10 )
-        tk.Label(pop_up1, text = 'p-value').grid(row=1,column=4,sticky=N+S+E+W, padx=10, pady=10 )
-        tk.Label(pop_up1, text = 'Select').grid(row=1,column=5,sticky=N+S+E+W, padx=10, pady=10 )
+        #Canvas
+        Canvas1 = tk.Canvas(pop_up1)
+        Canvas1.grid(row=0,column=0,columnspan=6,sticky=N+S+E+W, padx=10, pady=10 )
+
+        #Scrollbar
+        vsb = tk.Scrollbar(pop_up1, orient="vertical", command=Canvas1.yview)
+        vsb.grid(row=0, column=7, rowspan=10 , sticky=N+S)
+        Canvas1.configure(yscrollcommand=vsb.set)
+
+        #Frame
+        canvas1_frame1 = tk.Frame(Canvas1)
+        Canvas1.create_window((0, 0), window=canvas1_frame1, anchor='nw')
+
+        tk.Label(canvas1_frame1, text = 'NOTE: Please check in front of the hinges you want to keep and click on the "Save HNG file" button to generate input file for hdANM. Please provide a valid filename\n Tip: p-value ideally should be <0.05 ').grid(row=0,columnspan=5)
+        tk.Label(canvas1_frame1, text = 'Hinge ID').grid(row=1,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(canvas1_frame1, text = 'PDB ID').grid(row=1,column=1,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(canvas1_frame1, text = 'Chain ID').grid(row=1,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(canvas1_frame1, text = 'Residue IDs').grid(row=1,column=3,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(canvas1_frame1, text = 'p-value').grid(row=1,column=4,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(canvas1_frame1, text = 'Select').grid(row=1,column=5,sticky=N+S+E+W, padx=10, pady=10 )
 
         All_Hinges = []
         if(self.Box2.get()!=''):
@@ -406,26 +419,30 @@ class HingePrediction(tk.Frame):
             Residue_IDs = sorted([j.get_id() for j in i.get_elements()])
             ChainOfHinge = i.get_elements()[0].get_parent().get_id()
 
-            tk.Label(pop_up1, text = numi+1).grid(row=numi+2,column=0,sticky=N+S+E+W, padx=10, pady=10 )
-            tk.Label(pop_up1, text = self.Box1.get() ).grid(row=numi+2,column=1,sticky=N+S+E+W, padx=10, pady=10 )
-            tk.Label(pop_up1, text = ChainOfHinge    ).grid(row=numi+2,column=2,sticky=N+S+E+W, padx=10, pady=10 )
-            tk.Label(pop_up1, text =  str(Residue_IDs[0])+':'+str(Residue_IDs[-1]) ).grid(row=numi+2,column=3,sticky=N+S+E+W, padx=10, pady=10 )
-            tk.Label(pop_up1, text = i.get_pvalue()).grid(row=numi+2,column=4,sticky=N+S+E+W, padx=10, pady=10 )
+            tk.Label(canvas1_frame1, text = numi+1).grid(row=numi+2,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+            tk.Label(canvas1_frame1, text = self.Box1.get() ).grid(row=numi+2,column=1,sticky=N+S+E+W, padx=10, pady=10 )
+            tk.Label(canvas1_frame1, text = ChainOfHinge    ).grid(row=numi+2,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+            tk.Label(canvas1_frame1, text =  str(Residue_IDs[0])+':'+str(Residue_IDs[-1]) ).grid(row=numi+2,column=3,sticky=N+S+E+W, padx=10, pady=10 )
+            tk.Label(canvas1_frame1, text = i.get_pvalue()).grid(row=numi+2,column=4,sticky=N+S+E+W, padx=10, pady=10 )
 
-            Selected_Hinges[numi] = BooleanVar(pop_up1)
-            Check = tk.Checkbutton(pop_up1, variable=Selected_Hinges[numi], onvalue=True, offvalue=False)
+            Selected_Hinges[numi] = BooleanVar(canvas1_frame1)
+            Check = tk.Checkbutton(canvas1_frame1, variable=Selected_Hinges[numi], onvalue=True, offvalue=False)
             Check.grid(row=numi+2,column=5,sticky=N+S+E+W, padx=10, pady=10 )
 
             #Details Button
-            tk.Button(pop_up1,text = 'Details', command= lambda i=i:show_details( i.get_stats() ) ).grid(row=numi+2,column=6,sticky=N+S+E+W, padx=10, pady=10 )
-            
+            tk.Button(canvas1_frame1,text = 'Details', command= lambda i=i:show_details( i.get_stats() ) ).grid(row=numi+2,column=6,sticky=N+S+E+W, padx=10, pady=10 )
+
+        #Fix the length of the result
+        canvas1_frame1.update_idletasks()
+        Canvas1.config(width=1000 ,height = 400)
+        Canvas1.config(scrollregion = Canvas1.bbox("all"))
         
-        tk.Label(pop_up1, text = 'output filename (.hng)').grid(row=len(All_Hinges)+2,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(pop_up1, text = 'output filename (.hng)').grid(row=2,column=1,sticky=N+S+E+W, padx=10, pady=10 )
         self.output_filename = tk.Entry(pop_up1)
-        tk.Button(pop_up1,text = 'Save HNG file', command=lambda: write_hng_file() ).grid(row=len(All_Hinges)+2,column=4,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Button(pop_up1,text = 'Save HNG file', command=lambda: write_hng_file() ).grid(row=2,column=3,sticky=N+S+E+W, padx=10, pady=10 )
 
         self.output_filename.insert(END,self.Box1.get()+'.hng')
-        self.output_filename.grid(row=len(All_Hinges)+2,column=1,columnspan=2,sticky=N+S+E+W, padx=10, pady=10 )
+        self.output_filename.grid(row=2,column=2,sticky=N+S+E+W, padx=10, pady=10 )
 
         def write_hng_file():
             ALL_RESIDUES = {}
