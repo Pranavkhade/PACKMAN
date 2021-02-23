@@ -361,20 +361,19 @@ def load_cif(filename):
 '''
 
 
-def load_structure(filename):
+def load_structure(filename, ftype = 'cif'):
     """Load a Molecule from a file.
 
     This class helps user to load the 3D structure of the protein onto a packman.molecule.Protein object.
 
     Example::
-
-        >>> from packman import molecule
-        >>> molecule.download_structure('1prw','1prw.pdb')
-        >>> molecule.load_structure('1prw.pdb')
+        from packman import molecule
+        molecule.download_structure('1prw')
+        molecule.load_structure('1prw.cif')
 
     Args:
         filename (str)          : Name of the input file
-        ftype    (str)          : Format name ('.cif' or '.pdb')
+        ftype    (str)          : Format name ('cif' or 'pdb'); Default: cif
     
     Returns:
         packman.molecule.Protein: Protein object containing all the information about the Protein
