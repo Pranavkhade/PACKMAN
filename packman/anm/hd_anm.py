@@ -21,10 +21,10 @@ Above format means that there are two domains (D1 and D2) separated by a hinge (
 
 
 
-Example:
+Example::
 
-    >>>from packman.anm import hdANM
-    >>>help( hdANM )
+    from packman.anm import hdANM
+    help( hdANM )
 
 Notes:
     * Tutorial:
@@ -552,15 +552,14 @@ class hdANM:
 
                 self.crosscorrelation_matrix[i][j] = trace_H_inv_ij / numpy.sqrt( trace_H_inv_ii*trace_H_inv_jj )
 
-    def calculate_movie(self,mode_number,scale=1.5,n=10, extrapolation="curvilinear", direction="both", ftype='cif'):
-        """This function generates the dynamic 3D projection of the normal modes obtained using hd-ANM. The 3D projection can be linearly extrapolated or curvilinearly extrapolated depending on the choices.
+    def calculate_movie(self, mode_number, scale=1.5, n=20, extrapolation="curvilinear", ftype='cif'):
+        """This function generates the dynamic 3D projection of the normal modes obtained using hd-ANM. The 3D projection can be linearly extrapolated or curvilinearly extrapolated depending on the choices. The first frame is the original structure and the projection progresses in positive (+) direction, returning to original structure and then in negative direction (-) again returning to the original structure.
 
         Args:
             mode_number (int)                   : Mode number. (first non-rigid mode is 6th)
-            scale (float)                       : Multiplier; extent to which mode will be extrapolated. Defaults to 1.5.
-            n (int)                             : Number of frames in output                             Defaults to 10
-            extrapolation (linear/curvilinear)  : Extrapolation method                                   Defaults to "curvilinear"
-            direction (both/+/-)                : Explore specific direcrion of the motion.              Defaults to "both"
+            scale (float)                       : Multiplier; extent to which mode will be extrapolated.                 Defaults to 1.5
+            n (int)                             : Number of frames in output (should be =>8 and ideally multiple of 4)   Defaults to 20
+            extrapolation (linear/curvilinear)  : Extrapolation method                                                   Defaults to "curvilinear"
             ftype (string)                      : Extension of the output file (.cif / .pdb)
 
         Note:
@@ -576,13 +575,7 @@ class hdANM:
         new_coords=[]
 
         if(extrapolation=="linear"):
-            
-            if(direction=="both"):
-                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
-            elif(direction=="+"):
-                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
-            elif(direction=="-"):
-                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+            movement = [ numpy.sin(k*(1.0/float(n))*2*numpy.pi) for k in range(0,n+1,1) ]
             ModelsOfTheProtein = []
             for j in movement:
                 HingeResidue=0
@@ -614,13 +607,7 @@ class hdANM:
             
 
         elif(extrapolation=="curvilinear"):
-        
-            if(direction=="both"):
-                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
-            elif(direction=="+"):
-                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
-            elif(direction=="-"):
-                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+            movement = [ numpy.sin(k*(1.0/float(n))*2*numpy.pi) for k in range(0,n+1,1) ]
             ModelsOfTheProtein = []
             for j in movement:
                 HingeResidue=0
@@ -660,11 +647,11 @@ class hdANM:
                     currentatm = Atom(self.atoms[numi].get_id() , self.atoms[numi].get_name(), numpy.array([new_x,new_y,new_z]), self.atoms[numi].get_occupancy(), self.atoms[numi].get_bfactor(), self.atoms[numi].get_element(),self.atoms[numi].get_charge(), self.atoms[numi].get_parent() )
                     AtomsOfTheFrame[numi] = currentatm
                     
-                ModelsOfTheProtein.append( Model(j, AtomsOfTheFrame, None, None, None, None) )    
+                ModelsOfTheProtein.append( Model(j, AtomsOfTheFrame, None, None, None, None) )
 
             Annotations = self.atoms[0].get_parent().get_parent().get_parent().get_parent().get_data()
             prot = Protein(str(mode_number), ModelsOfTheProtein)
             prot.set_data(Annotations)
-            prot.write_structure( str(mode_number)+'.'+ftype ) 
+            prot.write_structure( str(mode_number)+'.'+ftype )
             
         return True
