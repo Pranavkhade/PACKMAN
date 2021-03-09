@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.com/Pranavkhade/PACKMAN.svg?branch=master)](https://travis-ci.com/Pranavkhade/PACKMAN) [![Documentation Status](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/py-packman)](https://pepy.tech/project/py-packman)
 
---------------
 
 PACKMAN: PACKing and Motion ANalysis
 ------------------------------------
