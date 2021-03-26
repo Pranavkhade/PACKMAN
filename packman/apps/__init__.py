@@ -7,7 +7,7 @@
 Notes:
     * Current apps list: - predict_hinge : A program to predict the hinge on the molecule given the atoms and relevent parameters
 
-Example:
+Example::
     * Review the packman.bin.PACKMAN.py file for the app use.
 
 Todo:

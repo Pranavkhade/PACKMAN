@@ -2,7 +2,7 @@
 """The 'hdANM' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'hdANM' object documentation for details. [ help(packman.anm.hdANM) ]
+Please read the 'hdANM' object documentation for details.
 
 About .hng File:
 - hdANM requires the information about hinges and domains in the .hng format.
@@ -11,11 +11,11 @@ About .hng File:
 
 Filename_ChainID    Domain/HingeId   ResidueStartPosition:ResidueEndPosition
 
-Example of .hng file for PDBID 1EXR
+Example of .hng file for PDBID 1EXR::
 
-1EXR_A  D1  1:70
-1EXR_A  H1  70:90
-1EXR_A  D2  90:148
+    1EXR_A  D1  1:70
+    1EXR_A  H1  70:90
+    1EXR_A  D2  90:148
 
 Above format means that there are two domains (D1 and D2) separated by a hinge (H1). D1 stretches from residue 1 to 70; D2 stretches from 90 to 148 and hinge H1 is in the middle.
 

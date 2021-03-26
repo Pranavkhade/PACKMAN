@@ -2,15 +2,13 @@
 """The 'Residue' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Residue' object documentation for details. [ help(packman.molecule.residue.Residue) ]
+Please read the 'Residue' object documentation for details.
 
-Example:
-    >>>from packman.molecule import residue.Residue
-    >>>help( Residue )
-    OR
+Example::
 
-    >>>from packman import molecule
-    >>>help( molecule.Residue )
+    from packman.molecule import Residue
+    help( Residue )
+
 
 Todo:
     * Finish writing up the documentation.
