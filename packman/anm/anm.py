@@ -2,12 +2,11 @@
 """The 'ANM' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'ANM' object documentation for details. [ help(packman.anm.ANM) ]
+Please read the 'ANM' object documentation for details.
 
-Example:
-
-    >>>from packman.anm import ANM
-    >>>help( ANM )
+Example::
+    from packman.anm import ANM
+    help( ANM )
 
 Notes:
     * Tutorial: https://jerniganlab.github.io/Software/PACKMAN/Tutorials/compliance
@@ -278,14 +277,13 @@ class ANM:
         self.compliance_profile = [numpy.nanmean(i) for i in compliance_map]
         return True
     
-    def calculate_movie(self,mode_number,scale=1.5,n=10, direction="both"):
-        """Get the movie of the obtained LINEAR modes.
+    def calculate_movie(self,mode_number,scale=1.5,n=20):
+        """Get the movie of the obtained LINEAR modes. The first frame is the original structure and the projection progresses in positive (+) direction, returning to original structure and then in negative direction (-) again returning to the original structure.
 
         Args:
             mode_number (int)                   : Mode number. (first non-rigid mode is 6th)
-            scale (float)                       : Multiplier; extent to which mode will be extrapolated. Defaults to 1.5.
-            n (int)                             : Number of frames in output                             Defaults to 10
-            direction (both/+/-)                : Explore specific direcrion of the motion.              Defaults to "both"
+            scale (float)                       : Multiplier; extent to which mode will be extrapolated.                 Defaults to 1.5
+            n (int)                             : Number of frames in output (should be =>8 and ideally multiple of 4)   Defaults to 20
 
         Note:
             - Scale and n parameters should be redesigned.
@@ -297,12 +295,7 @@ class ANM:
         x0=self.coords
         new_coords=[]
         with open('ANM_'+str(mode_number)+'.pdb','w') as fh:
-            if(direction=="both"):
-                movement = [k for k in range(-n,n)]+[k for k in range(-n,n)[::-1]]
-            elif(direction=="+"):
-                movement = [k for k in range(n)]+[k for k in range(n)[::-1]]
-            elif(direction=="-"):
-                movement = [k for k in range(-n,1)]+[k for k in range(-n,1)[::-1]]
+            movement = [ numpy.sin(k*(1.0/float(n))*2*numpy.pi) for k in range(0,n+1,1) ]
             for j in movement:
                 for numi,i in enumerate(x0):
                     new_x=i[0]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+0]

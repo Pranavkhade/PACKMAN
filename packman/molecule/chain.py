@@ -2,15 +2,12 @@
 """The 'Chain' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Chain' object documentation for details. [ help(packman.molecule.chain.Chain) ]
+Please read the 'Chain' object documentation for details.
 
-Example:
-    >>>from packman.molecule import chain.Chain
-    >>>help( Chain )
-    OR
+Example::
 
-    >>>from packman import molecule
-    >>>help( molecule.Chain )
+    from packman.molecule import Chain
+    help( Chain )
 
 Note:
     * Iterating over chain only fetches the residues not the hetero atoms

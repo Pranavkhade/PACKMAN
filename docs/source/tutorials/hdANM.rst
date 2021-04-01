@@ -3,7 +3,7 @@
 Using hd-ANM to study the global dynamics of the molecular structures
 =====================================================================
 
-This tutorial aims to get the user to familiarize with the concept of hdANM. 
+This tutorial aims to get the user to familiarize with the concept of hdANM API. Please note that the hdANM is also available with GUI.
 
 How to cite::
 

@@ -14,5 +14,5 @@ from .constants import *
 from .utilities import *
 
 
-#VERSION CHANGE HERE CHANGES IT IN docs AND setup.py; STILL NEED TO CHANGE IT IN requirement.txt
-__version__='1.2.9'
+#VERSION CHANGE HERE CHANGES IT IN docs AND setup.py
+__version__='1.2.10'

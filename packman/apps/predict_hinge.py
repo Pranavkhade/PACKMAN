@@ -2,12 +2,12 @@
 """The 'predict_hinge' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'predict_hinge' object documentation for details. [ help(packman.apps.predict_hinge) ]
+Please read the 'predict_hinge' object documentation for details.
 
-Example:
+Example::
 
-    >>>from packman import apps
-    >>>help( apps.predict_hinge )
+    from packman.apps import predict_hinge
+    help( predict_hinge )
 
 Todo:
     * Finish writing up the documentation.

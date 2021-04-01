@@ -2,15 +2,13 @@
 """The 'Atom' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Atom' object documentation for details. [ help(packman.molecule.atoms.Atom) ]
+Please read the 'Atom' object documentation for details.
 
-Example:
-    >>>from packman.molecule import atom.Atom
-    >>>help( Atom )
-    OR
+Example::
 
-    >>>from packman import molecule
-    >>>help( molecule.Atom )
+    from packman.molecule import Atom
+    help( Atom )
+
 
 Todo:
     * Finish writing up the documentation.
