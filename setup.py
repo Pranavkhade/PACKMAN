@@ -28,7 +28,7 @@ setup(name='py-packman',
       license='MIT',
       packages=PACKAGES,
       package_data=PACKAGE_DATA,
-      long_description = long_description
+      long_description = long_description,
       keywords=('protein, dynamics, protein packing, protein domain, protein hinge'),
       classifiers=[
               'Intended Audience :: Education',
