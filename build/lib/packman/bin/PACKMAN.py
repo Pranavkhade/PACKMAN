@@ -228,10 +228,17 @@ class Skeleton(tk.Tk):
 
 class top_menu(tk.Frame):
     def __init__(self,parent):
-        tk.Frame.__init__(self)
-        tk.Button(parent, text = 'Home',             command = lambda: parent.show_frame('HomePage')        ).grid(row=0,column=0,sticky=E+W)
-        tk.Button(parent, text = 'Hinge Prediction', command = lambda: parent.show_frame('HingePrediction') ).grid(row=0,column=1,sticky=E+W)
-        tk.Button(parent, text = 'hdANM',            command = lambda: parent.show_frame('hdANM_GUI')       ).grid(row=0,column=2,sticky=E+W)
+        number_of_buttons = 3
+        Canvas_top_menu = tk.Canvas(parent)
+        Canvas_top_menu.grid(row=0,column=0,columnspan=3, sticky=E+W )
+
+        for i in range(0,number_of_buttons):
+            Grid.columnconfigure(Canvas_top_menu, i, weight=1)
+        
+        #tk.Frame.__init__(self)
+        tk.Button(Canvas_top_menu, text = 'Home',             command = lambda: parent.show_frame('HomePage')        ).grid( row=0,column=0,sticky=E+W )
+        tk.Button(Canvas_top_menu, text = 'Hinge Prediction', command = lambda: parent.show_frame('HingePrediction') ).grid( row=0,column=1,sticky=E+W )
+        tk.Button(Canvas_top_menu, text = 'hdANM',            command = lambda: parent.show_frame('hdANM_GUI')       ).grid( row=0,column=2,sticky=E+W )
 
 
 
@@ -257,9 +264,9 @@ class HomePage(tk.Frame):
         self.all_objects = self.__dict__
 
     def show(self):
-        self.Label1.grid(row=1,columnspan=3)
-        self.Label2.grid(row=2,columnspan=3)
-        self.Text1.grid(row=3,columnspan=3)
+        self.Label1.grid(row=1,columnspan=3, sticky=E+W, padx=10, pady=10 )
+        self.Label2.grid(row=2,columnspan=3, sticky=E+W, padx=10, pady=10 )
+        self.Text1.grid(row=3,columnspan=3, sticky=E+W, padx=10, pady=10 )
     
     def hide(self):
         for i in self.all_objects:
@@ -381,11 +388,10 @@ class HingePrediction(tk.Frame):
         #At this point, everything is okay
         
         
-        #Results
+        #Hinge Prediction Results
         pop_up1 = tk.Toplevel()
         pop_up1.title('PACKMAN Results')
 
-        #Canvas
         Canvas1 = tk.Canvas(pop_up1)
         Canvas1.grid(row=0,column=0,columnspan=6,sticky=N+S+E+W, padx=10, pady=10 )
 
@@ -502,7 +508,6 @@ class HingePrediction(tk.Frame):
 
         #on_click() Ends here
         return True
-    
     
 
 

@@ -2,15 +2,12 @@
 """The 'Model' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Model' object documentation for details. [ help(packman.molecule.model.Model) ]
+Please read the 'Model' object documentation for details.
 
-Example:
-    >>>from packman.molecule import model.Model
-    >>>help( Model )
-    OR
+Example::
 
-    >>>from packman import molecule
-    >>>help( molecule.Model )
+    from packman.molecule import Model
+    help( Model )
 
 Note:
     * The models are nothing but frames of the PDB file.
@@ -26,6 +23,7 @@ Authors:
 
 
 import numpy
+import logging
 
 
 class Model():
@@ -81,9 +79,16 @@ class Model():
         """Get the generator of corresponding 'Residue' objects of the 'Model'
 
         Returns:
-            generator of 'Residue' objects if successful, None otherwise.
+            array of 'Residue' objects if successful, None otherwise.
         """
-        return [j for i in self.__AllChains.keys() for j in self.__AllChains[i].get_residues()]
+        #return [j for i in self.__AllChains.keys() for j in self.__AllChains[i].get_residues()]
+        residues = []
+        for i in self.__AllChains.keys():
+            try:
+                residues.extend( self.__AllChains[i].get_residues() )
+            except:
+                logging.warning("Chain "+str(i)+" either doesn't have residues or an error occurred; Model.get_residues() may have loaded other chains.")
+        return residues
     
     def get_atoms(self):
         """Get the generator of corresponding 'Atom' objects of the 'Model'

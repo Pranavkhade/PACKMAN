@@ -4,10 +4,10 @@
 This is file information, not the class information. This information is only for the API developers.
 Please read the corrosponding object documentation for details.
 
-Example:
+Example::
 
-    >>>from packman import molecule
-    >>>help( molecule.Hinge )
+    from packman.molecule import Hinge
+    help( Hinge )
 
 Todo:
     * Finish writing up the documentation.

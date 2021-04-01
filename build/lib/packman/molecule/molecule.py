@@ -2,16 +2,13 @@
 """The 'Molecule' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Model' object documentation for details. [ help(packman.molecule) ]
+Please read the 'Model' object documentation for details.
 
-Example:
-    >>>from packman.molecule import molecule
-    >>>help( Model )
-    OR
+Example::
 
-    >>>from packman import molecule
-    >>>help( molecule )
-    
+    from packman.molecule import Model
+    help( Model )
+
 Todo:
     * Finish writing up the documentation.
     * Finish error handling.
@@ -367,6 +364,7 @@ def load_structure(filename, ftype = 'cif'):
     This class helps user to load the 3D structure of the protein onto a packman.molecule.Protein object.
 
     Example::
+
         from packman import molecule
         molecule.download_structure('1prw')
         molecule.load_structure('1prw.cif')
@@ -379,7 +377,9 @@ def load_structure(filename, ftype = 'cif'):
         packman.molecule.Protein: Protein object containing all the information about the Protein
     """
     try:
-        ftype = filename.split('.')[1]
+        possible_ftype = filename.split('.')[1]
+        if(possible_ftype == 'cif' or possible_ftype == 'pdb'):
+            ftype = possible_ftype
     except:
         None
 
@@ -402,8 +402,8 @@ def download_structure(pdbid,save_name=None,ftype='cif'):
 
     Example::
 
-        >>> from packman import molecule
-        >>> molecule.download_structure('1prw')
+        from packman import molecule
+        molecule.download_structure('1prw')
 
     Args:
         pdbid     (str) : A Unique 4 Letter PDB ID (eg.. 1PRW) 

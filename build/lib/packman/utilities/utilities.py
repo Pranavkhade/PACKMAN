@@ -123,7 +123,7 @@ def load_hinge(filename):
 
     Filename_ChainID    Domain/HingeId   ResidueStartPosition:ResidueEndPosition
 
-    Example of .hng file for PDBID 1EXR
+    Example of .hng file for PDBID 1EXR::
 
     1EXR_A  D1  1:70
     1EXR_A  H1  70:90

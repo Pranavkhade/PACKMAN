@@ -9,6 +9,7 @@ packman/apps/__init__.py
 packman/apps/predict_hinge.py
 packman/bin/PACKMAN.py
 packman/bin/__init__.py
+packman/bin/logo.ico
 packman/constants/Constants.py
 packman/constants/__init__.py
 packman/molecule/__init__.py

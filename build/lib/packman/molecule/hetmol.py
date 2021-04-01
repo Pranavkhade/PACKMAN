@@ -2,15 +2,12 @@
 """The 'HetMol' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'HetMol' object documentation for details. [ help(packman.molecule.residue.Residue) ]
+Please read the 'HetMol' object documentation for details.
 
-Example:
-    >>>from packman.molecule import residue.HetMol
-    >>>help( HetMol )
-    OR
+Example::
 
-    >>>from packman import HetMol
-    >>>help( molecule.HetMol )
+    from packman.molecule import HetMol
+    help( HetMol )
 
 Todo:
     * Finish writing up the documentation.

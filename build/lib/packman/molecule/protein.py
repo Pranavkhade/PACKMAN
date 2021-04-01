@@ -2,17 +2,12 @@
 """The 'Protein' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Protein' object documentation for details. [ help(packman.molecule.protein.Protein) ]
+Please read the 'Protein' object documentation for details.
 
 Example::
 
-    >>> from packman.molecule import protein.Protein
-    >>> help( Protein )
-    
-    OR::
-
-    >>> from packman import molecule
-    >>> help( molecule.Protein )
+    from packman.molecule import Protein
+    help( Protein )
 
 Note:
     * Top in the hierarchy
