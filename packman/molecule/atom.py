@@ -57,6 +57,9 @@ class Atom():
         self.__Element=Element
         self.__Charge=Charge
 
+        #Properties are the entities that are not included in the PDB files and are obtained by calculations
+        self.__properties = {}
+
     #Get Functions
     def get_id(self):
         """Get the ID of the 'Atom'
@@ -154,6 +157,23 @@ class Atom():
         """
         return self.get_parent().get_domain_id()
     
+    def get_property(self,property_name):
+        """Get the Property of the given 'Chain'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            return self.__properties[property_name]
+        except:
+            logging.warning('The Property Name provided is not assigned.')
+
     #Set Functions
     def set_id(self,new_id):
         """Set the ID of the given 'Atom'
@@ -234,9 +254,28 @@ class Atom():
             new_charge (str): The Charge User wishes to assign to the given 'Atom'
         """
         self.__Charge=new_charge
+    
+    def set_property(self,property_name,value):
+        """Set the Property of the given 'Atom'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+        
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+            value (object):         The value the user wants to assign to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            self.__properties[property_name] = value
+        except:
+            logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
+
 
     #Calculation Functions
-    def calc_dist(self,another_atom):
+    def calculate_distance(self,another_atom):
         """Calculate the Distance between the given 'Atom' and another 'Atom'
 
         Args:

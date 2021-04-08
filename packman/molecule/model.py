@@ -21,6 +21,7 @@ Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
 
+from ..entropy import PackingEntropy
 
 import numpy
 import logging
@@ -54,6 +55,9 @@ class Model():
         self.__AllHetAtoms=AllHetAtoms
         self.__AllHetMols=AllHetMols
         self.__parent = None
+        
+        #Properties are the entities that are not included in the PDB files and are obtained by calculations
+        self.__properties = {}
 
     def __getitem__(self,ChainID):
         return self.__AllChains[ChainID]
@@ -137,7 +141,43 @@ class Model():
             'packman.molecule.Protein' object if successful, None otherwise.
         """
         return self.__parent
+    
+    def get_entropy(self,entropy_type):
+        """Get the Packing Entropy of the given 'Chain'.
+
+        Args:
+            type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
+
+        Note:
+            - More type of Entropies might be added in the future.
+        """
+        EntropyTypes = ['PackingEntropy']
+        try:
+            return numpy.sum( [self.__AllResidues[i].get_entropy(entropy_type) for i in self.__AllResidues] )
+        except:
+            if(entropy_type in EntropyTypes):
+                logging.warning('This Entropy type might not be calculated for all the chains/residues. Please check the "calculate_entropy" function in the documentation for the details.')
+            else:
+                logging.warning('The Entropy type provided is invalid. Please check the documentation for the details.')
+
+    def get_property(self,property_name):
+        """Get the Property of the given 'Chain'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
         
+        Note:
+            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            return self.__properties[property_name]
+        except:
+            logging.warning('The Property Name provided is not assigned.')
+
+
     #Compute Functions
     def get_calpha(self):
         """Get the C-Alpha atom of the 'Model' as an 'Atom' object.
@@ -302,6 +342,41 @@ class Model():
                 Coordinates[2]+=tz
                 i.set_location(numpy.array(Coordinates))
         return True
+
+    def set_property(self,property_name,value):
+        """Set the Property of the given 'Model'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+        
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+            value (object):         The value the user wants to assign to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            self.__properties[property_name] = value
+        except:
+            logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
+
+    #Calculate Functions
+    def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
+        """Calculate the entropy for the each amino acid will be returned.
+    
+        The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
+
+        Args:
+            entropy_type (str)              : Type of entropy to be calculated (Options: PackingEntropy)
+            chains ([str]/str)              : Chain IDs for the Entropy calculation (None means all the chains are included; single string means only one chain ID; multiple chains should be an array of strings).
+            probe_size (float)              : Radius of the probe to generate the surface points (This value should not be less than 1;Read the Publication for more details)
+            onspherepoints (int)            : Number of points to be generated around each point for the surface (Read the Publication for more details)
+        """
+        if(entropy_type=='PackingEntropy'):
+            PackingEntropy(self.get_atoms(), chains=chains, probe_size=probe_size, onspherepoints=onspherepoints)
+        else:
+            logging.warning("Please provide the valid type for the Entropy Calculation.")
 
     #Check Function
     def check_clashes(self,distance=0.77):

@@ -43,12 +43,16 @@ class HetMol():
         self.__parent=parent
         self.__Atoms=None
         self.__domain_id=None
+
+        #Properties are the entities that are not included in the PDB files and are obtained by calculations
+        self.__properties = {}
     
     def __setitem__(self,id,Atom):
         """Simply assign new atom to the 'HetMol'
 
         Args:
-            new_id: The ID User wishes to assign to the given 'Atom'
+            new_id (int)                  : The ID User wishes to assign to the given 'Atom'
+            Atom  (packman.molecule.Atom) : The new 'Atom' to be assigned to the 'HetMol'
         """
         try:
             self.__Atoms[id]=Atom
@@ -102,6 +106,23 @@ class HetMol():
         """
         return self.__domain_id
     
+    def get_property(self,property_name):
+        """Get the Property of the given 'HetMol'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            return self.__properties[property_name]
+        except:
+            logging.warning('The Property Name provided is not assigned.')
+    
     #Set Functions
     def set_id(self,new_id):
         """Set the ID of the given 'HetMol'
@@ -139,6 +160,24 @@ class HetMol():
             new_domain_id (str): The Domain Identifies User wishes to assign to the given 'HetMol'
         """
         self.__domain_id=new_domain_id
+    
+    def set_property(self,property_name,value):
+        """Set the Property of the given 'HetMol'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+        
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+            value (object):         The value the user wants to assign to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            self.__properties[property_name] = value
+        except:
+            logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
     #Calculation Functions
     def get_centerofgravity(self):
