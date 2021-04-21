@@ -438,3 +438,51 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             return AlphaKirchoff,SelectedTesselations
         else:
             return SelectedTesselations
+
+def hinge_cli(args,mol):
+    """Command-line Interface for the 'hinge' command. Please check the packman.bin.PACKMAN file for more details.
+
+    This function is for the CLI and not an integral function for the API.
+
+    Args:
+        args (parser.parse_args())     : The arguments that were passed by the user to the PACKMAN-hinge app.
+        mol (packman.molecule.Protein) : The 'Protein' object for the anaylsis.
+    """
+    
+    def print_footnotes(outputfile):
+        """Add footnotes to the output file.
+            
+        Args:
+                outputfile (file): The file to which the footnotes will be written.
+        """
+        outputfile.write('Footnotes:\n\nSTATISTICS Section Legend:\nN: Number of residues\nMin: Minimum B-factor value\nMax: Maximum B-factor value\nMean: Mean B-factor value\nMode: Mode B-factor value\nMedian: Median B-factor value\nSTDDev: Standard Deviation of the B-factor values\n')
+        outputfile.write('\nRMSF Plane Visualization:\nDownload plane.py file from https://pymolwiki.org/index.php/Plane_Wizard and place it in the PyMol working directory if the RMSF plane needs to be visualized.\n')
+        return True
+
+    try:
+        if(args.chain):
+            Backbone = [item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
+            SelectedTesselations= predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+            if(args.generateobj is not None):
+                WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
+        else:
+            for i in mol[0].get_chains():
+                Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
+                SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+        
+        if args.nodeid is not None:
+            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
+
+    except Exception:
+        if args.nodeid is not None:
+            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
+    
+    finally:
+        print_footnotes(args.outputfile)
+        args.outputfile.flush()
+        args.logfile.flush()
+
+        if(args.generateobj is not None):
+            args.generateobj.flush()
+
+    return True

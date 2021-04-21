@@ -1,7 +1,7 @@
-packman.anm package
-===================
+packman.entropy package
+=======================
 
-.. automodule:: packman.anm
+.. automodule:: packman.entropy
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,5 +12,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   packman.anm.anm
-   packman.anm.hd_anm
+   packman.entropy.entropy

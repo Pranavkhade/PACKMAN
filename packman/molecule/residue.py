@@ -282,7 +282,7 @@ class Residue():
                     TipofAA=i
         return TipofAA
     
-    def calculate_entropy(entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
+    def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
         """Calculate the entropy for the each amino acid will be returned.
     
         The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.

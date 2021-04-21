@@ -2,25 +2,25 @@
 
 
 Tutorials
-============================
-
+=========
 
 Installation
 ------------
 #. :ref:`tutorials_installation`
 
-PACKMAN Binaries
-----------------
-#. :ref:`tutorials_hinge_prediction`
+PACKMAN Graphical User Interface (GUI)
+--------------------------------------
+#. :ref:`tutorials_gui`
 
+PACKMAN Command Line Interface (CLI)
+------------------------------------
+#. :ref:`tutorials_hinge_prediction_cli`
+#. :ref:`tutorials_entropy_cli`
 
-PACKMAN API
------------
+PACKMAN Application Programming Interface (API)
+------------------------------------------------
 #. :ref:`tutorials_molecule`
 #. :ref:`tutorials_predict_hinge`
 #. :ref:`tutorials_compliance`
 #. :ref:`tutorials_hdANM`
-
-
-Utilities
----------
+#. :ref:`tutorials_entropy_api`

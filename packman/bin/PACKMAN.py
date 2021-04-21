@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """The PACKMAN Command-line Interface (CLI) and Graphical User Interface (GUI) host file.
 
-How to use:
-python -m packman gui (For GUI)
-python -m packman     (For CLI)
+How to use::
+    python -m packman gui #(For GUI)
+    python -m packman     #(For CLI)
 
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
@@ -11,10 +11,12 @@ Authors:
 import numpy
 
 import traceback
+import logging
 
 from .. import molecule
-from ..apps import predict_hinge
+from ..apps import predict_hinge, hinge_cli, entropy_cli
 from ..anm import hdANM
+from ..entropy import PackingEntropy
 
 import operator
 import argparse
@@ -80,17 +82,27 @@ def IO():
     Returns:
         Namespace: Various arguments in various formats
     """
-    parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)')
+    parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)\n\nFollowing Apps Available: \n1. hinge \n2. entropy\n\nHow to run an app: python -m packman <app name>\nExample: python -m packman hinge', formatter_class=argparse.RawTextHelpFormatter )
+    subparsers = parser.add_subparsers(dest='command')
 
-    parser.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
+    #Hinge Prediction
+    hinge_app_io = subparsers.add_parser('hinge')
+    hinge_app_io.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
+    hinge_app_io.add_argument('alpha', metavar='AlphaValue', help='Recommended: 2.8 for closed; 4.5 for open form, Please refer to the paper for more details')
+    hinge_app_io.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
+    hinge_app_io.add_argument('--e_clusters',metavar='NumberOfEccentricityClusters',type=int,default=4,help='Recommended: 4, Please refer to the paper for more details')
+    hinge_app_io.add_argument('--minhnglen',metavar='MinimumHingeLength',type=int,default=5,help='Recommended: 5, Please refer to the paper for more details')
+    hinge_app_io.add_argument("--chain", help='Enter The Chain ID')
+    hinge_app_io.add_argument('--generateobj', type=argparse.FileType('wb', 0), help='Path and filename to save the .obj file at. Ignored unless --chain is provided.')
 
-    parser.add_argument('alpha', metavar='AlphaValue', help='Recommended: 2.8 for closed; 4.5 for open form, Please refer to the paper for more details')
-    parser.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
-
-    parser.add_argument('--e_clusters',metavar='NumberOfEccentricityClusters',type=int,default=4,help='Recommended: 4, Please refer to the paper for more details')
-    parser.add_argument('--minhnglen',metavar='MinimumHingeLength',type=int,default=5,help='Recommended: 5, Please refer to the paper for more details')
-    parser.add_argument("--chain", help='Enter The Chain ID')
-    parser.add_argument('--generateobj', type=argparse.FileType('wb', 0), help='Path and filename to save the .obj file at. Ignored unless --chain is provided.')
+    #Entropy
+    entropy_app_io = subparsers.add_parser('entropy')
+    entropy_app_io.add_argument('-type','--type', metavar='entropy_type', type=str, help='Provide the Entropy type (Options: 1. PackingEntropy)')
+    entropy_app_io.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
+    entropy_app_io.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
+    entropy_app_io.add_argument('--chains',metavar='Chains to be used for the entropy calculation',type=str,default=None, help='Recommended: None. Chain IDs for the Entropy calculation (None means all the chains are included; single string means only one chain ID; multiple chains should be comma separated).')
+    entropy_app_io.add_argument('--probe_size',metavar='Size surface probe radius',type=float,default=1.4, help='Recommended: 1.4 (radius of a water molecule), Please refer to the paper for more details')
+    entropy_app_io.add_argument('--onspherepoints',metavar='Number of points on a sphere',type=int,default=30, help='Recommended: 30. Number of points to be generated around each point for the surface (Read the Publication for more details)')
 
     # web server parameters
     web_server_group = parser.add_argument_group('Web server parameters', 'Used by the web form')
@@ -122,52 +134,19 @@ def load_cli():
     if(args.pdbid is not None):
         molecule.download_structure(args.pdbid, args.filename)
 
-    mol = molecule.load_structure(args.filename)
-
     try:
-        if(args.chain):
-            Backbone = [item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
-            SelectedTesselations= predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
-            if(args.generateobj is not None):
-                WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
-        else:
-            for i in mol[0].get_chains():
-                Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
-                SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
-        
-        if args.nodeid is not None:
-            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
-
-    except Exception:
-        print(traceback.print_exc())
-        if args.nodeid is not None:
-            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
+        extension = args.filename.split('.')[-1]
+        mol = molecule.load_structure(args.filename,ftype=extension)
+    except:
+        logging.warning("The filename provided does not appear to have a format extension.")
+        mol = molecule.load_structure(args.filename)
     
-    finally:
-        print_footnotes(args.outputfile)
-        args.outputfile.flush()
-        args.logfile.flush()
+    if(args.command == 'hinge'):
+        hinge_cli(args,mol)
+    elif(args.command == 'entropy'):
+        entropy_cli(args,mol)
 
-        if(args.generateobj is not None):
-            args.generateobj.flush()
     return True
-
-'''
-##################################################################################################
-#                                             End                                                #
-##################################################################################################
-'''
-def print_footnotes(outputfile):
-    """Add footnotes to the output file.
-    
-    Args:
-        outputfile (file): The file to which the footnotes will be written.
-    """
-    outputfile.write('Footnotes:\n\nSTATISTICS Section Legend:\nN: Number of residues\nMin: Minimum B-factor value\nMax: Maximum B-factor value\nMean: Mean B-factor value\nMode: Mode B-factor value\nMedian: Median B-factor value\nSTDDev: Standard Deviation of the B-factor values\n')
-    outputfile.write('\nRMSF Plane Visualization:\nDownload plane.py file from https://pymolwiki.org/index.php/Plane_Wizard and place it in the PyMol working directory if the RMSF plane needs to be visualized.\n')
-    return True
-
-
 
 '''
 ##################################################################################################
@@ -199,6 +178,7 @@ class Skeleton(tk.Tk):
         self.frames['HomePage'] = HomePage(self)
         self.frames['HingePrediction'] = HingePrediction(self)
         self.frames['hdANM_GUI'] = hdANM_GUI(self)
+        self.frames['Voronoi_Packing_Entropy_GUI'] = Voronoi_Packing_Entropy_GUI(self)
         self.frames['TopMenu'] = top_menu(self)
 
         self.geometry("800x600")
@@ -228,7 +208,7 @@ class Skeleton(tk.Tk):
 
 class top_menu(tk.Frame):
     def __init__(self,parent):
-        number_of_buttons = 3
+        number_of_buttons = 4
         Canvas_top_menu = tk.Canvas(parent)
         Canvas_top_menu.grid(row=0,column=0,columnspan=3, sticky=E+W )
 
@@ -239,16 +219,17 @@ class top_menu(tk.Frame):
         tk.Button(Canvas_top_menu, text = 'Home',             command = lambda: parent.show_frame('HomePage')        ).grid( row=0,column=0,sticky=E+W )
         tk.Button(Canvas_top_menu, text = 'Hinge Prediction', command = lambda: parent.show_frame('HingePrediction') ).grid( row=0,column=1,sticky=E+W )
         tk.Button(Canvas_top_menu, text = 'hdANM',            command = lambda: parent.show_frame('hdANM_GUI')       ).grid( row=0,column=2,sticky=E+W )
+        tk.Button(Canvas_top_menu, text = 'Packing Entropy (Voronoi)',          command = lambda: parent.show_frame('Voronoi_Packing_Entropy_GUI')     ).grid( row=0,column=3,sticky=E+W )
 
-
+def load_gui():
+    app = Skeleton('HomePage')
+    app.mainloop()
 
 '''
 ##################################################################################################
 #                                               Home                                             #
 ##################################################################################################
 '''
-
-
 
 class HomePage(tk.Frame):
     def __init__(self,parent):
@@ -508,15 +489,12 @@ class HingePrediction(tk.Frame):
 
         #on_click() Ends here
         return True
-    
-
 
 '''
 ##################################################################################################
 #                                            hd-ANM                                              #
 ##################################################################################################
 '''
-
 
 class hdANM_GUI(tk.Frame):
     def __init__(self,parent):
@@ -709,9 +687,133 @@ class hdANM_GUI(tk.Frame):
         
         return True
 
-def load_gui():
-    app = Skeleton('HomePage')
-    app.mainloop()
+'''
+##################################################################################################
+#                                           Entropy                                              #
+##################################################################################################
+'''
+
+class Voronoi_Packing_Entropy_GUI(tk.Frame):
+    def __init__(self,parent):
+        tk.Frame.__init__(self)
+        self.grid(padx=50)
+        self.Text1 =  tk.Text(parent, height=10)
+        self.Label1 = tk.Label(parent, text="Entropy")
+        self.Label2 = tk.Label(parent, text="Note: ", borderwidth=2, relief="groove")
+        self.Label3 = tk.Label(parent, text="Filename:")
+        self.Label4 = tk.Label(parent, text="Chain IDs (comma separated):")
+        self.Label5 = tk.Label(parent, text="Probe size:")
+        self.Label6 = tk.Label(parent, text="On Sphere Points:")
+        self.Label7 = tk.Label(parent, text="Output Filename:")
+
+        #Input
+        self.Text1.insert(END,"Interface to the functionality to identify the protein hinges (separating the domains) using PACKMAN. It can also be used to read, write, manipulate and analyze protein molecules and it's properties through its API.\n\nCitation:\nKhade PM, Kumar A, Jernigan RL. Characterizing and Predicting Protein Hinges for Mechanistic\nInsight. J Mol Biol. November 2019. doi:10.1016/j.jmb.2019.11.018\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid)" )
+        self.Text1.config(state=DISABLED)
+        self.Box1 = tk.Entry(parent)
+        self.Box2 = tk.Entry(parent)
+        self.Box3 = tk.Entry(parent)
+        self.Box4 = tk.Entry(parent)
+        self.Box5 = tk.Entry(parent)
+
+        self.Box3.insert(END, '1.4')
+        self.Box4.insert(END, '30')
+        self.Box5.insert(END, 'voronoi_packing_entropy_output.txt')
+
+        self.Button1 = tk.Button(parent, text = "Run", command = lambda: self.run_Entropy() )
+
+        self.all_objects = self.__dict__
+
+    def show(self):
+        self.Text1.grid(row=2,columnspan=3,sticky=E+W, padx=10, pady=10 )
+        self.Label1.grid(row=1,columnspan=3,sticky=E+W, padx=10, pady=10 )
+        self.Label2.grid(row=3,columnspan=3,sticky=E+W, padx=10, pady=10 )
+        self.Label3.grid(row=4,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Label4.grid(row=5,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Label5.grid(row=6,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Label6.grid(row=7,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Label7.grid(row=8,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+
+        self.Box1.grid(row=4,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Box2.grid(row=5,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Box3.grid(row=6,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Box4.grid(row=7,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Box5.grid(row=8,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+        
+        self.Button1.grid(row=9, column=2)
+    
+    def hide(self):
+        for i in self.all_objects:
+            try:
+                self.all_objects[i].grid_forget()
+            except:
+                continue
+    
+    def run_Entropy(self):
+        """
+        PACKMAN Hinge Prediction Algorithm
+        """
+        try:
+            mol = molecule.load_structure(self.Box1.get())
+        except:
+            showinfo('Notification','File not found in the folder, downloading it from the PDB.')
+            
+            #For file availability
+            try:
+                try:
+                    molecule.download_structure(self.Box1.get().split('.')[0], ftype= self.Box1.get().split('.')[1])
+                except:
+                    molecule.download_structure( self.Box1.get() )
+            except:
+                showerror('Error','Please check the internet connection or the validity of the PDB ID')
+                exit()
+        try:
+            mol = molecule.load_structure( self.Box1.get() )
+        except:
+            mol = molecule.load_structure(self.Box1.get()+'.cif')
+
+        #Other parameter validity
+        try:
+            input_probe_size = float(self.Box3.get())
+            input_onspherepoints = int(self.Box4.get())
+            output_file = open(self.Box5.get(),'w')
+        except:
+            showerror('Error','Check the value of the parameters:\n\nAlpha Value(float)\nNumber of Eccentricity Clusters (int)\nMinimum Hinge Length (int)')
+        
+        try:
+            input_chains = self.Box2.get().split(',')
+        except:
+            input_chains = None
+        
+        print(input_chains)
+    
+        output_file.write('Frame\tChain\tResidueID\tResidueName\tPackingEntropy\n')
+        for i in mol:
+            try:
+                result = PackingEntropy(i.get_atoms(), chains=input_chains, probe_size=input_probe_size, onspherepoints=input_onspherepoints)
+            except:
+                logging.error('Please check the parameters.')
+                exit()
+            
+            for j in i.get_residues():
+                try:
+                    output_file.write( str(i.get_id())+'\t'+str(j.get_parent().get_id())+'\t'+str(j.get_id())+'\t'+str(j.get_name())+'\t'+str(j.get_entropy('PackingEntropy'))+'\n' )
+                except:
+                    None
+            try:
+                output_file.write('Total (Frame '+str(i.get_id())+')\t'+str(result.get_total_entropy())+'\n' )
+            except:
+                None
+        output_file.flush()
+        output_file.close()
+        showinfo('Notification','The Voronoi Packing Entropy calculation is completed successfully. Please check the output file.')
+        #on_click() Ends here
+        return True
+
+'''
+##################################################################################################
+#                                            Main                                                #
+##################################################################################################
+'''
 
 
 def main():
@@ -719,9 +821,16 @@ def main():
     """
     GUI_OPTION = False
     try:
-        if(sys.argv[1] == "gui"):GUI_OPTION = True
+        if(sys.argv[1] == "gui"):
+            GUI_OPTION = True
+        else:
+            exit()
     except:
-        load_cli()
+        try:
+            load_cli()
+        except Exception as e:
+            print(e)
+            logging.error("Please provide a valid option. Enter 'python -m packman gui' for the GUI. Otherwise, please check the documentation for the CLI options. This function is for the CLI and not an integral function for the API.")
     
     if(GUI_OPTION):load_gui()
 

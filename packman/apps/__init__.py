@@ -19,4 +19,5 @@ Todo:
 
 """
 
-from .predict_hinge import predict_hinge
+from .predict_hinge import predict_hinge, hinge_cli
+from .calculate_entropy import entropy_cli
