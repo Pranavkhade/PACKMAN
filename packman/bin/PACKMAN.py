@@ -64,9 +64,6 @@ def WriteOBJ(atoms,faces, fh):
         #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
     return True
 
-
-
-
 '''
 ##################################################################################################
 #                                          Interface                                             #
@@ -699,7 +696,7 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         self.grid(padx=50)
         self.Text1 =  tk.Text(parent, height=10)
         self.Label1 = tk.Label(parent, text="Entropy")
-        self.Label2 = tk.Label(parent, text="Note: ", borderwidth=2, relief="groove")
+        self.Label2 = tk.Label(parent, text="Note: Important information in the section above. (Use scrolling)", borderwidth=2, relief="groove")
         self.Label3 = tk.Label(parent, text="Filename:")
         self.Label4 = tk.Label(parent, text="Chain IDs (comma separated):")
         self.Label5 = tk.Label(parent, text="Probe size:")
@@ -707,7 +704,7 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         self.Label7 = tk.Label(parent, text="Output Filename:")
 
         #Input
-        self.Text1.insert(END,"Interface to the functionality to identify the protein hinges (separating the domains) using PACKMAN. It can also be used to read, write, manipulate and analyze protein molecules and it's properties through its API.\n\nCitation:\nKhade PM, Kumar A, Jernigan RL. Characterizing and Predicting Protein Hinges for Mechanistic\nInsight. J Mol Biol. November 2019. doi:10.1016/j.jmb.2019.11.018\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid)" )
+        self.Text1.insert(END,"Interface to the functionality to calculate Packing Entropy using PACKMAN. The same program is available via API and CLI.\n\nCitation:\nPaper Under Review\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid).\n\nPlease note that selecting Chain IDs option is used to calculate the entropy with or without the other chains. For example, if a protein has three chains A, B & C, and the user wants to calculate the entropy of chains A & B in the absence of chain C, the user can use Chain IDs A,B parameter-option do so. However, the presence of the chain C is not an issue, but the user wants to calculate the entropy of chain A & B (with C present), Chain IDs option can be ignored, and chain column in the output should be used to select only A & B chains. The use of API is recommended to control these types of situations efficiently that require more control. Also, we recommend reading the publication for more details on the other parameters." )
         self.Text1.config(state=DISABLED)
         self.Box1 = tk.Entry(parent)
         self.Box2 = tk.Entry(parent)
