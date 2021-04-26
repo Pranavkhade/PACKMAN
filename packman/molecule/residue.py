@@ -242,9 +242,9 @@ class Residue():
         XYZ_M=[0,0,0]
         MassofAA=0
         for i in atoms:
-            XYZ_M[0]+=i.Coordinates[0]*AtomicMass
-            XYZ_M[1]+=i.Coordinates[1]*AtomicMass
-            XYZ_M[2]+=i.Coordinates[2]*AtomicMass
+            XYZ_M[0]+=i.get_location()[0]*AtomicMass
+            XYZ_M[1]+=i.get_location()[1]*AtomicMass
+            XYZ_M[2]+=i.get_location()[2]*AtomicMass
             MassofAA=MassofAA+AtomicMass
         return numpy.array([i/MassofAA for i in XYZ_M])
     
@@ -276,7 +276,7 @@ class Residue():
         else:
             MaxDistance=0
             for i in self.get_atoms():
-                tempdistance=CAlpha.calc_dist(i)
+                tempdistance=CAlpha.calculate_distance(i)
                 if(tempdistance>MaxDistance):
                     MaxDistance=tempdistance
                     TipofAA=i

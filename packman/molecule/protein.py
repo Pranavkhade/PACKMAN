@@ -154,4 +154,6 @@ class Protein():
         elif(ftype == 'pdb'):
             self.write_pdb(filename)
         else:
-            print('Please provide appropriate "ftype" argument. (cif/pdb).')
+            raise Exception('Please provide appropriate "ftype" argument. (cif/pdb).')
+
+        return True

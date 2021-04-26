@@ -15,6 +15,7 @@ install:
   - pip install mlxtend
   - pip install sklearn
   - pip install py-packman
+  - pip install nose
 
 script:
-  - python tests/stability_tests.py
+  - nosetests packman -a '!slow'
