@@ -88,7 +88,5 @@ class TestMolecule(unittest.TestCase):
     def tearDown(self):
         logging.info('Molecule Test Done.')
 
-
 if(__name__=='__main__'):
     unittest.main()
-    

@@ -14,7 +14,6 @@ install:
   - pip install networkx
   - pip install mlxtend
   - pip install sklearn
-  - pip install py-packman
   - pip install nose
 
 script:

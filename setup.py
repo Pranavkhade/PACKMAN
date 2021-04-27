@@ -11,10 +11,16 @@ PACKAGES=['packman',
           'packman.bin',
           'packman.constants',
           'packman.utilities',
-          'packman.entropy'
+          'packman.entropy',
+          'packman.tests',
+          'packman.tests.anm',
+          'packman.tests.data',
+          'packman.tests.entropy',
+          'packman.tests.molecule'
           ]
 
-PACKAGE_DATA = {'packman.bin': ['logo.ico']
+PACKAGE_DATA = {'packman.bin': ['logo.ico'],
+                'packman.tests' : ['data/*.hng','data/*.pdb','data/*.cif']
 }
 
 SCRIPTS=['packman=packman.bin.PACKMAN:main']

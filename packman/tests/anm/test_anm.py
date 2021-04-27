@@ -45,10 +45,8 @@ class TestMolecule(unittest.TestCase):
         self.assertIsNotNone( self.ANM_MODEL.get_stiffness_profile() )
         self.assertIsNotNone( self.ANM_MODEL.get_compliance_profile() )
 
-    
     def tearDown(self):
         logging.info('ANM, hdANM and Compliance Test Done.')
-
 
 if(__name__=='__main__'):
     unittest.main()
