@@ -19,7 +19,11 @@ QUICK ALGORITHM OVERVIEW
 ------------------------
 .. image:: ../../_static/gallary/hinge_prediction_algorithm_method1.jpg
 
-Please visit the following for the 15 minute video about the algorithm: https://youtu.be/3ALOxMqR1EA
+Please visit the following for the 15 minute video about the algorithm
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/3ALOxMqR1EA?start=522" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 Step 1: Loading Structure

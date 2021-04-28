@@ -24,6 +24,7 @@ Authors:
 
 
 import numpy
+import logging
 
 
 class Chain():
@@ -43,12 +44,15 @@ class Chain():
     """
     
     def __init__(self,id):
-        self.__id=id
-        self.__Residues=None
-        self.__HetMols=None
-        self.__parent=None
+        self.__id = id
+        self.__Residues = None
+        self.__HetMols = None
+        self.__parent = None
         #More Features
-        self.__Hinges=[]
+        self.__Hinges = []
+
+        #Properties are the entities that are not included in the PDB files and are obtained by calculations
+        self.__properties = {}
     
     def __setitem__(self,Number,Entity,Type):
         if(Type=='Residue'):
@@ -95,6 +99,86 @@ class Chain():
         """
         return self.__Hinges
     
+    def get_entropy(self,entropy_type):
+        """Get the Packing Entropy of the given 'Chain'.
+
+        Please note that if the Entropy is calculated using specific atoms, this option might not give results for the amino acids that are not included because of the specific selection. Use the get_total_chain_entropy() function. Please see the documentation for more details.
+
+        Args:
+            type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
+
+        Note:
+            - More type of Entropies might be added in the future.
+        """
+        EntropyTypes = ['PackingEntropy']
+        try:
+            return numpy.sum( [self.__Residues[i].get_entropy(entropy_type) for i in self.__Residues] )
+        except:
+            if(entropy_type in EntropyTypes):
+                logging.warning('This Entropy type is not yet calculated for parameters provided. Please check the "calculate_entropy" function in the documentation for the details.')
+            else:
+                logging.warning('The Entropy type provided is invalid. Please check the documentation for the details.')
+
+    def get_property(self,property_name):
+        """Get the Property of the given 'Chain'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            return self.__properties[property_name]
+        except:
+            logging.warning('The Property Name provided is not assigned.')
+    
+    #Set Functions
+    def set_id(self,new_id):
+        """Set the ID of the given 'Chain'
+
+        Args:
+            new_id (str): The ID User wishes to assign to the given 'Chain'
+        """
+        self.__id=new_id
+    
+    def set_parent(self,parent):
+        """Set the Parent of the given 'Residue'
+
+        Args:
+            new_parent (packman.molecule.Chain): The parent 'Chain' User wishes to assign to the given 'Residue'
+        """
+        self.__parent=parent
+    
+    def set_hinges(self,new_hinges):
+        """Set/Add hinge to the 'Chain' object
+
+        Args:
+            new_hinges (packman.molecule.annotations.Hinge): The 'Hinge' User wishes to assign/add to the given 'Chain'
+        """
+        self.__Hinges=self.__Hinges+new_hinges
+
+    def set_property(self,property_name,value):
+        """Set the Property of the given 'Chain'.
+
+        Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+        
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+            value (object):         The value the user wants to assign to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            self.__properties[property_name] = value
+        except:
+            logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
+
     #Calculation Functions
     def get_atoms(self):
         """Get the generator of corresponding 'atom' objects of the 'Chain'
@@ -143,28 +227,16 @@ class Chain():
             list of packman.molecule.Atom if successful, None otherwise.
         """
         return [i.get_backbone() for i in self.get_residues()]
-
-    #Set Functions
-    def set_id(self,new_id):
-        """Set the ID of the given 'Chain'
-
-        Args:
-            new_id (str): The ID User wishes to assign to the given 'Chain'
-        """
-        self.__id=new_id
     
-    def set_parent(self,parent):
-        """Set the Parent of the given 'Residue'
-
-        Args:
-            new_parent (packman.molecule.Chain): The parent 'Chain' User wishes to assign to the given 'Residue'
-        """
-        self.__parent=parent
+    def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
+        """Calculate the entropy for the each amino acid will be returned.
     
-    def set_hinges(self,new_hinges):
-        """Set/Add hinge to the 'Chain' object
+        The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
 
         Args:
-            new_hinges (packman.molecule.annotations.Hinge): The 'Hinge' User wishes to assign/add to the given 'Chain'
+            entropy_type (str)              : Type of entropy to be calculated (Options: PackingEntropy)
+            chains ([str]/str)              : Chain IDs for the Entropy calculation (None means all the chains are included; single string means only one chain ID; multiple chains should be an array of strings).
+            probe_size (float)              : Radius of the probe to generate the surface points (This value should not be less than 1;Read the Publication for more details)
+            onspherepoints (int)            : Number of points to be generated around each point for the surface (Read the Publication for more details)
         """
-        self.__Hinges=self.__Hinges+new_hinges
+        self.get_parent().calculate_entropy(entropy_type,chains=chains, probe_size=probe_size, onspherepoints=onspherepoints)

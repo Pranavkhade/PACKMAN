@@ -10,10 +10,17 @@ PACKAGES=['packman',
           'packman.apps',
           'packman.bin',
           'packman.constants',
-          'packman.utilities'
+          'packman.utilities',
+          'packman.entropy',
+          'packman.tests',
+          'packman.tests.anm',
+          'packman.tests.data',
+          'packman.tests.entropy',
+          'packman.tests.molecule'
           ]
 
-PACKAGE_DATA = {'packman.bin': ['logo.ico']
+PACKAGE_DATA = {'packman.bin': ['logo.ico'],
+                'packman.tests' : ['data/*.hng','data/*.pdb','data/*.cif']
 }
 
 SCRIPTS=['packman=packman.bin.PACKMAN:main']
@@ -29,6 +36,7 @@ setup(name='py-packman',
       packages=PACKAGES,
       package_data=PACKAGE_DATA,
       long_description = long_description,
+      long_description_content_type='text/markdown',
       keywords=('protein, dynamics, protein packing, protein domain, protein hinge'),
       classifiers=[
               'Intended Audience :: Education',
