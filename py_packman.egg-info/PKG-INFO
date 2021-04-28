@@ -1,12 +1,12 @@
-Metadata-Version: 1.1
+Metadata-Version: 2.1
 Name: py-packman
-Version: 1.2.10
+Version: 1.3.0
 Summary: A software package for molecular PACKing and Motion ANalysis (PACKMAN)
 Home-page: https://github.com/Pranavkhade/PACKMAN
 Author: Pranav Khade
 Author-email: pranavk@iastate.edu
 License: MIT
-Description: [![Build Status](https://travis-ci.com/Pranavkhade/PACKMAN.svg?branch=master)](https://travis-ci.com/Pranavkhade/PACKMAN) [![Documentation Status](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/py-packman)](https://pepy.tech/project/py-packman)
+Description: [![PyPI version](https://badge.fury.io/py/py-packman.svg)](https://badge.fury.io/py/py-packman) [![Build Status](https://travis-ci.com/Pranavkhade/PACKMAN.svg?branch=master)](https://travis-ci.com/Pranavkhade/PACKMAN) [![Documentation Status](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/py-packman)](https://pepy.tech/project/py-packman)
         
         
         PACKMAN: PACKing and Motion ANalysis
@@ -82,3 +82,4 @@ Classifier: Programming Language :: Python :: 3
 Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
 Classifier: Topic :: Scientific/Engineering :: Chemistry
 Classifier: Topic :: Scientific/Engineering :: Mathematics
+Description-Content-Type: text/markdown

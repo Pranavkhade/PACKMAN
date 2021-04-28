@@ -278,7 +278,7 @@ class hdANM:
             self.eigen_values  = self.eigen_values[idx]
             self.eigen_vectors = self.eigen_vectors[:,idx]
         else:
-            self.eigen_values,self.eigen_vectors = numpy.linalg.eigh(self.domain_hessian)
+            self.eigen_values, self.eigen_vectors = numpy.linalg.eigh(self.domain_hessian)
         return True
     
     

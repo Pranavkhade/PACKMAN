@@ -781,7 +781,8 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         except:
             input_chains = None
         
-        print(input_chains)
+        if(input_chains==['']):
+            input_chains=None
     
         output_file.write('Frame\tChain\tResidueID\tResidueName\tPackingEntropy\n')
         for i in mol:
