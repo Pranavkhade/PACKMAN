@@ -15,7 +15,6 @@ import logging
 
 from .. import molecule
 from ..apps import hinge_cli, entropy_cli
-from .GUI import load_gui
 
 import operator
 import argparse
@@ -155,20 +154,15 @@ def load_cli():
 def main():
     """Gatewayto CLI and GUI
     """
-    GUI_OPTION = False
     try:
-        if(sys.argv[1] == "gui"):
-            GUI_OPTION = True
+        if(len(sys.argv) >  1 and sys.argv[1] == "gui"):
+            from .GUI import load_gui
+            load_gui()
         else:
-            exit()
-    except:
-        try:
             load_cli()
-        except Exception as e:
-            print(e)
-            logging.error("Please provide a valid option. Enter 'python -m packman gui' for the GUI. Otherwise, please check the documentation for the CLI options. This function is for the CLI and not an integral function for the API.")
-    
-    if(GUI_OPTION):load_gui()
+    except Exception as e:
+        print(e)
+        logging.error("Please provide a valid option. Enter 'python -m packman gui' for the GUI. Otherwise, please check the documentation for the CLI options. This function is for the CLI and not an integral function for the API.")
 
 
 
