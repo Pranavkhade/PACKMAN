@@ -11,11 +11,6 @@ This package focuses on studying molecular structures and their dynamics using a
 DOCUMENTATION
 -------------
 * [IMPORTANT : Documentation, Tutorials & More](https://py-packman.readthedocs.io)
-* [Hinge Prediction Web Server](https://packman.bb.iastate.edu/)
-* [hd-ANM Web Server](https://hdanm.bb.iastate.edu/)
-* [Reference for Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
-* [Reference for Compliance](https://doi.org/10.1002/prot.25968)
-* [Reference for hd-ANM](coming_soon)
 
 INSTALLATION
 ------------
@@ -48,15 +43,13 @@ python3 -m packman gui
 
 For the CLI and API, please read the tutorials & documentation.
 
-PREREQUISITES
--------------
+WEB SERVERS
+-----------
+* [Hinge Prediction Web Server](https://packman.bb.iastate.edu/)
+* [hd-ANM Web Server](https://hdanm.bb.iastate.edu/)
 
-* [numpy](http://www.numpy.org/)
-
-* [scipy](https://www.scipy.org/)
-
-* [networkx](https://networkx.github.io/)
-
-* [mlxtend](http://rasbt.github.io/mlxtend/)
-
-* [sklearn](https://scikit-learn.org/stable/)
+RELATED RESEARCH ARTICLES
+-------------------------
+* [Reference for Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
+* [Reference for Compliance](https://doi.org/10.1002/prot.25968)
+* [Reference for hd-ANM](coming_soon)
