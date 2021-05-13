@@ -41,6 +41,7 @@ def entropy_cli(args,mol):
             try:
                 result = PackingEntropy(i.get_atoms(),chains=input_chains,probe_size=args.probe_size,onspherepoints=args.onspherepoints)
             except:
+		raise
                 logging.error('Please check the parameters.')
                 exit()
             
