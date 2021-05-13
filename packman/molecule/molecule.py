@@ -427,6 +427,7 @@ def download_structure(pdbid,save_name=None,ftype='cif'):
     else:
         try:
             open(save_name+'.'+ftype,'wb').write(response.read())
+            return save_name+'.'+ftype
         except(IOError):
             None
     return True

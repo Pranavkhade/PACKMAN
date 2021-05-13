@@ -127,7 +127,7 @@ def load_cli():
     args=IO()
 
     if(args.pdbid is not None):
-        molecule.download_structure(args.pdbid, args.filename)
+        args.filename = molecule.download_structure(args.pdbid, args.filename)
 
     try:
         extension = args.filename.split('.')[-1]
