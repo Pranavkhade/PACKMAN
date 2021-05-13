@@ -161,7 +161,7 @@ def main():
         else:
             load_cli()
     except Exception as e:
-        raise
+        print(e)
         logging.error("Please provide a valid option. Enter 'python -m packman gui' for the GUI. Otherwise, please check the documentation for the CLI options. This function is for the CLI and not an integral function for the API.")
 
 
