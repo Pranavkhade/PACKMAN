@@ -111,7 +111,7 @@ class PackingEntropy():
     def calculate_surafacepoints(self):
         """Calculate the surface points with the current setup.
         """
-        pool = ThreadPool(len(self.atoms))
+        pool = ThreadPool()
         surface=pool.map( self.calculate_spherepoints, self.coordinates )
         surface=[item for sublist in surface for item in sublist]
         self.surface_points = surface
