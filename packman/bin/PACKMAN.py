@@ -126,6 +126,8 @@ def load_cli():
     """
     args=IO()
 
+    logging.basicConfig(stream=args.logfile)
+
     if(args.pdbid is not None):
         molecule.download_structure(args.pdbid, save_name=args.filename.split('.')[0], ftype=args.filename.split('.')[1])
 
