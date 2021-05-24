@@ -469,14 +469,7 @@ def hinge_cli(args,mol):
             for i in mol[0].get_chains():
                 Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
                 SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
-        
-        if args.nodeid is not None:
-            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/0")
 
-    except Exception:
-        if args.nodeid is not None:
-            urlopen(args.callbackurl + '/' + str(args.nodeid) + "/1")
-    
     finally:
         print_footnotes(args.outputfile)
         args.outputfile.flush()

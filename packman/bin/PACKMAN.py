@@ -21,12 +21,6 @@ import argparse
 import os
 import sys
 
-try:
-    from urllib.request import urlopen
-except Exception:
-    from urllib2 import urlopen
-
-
 '''
 ##################################################################################################
 #                                    Non Algorithm Functions                                     #
