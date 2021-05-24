@@ -21,47 +21,6 @@ import argparse
 import os
 import sys
 
-try:
-    from urllib.request import urlopen
-except Exception:
-    from urllib2 import urlopen
-
-
-'''
-##################################################################################################
-#                                    Non Algorithm Functions                                     #
-##################################################################################################
-'''
-
-def WriteOBJ(atoms,faces, fh):
-    """Write the .obj file to visualize the obtain alpha shape tesselations.
-    
-    Args:
-        atoms (packman.molecule.Atom): Atoms (Just for the node records)
-        faces ([float])              : SelectedTesselations (See the packman.apps.predict_hinge)
-        fh (file)                    : Output file with .obj extension
-    
-    """
-    NewIDs={i.get_id():numi+1 for numi,i in enumerate(atoms)}
-    fh.write('mtllib master.mtl\ng\n'.encode())
-    fh.write('usemtl atoms\n'.encode())
-    for i in atoms:
-        x,y,z=i.get_location()
-        fh.write("v %f %f %f\n".encode()%(x,y,z))
-    
-    line='usemtl bonds\nl'
-    for i in atoms:
-        line=line+" "+str(NewIDs[i.get_id()])
-    line=line+'\n'
-    fh.write(line.encode())
-    
-    fh.write('usemtl faces\n'.encode())
-    for i in faces:
-        faces=[NewIDs[j.get_id()] for j in i]
-        fh.write("f %i %i %i %i\n".encode()%(faces[0],faces[1],faces[2],faces[3]))
-        #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
-    return True
-
 '''
 ##################################################################################################
 #                                          Interface                                             #
@@ -103,8 +62,6 @@ def IO():
     web_server_group = parser.add_argument_group('Web server parameters', 'Used by the web form')
     web_server_group.add_argument('--outputfile', type=argparse.FileType('w', 1), default=sys.stdout, help='Path and filename write output to')
     web_server_group.add_argument('--logfile', type=argparse.FileType('w', 1), default=sys.stderr, help='Path and filename write log messages to')
-    web_server_group.add_argument('--callbackurl', type=str, help='Optional callback url if this script was called from Drupal.')
-    web_server_group.add_argument('--nodeid', type=int, help='Optional node id if this script was called from Drupal.')
     
     args=parser.parse_args()
     return args
