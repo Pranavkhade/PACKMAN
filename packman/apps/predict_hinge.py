@@ -37,7 +37,7 @@ from mlxtend.evaluate import permutation_test
 from itertools import groupby, count
 
 from ..molecule import Hinge
-
+from ..utilities import WriteOBJ
 
 
 def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5,nclusters=4):

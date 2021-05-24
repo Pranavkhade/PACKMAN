@@ -143,3 +143,38 @@ def load_hinge(filename):
         line=i.strip().split()
         HNGinfo[ line[0]+'_'+line[1] ]=[float(j) for j in line[2].split(':')]
     return HNGinfo
+
+'''
+##################################################################################################
+#                                    Non Algorithm Functions                                     #
+##################################################################################################
+'''
+
+def WriteOBJ(atoms,faces, fh):
+    """Write the .obj file to visualize the obtain alpha shape tesselations.
+    
+    Args:
+        atoms (packman.molecule.Atom): Atoms (Just for the node records)
+        faces ([float])              : SelectedTesselations (See the packman.apps.predict_hinge)
+        fh (file)                    : Output file with .obj extension
+    
+    """
+    NewIDs={i.get_id():numi+1 for numi,i in enumerate(atoms)}
+    fh.write('mtllib master.mtl\ng\n'.encode())
+    fh.write('usemtl atoms\n'.encode())
+    for i in atoms:
+        x,y,z=i.get_location()
+        fh.write("v %f %f %f\n".encode()%(x,y,z))
+    
+    line='usemtl bonds\nl'
+    for i in atoms:
+        line=line+" "+str(NewIDs[i.get_id()])
+    line=line+'\n'
+    fh.write(line.encode())
+    
+    fh.write('usemtl faces\n'.encode())
+    for i in faces:
+        faces=[NewIDs[j.get_id()] for j in i]
+        fh.write("f %i %i %i %i\n".encode()%(faces[0],faces[1],faces[2],faces[3]))
+        #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
+    return True
