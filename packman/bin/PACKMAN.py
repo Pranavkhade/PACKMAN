@@ -62,8 +62,6 @@ def IO():
     web_server_group = parser.add_argument_group('Web server parameters', 'Used by the web form')
     web_server_group.add_argument('--outputfile', type=argparse.FileType('w', 1), default=sys.stdout, help='Path and filename write output to')
     web_server_group.add_argument('--logfile', type=argparse.FileType('w', 1), default=sys.stderr, help='Path and filename write log messages to')
-    web_server_group.add_argument('--callbackurl', type=str, help='Optional callback url if this script was called from Drupal.')
-    web_server_group.add_argument('--nodeid', type=int, help='Optional node id if this script was called from Drupal.')
     
     args=parser.parse_args()
     return args
