@@ -14,7 +14,7 @@ import traceback
 import logging
 
 from .. import molecule
-from ..apps import hinge_cli, entropy_cli
+from ..apps import hinge_cli, hdanm_cli, entropy_cli
 
 import operator
 import argparse
@@ -48,6 +48,20 @@ def IO():
     hinge_app_io.add_argument('--minhnglen',metavar='MinimumHingeLength',type=int,default=5,help='Recommended: 5, Please refer to the paper for more details')
     hinge_app_io.add_argument("--chain", help='Enter The Chain ID')
     hinge_app_io.add_argument('--generateobj', type=argparse.FileType('wb', 0), help='Path and filename to save the .obj file at. Ignored unless --chain is provided.')
+
+    #hdanm
+    hd_anm_io = subparsers.add_parser('hdanm')
+    hd_anm_io.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
+    hd_anm_io.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
+    hd_anm_io.add_argument('hngfile', metavar='HNG', help='Path and filename of the corresponding HNG file.')
+    hd_anm_io.add_argument("--chain", help='Enter The Chain ID')
+    hd_anm_io.add_argument("--dr", type=float, default=15, help='Distance cutoff for the ANM.')
+    hd_anm_io.add_argument("--power", type=float, default=0, help='Power of the distance in non-parametric ANM.')
+    hd_anm_io.add_argument("--mass", default='residue', help='Mass of the residue; unit or molecular weight')
+    hd_anm_io.add_argument("--scale", type=int, default=2, help='movie scale')
+    hd_anm_io.add_argument("--frames", type=int, default=10, help='number of frames')
+    hd_anm_io.add_argument("--modes", type=int, default=10, help='how many modes')
+    hd_anm_io.add_argument("--make_tar", action='store_true', help='package output files into a tar.gz file')
 
     #Entropy
     entropy_app_io = subparsers.add_parser('entropy')
@@ -97,6 +111,8 @@ def load_cli():
     
     if(args.command == 'hinge'):
         hinge_cli(args,mol)
+    elif(args.command == 'hdanm'):
+        hdanm_cli(args,mol)
     elif(args.command == 'entropy'):
         entropy_cli(args,mol)
 
