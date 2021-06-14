@@ -309,8 +309,8 @@ class hdANM:
                 HNGrange = self.HNGinfo[j]
                 IDs  = j.split('_')
                 if( HNGrange[0] <= i.get_parent().get_id() <= HNGrange[1] and IDs[1] == i.get_parent().get_parent().get_id() ):
-                    i.get_parent().set_domain_id( IDs[-1] )
-        
+                    i.get_parent().set_domain_id( IDs[-1].strip() )
+
         #Domain groups stores the atom index(of self.atoms) with Domain ID as a key (D5: [1,2] domain 5 with atom index 1 and 2 )
         DomainGroups={}
         for numi,i in enumerate(self.atoms):
@@ -319,7 +319,6 @@ class hdANM:
             except:
                 DomainGroups[i.get_domain_id()]=[]
                 DomainGroups[i.get_domain_id()].append(numi)
-        
         
         #HHH
         HingeAtoms=[]
