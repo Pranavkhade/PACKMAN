@@ -24,6 +24,7 @@ Authors:
 
 import numpy
 import functools
+import logging
 
 import networkx as nx
 
@@ -467,8 +468,11 @@ def hinge_cli(args,mol):
                 WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
         else:
             for i in mol[0].get_chains():
-                Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
-                SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+                try:
+                    Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
+                    SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+                except:
+                    logging.warning('Chain '+str(i.get_id())+' has none/missing backbone atoms to calculate the hinge.')
 
     finally:
         print_footnotes(args.outputfile)
