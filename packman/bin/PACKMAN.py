@@ -129,16 +129,11 @@ def load_cli():
 def main():
     """Gatewayto CLI and GUI
     """
-    try:
-        if(len(sys.argv) >  1 and sys.argv[1] == "gui"):
-            from .GUI import load_gui
-            load_gui()
-        else:
-            load_cli()
-    except Exception as e:
-        print(e)
-        logging.error("Please provide a valid option. Enter 'python -m packman gui' for the GUI. Otherwise, please check the documentation for the CLI options. This function is for the CLI and not an integral function for the API.")
-
+    if(len(sys.argv) >  1 and sys.argv[1] == "gui"):
+        from .GUI import load_gui
+        load_gui()
+    else:
+        load_cli()
 
 
 if(__name__ == '__main__'):
