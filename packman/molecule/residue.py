@@ -271,15 +271,19 @@ class Residue():
         CAlpha=self.get_calpha()
         resname=self.get_name()
         TipofAA=None
-        if(resname=='ALA' or resname=='GLY'):
+        if(resname=='GLY'):
             TipofAA=CAlpha
         else:
-            MaxDistance=0
-            for i in self.get_atoms():
-                tempdistance=CAlpha.calculate_distance(i)
-                if(tempdistance>MaxDistance):
-                    MaxDistance=tempdistance
-                    TipofAA=i
+            try:
+                MaxDistance=0
+                for i in self.get_atoms():
+                    tempdistance=CAlpha.calculate_distance(i)
+                    if(tempdistance>MaxDistance):
+                        MaxDistance=tempdistance
+                        TipofAA=i
+            except:
+                TipofAA = CAlpha
+                logging.warning('The tip atoms for '+resname+str(self.get_id())+' not found; Using C-Alpha atoms as a tip.')
         return TipofAA
     
     def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
