@@ -47,9 +47,16 @@ WEB SERVERS
 -----------
 * [Hinge Prediction Web Server](https://packman.bb.iastate.edu/)
 * [hd-ANM Web Server](https://hdanm.bb.iastate.edu/)
+* [Packing Entropy Web Server](https://packing-entropy.bb.iastate.edu/)
 
 RELATED RESEARCH ARTICLES
 -------------------------
-* [Reference for Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
-* [Reference for Compliance](https://doi.org/10.1002/prot.25968)
-* [Reference for hd-ANM](coming_soon)
+* [Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
+* [Compliance](https://doi.org/10.1002/prot.25968)
+* [hd-ANM](coming_soon)
+* [Packing Entropy](coming_soon)
+
+ACKNOWLEDGEMENTS
+----------------
+
+The development of the PACKMAN package is supported by [NSF](https://www.nsf.gov/) grant DBI 1661391. The authors also thank [ResearchIT@Iowa State University](https://researchit.las.iastate.edu/about-research-it-iowa-state-university) for helping with many aspects of computing.
