@@ -26,10 +26,8 @@ import numpy
 import functools
 import logging
 
-import networkx as nx
+from networkx import eccentricity
 
-from scipy.spatial import Delaunay
-from scipy.spatial import KDTree
 from scipy.stats import mode
 from scipy.optimize import minimize
 
@@ -39,9 +37,10 @@ from itertools import groupby, count
 
 from ..molecule import Hinge
 from ..utilities import WriteOBJ
+from ..geometry import AlphaShape
 
 
-def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',GenerateKirchoff=False,filename='Output.pdb',MinimumHingeLength=5,nclusters=4):
+def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',filename='Output.pdb',MinimumHingeLength=5,nclusters=4):
     """This function is used to carry out hinge prediction given the parameters.
 
     Notes:
@@ -54,92 +53,28 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             Journal of Molecular Biology, Volume 432, Issue 2, 2020, Pages 508-522, ISSN 0022-2836, https://doi.org/10.1016/j.jmb.2019.11.018.
             (http://www.sciencedirect.com/science/article/pii/S0022283619306837)
         
-        * Tutorial Link:
+        * Tutorial Link: https://py-packman.readthedocs.io/en/latest/tutorials/hinge_predict.html#tutorials-predict-hinge
 
         * The predicted hinges are stored in packman.molecule.Chain object as an packman.molecule.Hinge object.
 
     Todo:
         * Add reference to the function in the description which scans multiple alpha values for conclusive hinges.
-        * Remove GenerateKirchoff parameter and sections
     
     Args:
         atoms ([packman.molecule.Atom])   : PACKMAN uses backbone atoms of the protein. However, any number and type of atoms can be used (Alpha value range will change)
         outputfile (file)                 : Output File.
         Alpha (float, optional)           : Please refer to the paper for this parameter. Defaults to float('Inf').
-        method (str, optional)            : Please refer to the paper for this parameter. Defaults to 'AlphaShape'.
-        GenerateKirchoff (bool, optional) : Soon to be removed. Defaults to False.
+        method (str, optional)            : Please refer to the paper for this parameter. Defaults to 'alpha_shape'.
         filename (str, optional)          : Please refer to the paper for this parameter. Defaults to 'Output.pdb'.
         MinimumHingeLength (int, optional): Please refer to the paper for this parameter. Defaults to 5.
         nclusters (int, optional)         : Please refer to the paper for this parameter. Defaults to 4.
     
     Returns:
-        SelectedTesselations              : The Alpha Shape (Subset of Delaunay Tesselations) 
+        alpha_shape              : The Alpha Shape (Subset of Delaunay Tesselations) 
     """
-    if(method=='AlphaShape'):
-        def GetCircumsphere(Tetrahydron):
-            """Get the Circumsphere of the set of four points.
-            
-            Given any four three dimentional points, this function calculates the features of the circumsphere having the given four points on it's surface.
-            
-            Notes:
-                * Function level: 1 (1 being top)
-                * DistanceToSurface will be removed in future.
-                * Possible to move this to geometrical package in future. 
+    if(method=='alpha_shape'):
 
-            Args:
-                Tetrahydron ([type]): [description]
-            
-            Returns:
-                [Centre, Radius, DistanceToSurface] (float): The 3D coordinates of the geometrical center of the given four points, Radius of the circumsphere made up of given four points, Distance to the center (in that order)
-            """
-            alpha_mat,gamma_mat,Dx_mat,Dy_mat,Dz_mat=[],[],[],[],[]
-            for i in Tetrahydron:
-                temp_coords=i.get_location()
-                alpha_mat.append([temp_coords[0],temp_coords[1],temp_coords[2],1])
-                gamma_mat.append([temp_coords[0]**2+temp_coords[1]**2+temp_coords[2]**2,temp_coords[0],temp_coords[1],temp_coords[2]])
-                Dx_mat.append([temp_coords[0]**2+temp_coords[1]**2+temp_coords[2]**2,temp_coords[1],temp_coords[2],1])
-                Dy_mat.append([temp_coords[0]**2+temp_coords[1]**2+temp_coords[2]**2,temp_coords[0],temp_coords[2],1])
-                Dz_mat.append([temp_coords[0]**2+temp_coords[1]**2+temp_coords[2]**2,temp_coords[0],temp_coords[1],1])
-            alpha=numpy.linalg.det(alpha_mat)
-            gamma=numpy.linalg.det(gamma_mat)
-            Dx=(+numpy.linalg.det(Dx_mat))
-            Dy=(-numpy.linalg.det(Dy_mat))
-            Dz=(+numpy.linalg.det(Dz_mat))
-            Centre=numpy.array([Dx/2*alpha,Dy/2*alpha,Dz/2*alpha])
-            Radius=numpy.sqrt(Dx**2 + Dy**2 + Dz**2 - 4*alpha*gamma)/(2*numpy.absolute(alpha))
-            DistanceToSurface=numpy.linalg.norm(Centre-AllAtoms[a].get_location())
-            return Centre,Radius,DistanceToSurface
-
-        def AlphaTest(atoms,Alpha,Centre,CircumRadius,DistanceToSurface,Tree=None):
-            """Alpha Test as per the paper.
-            
-            Notes:
-                * Function level: 1 (1 being top)
-                * Confirm is sphere hollowness should be checked or it is covered by tesselations.
-                * For more information on the alpha shape, read the following paper:
-                    EdelsbrunnerandE. P. M ̈ucke.Three-dimensional alpha shapes.
-                    Manuscript UIUCDCS-R-92-1734, Dept.Comput.Sci. ,Univ.Illinois, Urbana-Champaign, IL, 1992.
-
-            Todo:
-                * Remove multiple unused parameters
-
-            Args:
-                atoms ([packman.molecule.Atom]): Set of atoms.                     (Read parent method description)
-                Alpha (float)                  : Alpha.                            (Read parent method description)
-                Centre ([float])               : Centre of the circumsphere.       (Read parent method description)
-                CircumRadius ([float])         : Circumradius of the circumsphere. (Read parent method description)
-                DistanceToSurface ([float])    : Distance to the surface                (Will be removed)
-                Tree ([scipy.KDTree], optional): KDTree of the atoms. Defaults to None. (Will be removed)
-            
-            Returns:
-                bool: True if alpha test is passed. False otherwise.
-            """
-            if(CircumRadius<Alpha):
-                return True
-            else:
-                return False
-        
-        def GetStats(atoms,SelectedHingeResidues,filename='Output'):
+        def get_statistics(atoms,SelectedHingeResidues,filename='Output'):
             """This sub-method is used to get the statistical data on the hinges and print it into a file.
             
             Notes:
@@ -176,8 +111,7 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             outputfile.write('\np-value:\t'+str(p_value)+'\n')
             return p_value,return_stats
         
-
-        def GetLeastSquarePlane(atoms,HingeResidues,HingePlane):
+        def get_leastsquareplane(atoms,HingeResidues,HingePlane):
             """This sub-function gives the Least Square Plane equation of the given atoms.
 
             This plane is currently gives us an idea about the possible direction of the movement of the hinge residues (See figures in the publication)
@@ -344,48 +278,12 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             projected=project_points(hinge_xs,hinge_ys,hinge_zs,a,b,c)
             return projected
         
-        AllAtoms=[i for i in atoms]
-        AlphaKirchoff=numpy.zeros((len(AllAtoms),len(AllAtoms)))
-        DelaunayTesssellation=Delaunay([i.get_location() for i in AllAtoms])
-        SelectedTesselations=[]
-        ProteinGraph=nx.Graph()
-        if(GenerateKirchoff):
-            Tree=KDTree([i.get_location() for i in AllAtoms])
-            for a,b,c,d in DelaunayTesssellation.vertices:
-                Tetrahydron=[AllAtoms[a],AllAtoms[b],AllAtoms[c],AllAtoms[d]]
-                Centre,Radius,DistanceToSurface=GetCircumsphere(Tetrahydron)
-                #Alpha Test
-                if(AlphaTest(AllAtoms,Alpha,Centre,Radius,DistanceToSurface,Tree=Tree)):
-                    ProteinGraph.add_nodes_from([a,b,c,d])
-                    ProteinGraph.add_edges_from([(a,b),(a,c),(a,d),(b,c),(b,d),(c,d)])
-                    SelectedTesselations.append([AllAtoms[a],AllAtoms[b],AllAtoms[c],AllAtoms[d]])
-                    AlphaKirchoff[a][b]=1
-                    AlphaKirchoff[a][c]=1
-                    AlphaKirchoff[a][d]=1
-                    AlphaKirchoff[b][a]=1
-                    AlphaKirchoff[b][c]=1
-                    AlphaKirchoff[b][d]=1
-                    AlphaKirchoff[c][a]=1
-                    AlphaKirchoff[c][b]=1
-                    AlphaKirchoff[c][d]=1
-                    AlphaKirchoff[d][a]=1
-                    AlphaKirchoff[d][b]=1
-                    AlphaKirchoff[d][c]=1
+        #Alpha shape bit
+        alpha_shape, ProteinGraph = AlphaShape( atoms, Alpha, get_graph = True )
 
-            for numi,i in enumerate(AlphaKirchoff):
-                AlphaKirchoff[numi][numi]=numpy.sum(i)
-        else:
-            for a,b,c,d in DelaunayTesssellation.vertices:
-                Tetrahydron=[AllAtoms[a],AllAtoms[b],AllAtoms[c],AllAtoms[d]]
-                Centre,Radius,DistanceToSurface=GetCircumsphere(Tetrahydron)
-                #Alpha Test
-                if(AlphaTest(AllAtoms,Alpha,Centre,Radius,DistanceToSurface)):
-                    ProteinGraph.add_nodes_from([a,b,c,d])
-                    ProteinGraph.add_edges_from([(a,b),(a,c),(a,d),(b,c),(b,d),(c,d)])
-                    SelectedTesselations.append([AllAtoms[a],AllAtoms[b],AllAtoms[c],AllAtoms[d]])
-
-        centrality=nx.eccentricity(ProteinGraph)
-        centrality_sorted_with_keys=numpy.array([float(centrality[j]) for j in sorted([i for i in centrality.keys()])]).reshape(-1, 1)
+        centrality = eccentricity(ProteinGraph)
+        centrality_sorted_with_keys = numpy.array([float(centrality[j]) for j in sorted([i for i in centrality.keys()])]).reshape(-1, 1)
+        
         #Cluster (4 is like a resolution here)
         km=KMeans(n_clusters=nclusters)
         km.fit(centrality_sorted_with_keys)
@@ -411,34 +309,27 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='AlphaShape',Gene
             for _ in i:_.set_domain_id('FL'+str(numi))
             #Molecule.Hinge(numi,elements,stats,p)
             outputfile.write('\nHinge #'+str(numi+1)+'\nResidues: '+i[0].get_name()+'-'+str(i[0].get_id()) +' to '+i[-1].get_name()+'-'+str(i[-1].get_id())+'\n')
-            p_value,hstats=GetStats(atoms,i,filename=filename)
+            p_value,hstats=get_statistics(atoms,i,filename=filename)
             outputfile.write('\nPymol Terminal Commands for Visualizing:\ncolor blue, resi '+str(i[0].get_id())+':'+str(i[-1].get_id())+'\n')
-            GetLeastSquarePlane(atoms,i,numi+1)
+            get_leastsquareplane(atoms,i,numi+1)
             outputfile.write("#--------------------------------------------------#\n")
             #HingeObject
             Hinges.append( Hinge(numi,Alpha,i,hstats,p_value))
         
         #Assigning domain IDs
-        AllChainResidues=[i for i in HingeResidues[0].get_parent().get_residues()]
+        AllChainResidues = [i for i in HingeResidues[0].get_parent().get_residues()]
         #If sorting is needed
-        #AllChainResiduesID=[i.get_id() for i in AllChainResidues]
-        #print([i.get_id() for i in AllChainResidues])
-        #AllChainResidues=[x for _,x in sorted(zip(AllChainResiduesID,AllChainResidues))]
-        DomainNumber,flag=0,True
+        DomainNumber, flag = 0, True
         for i in AllChainResidues:
-            if(i.get_domain_id()==None):
+            if(i.get_domain_id() == None):
                 i.set_domain_id('DM'+str(DomainNumber))
                 flag=True
-            elif(i.get_domain_id()[:2]=='FL' and flag):
+            elif(i.get_domain_id()[:2] == 'FL' and flag):
                 DomainNumber+=1
                 flag=False
         
         AllChainResidues[0].get_parent().set_hinges(Hinges)
-
-        if(GenerateKirchoff):
-            return AlphaKirchoff,SelectedTesselations
-        else:
-            return SelectedTesselations
+        return alpha_shape
 
 def hinge_cli(args,mol):
     """Command-line Interface for the 'hinge' command. Please check the packman.bin.PACKMAN file for more details.
@@ -463,17 +354,16 @@ def hinge_cli(args,mol):
     try:
         if(args.chain):
             Backbone = [item for sublist in mol[0][args.chain].get_backbone() for item in sublist]
-            SelectedTesselations= predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+            alpha_shape= predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
             if(args.generateobj is not None):
-                WriteOBJ(Backbone, SelectedTesselations, args.generateobj)
+                WriteOBJ(Backbone, alpha_shape, args.generateobj)
         else:
             for i in mol[0].get_chains():
                 try:
                     Backbone = [item for sublist in mol[0][i.get_id()].get_backbone() for item in sublist]
-                    SelectedTesselations = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
+                    alpha_shape = predict_hinge(Backbone, args.outputfile, Alpha=float(args.alpha), filename=args.filename,nclusters=args.e_clusters,MinimumHingeLength=args.minhnglen)
                 except:
                     logging.warning('Chain '+str(i.get_id())+' has none/missing backbone atoms to calculate the hinge.')
-
     finally:
         print_footnotes(args.outputfile)
         args.outputfile.flush()

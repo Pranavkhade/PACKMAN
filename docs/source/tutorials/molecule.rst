@@ -83,7 +83,7 @@ Each object with a method for any property has a set method to manipulate that p
 Calculate Methods
 -----------------
 
-Calculate methods use the available information in the PDB do carry out calculations required to return the output. eg.. :func:`packman.molecule.atom.calc_dist`
+Calculate methods use the available information in the PDB do carry out calculations required to return the output. eg.. :func:`packman.molecule.atom.calculate_distance`
 
 
 Bottomline
