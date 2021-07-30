@@ -39,21 +39,16 @@ Step 2
 
 2. Load the C-Alpha atoms of the molecule from the first model. For further information about the atoms selection and 'molecule' object functions, please read the PACKMAN 'molecule' tutorials.
 
-3. Get the C-Alpha atom coordinates.
-
-4. Build the ANM model of the selected atoms. With appropriate power (Please refer to the Publication)::
+3. Build the ANM model of the selected atoms. With appropriate power (Please refer to the Publication)::
 
     #Step 2.1
     from packman import anm
 
     #Step 2.2
-    c_alpha=mol[0].get_calpha()
+    c_alpha = mol[0].get_calpha()
 
     #Step 2.3
-    coords=[i.get_location() for i in c_alpha]
-
-    #Step 2.4
-    ANM_MODEL=anm.ANM(coords,pf=True,dr=float('Inf'),power=3)
+    ANM_MODEL = anm.ANM( c_alpha, pf=True, dr=float('Inf'), power=3 )
 
 Step 3
 ------

@@ -25,6 +25,7 @@ Authors:
 
 import numpy
 
+from packman.molecule import Protein, Model, Atom
 
 '''
 ##################################################################################################
@@ -57,13 +58,13 @@ class ANM:
             Exception: [description]
         """
     
-    def __init__(self, coords , atoms=None, gamma=1.0, dr=15.0, power=0, pf=None):
+    def __init__(self, atoms, gamma=1.0, dr=15.0, power=0, pf=None):
         self.gamma   = gamma
         self.dr      = dr
         self.power   = power
         self.pf      = pf
-        self.coords  = numpy.array(coords)
-        self.atoms   = atoms
+        self.atoms   = [i for i in atoms]
+        self.coords  = numpy.array([i.get_location() for i in self.atoms])
         if self.pf != None and self.pf <= 0:
             raise Exception("pf value cannot be zero or negative")
         if self.gamma <= 0:
@@ -277,13 +278,14 @@ class ANM:
         self.compliance_profile = [numpy.nanmean(i) for i in compliance_map]
         return True
     
-    def calculate_movie(self,mode_number,scale=1.5,n=20):
+    def calculate_movie(self, mode_number, scale=1.5, n=20, ftype='cif'):
         """Get the movie of the obtained LINEAR modes. The first frame is the original structure and the projection progresses in positive (+) direction, returning to original structure and then in negative direction (-) again returning to the original structure.
 
         Args:
             mode_number (int)                   : Mode number. (first non-rigid mode is 6th)
             scale (float)                       : Multiplier; extent to which mode will be extrapolated.                 Defaults to 1.5
             n (int)                             : Number of frames in output (should be =>8 and ideally multiple of 4)   Defaults to 20
+            ftype (string)                      : Extension of the output file (.cif / .pdb)
 
         Note:
             - Scale and n parameters should be redesigned.
@@ -294,18 +296,22 @@ class ANM:
         """
         x0=self.coords
         new_coords=[]
-        with open('ANM_'+str(mode_number)+'.pdb','w') as fh:
-            movement = [ numpy.sin(k*(1.0/float(n))*2*numpy.pi) for k in range(0,n+1,1) ]
-            for j in movement:
-                for numi,i in enumerate(x0):
-                    new_x=i[0]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+0]
-                    new_y=i[1]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+1]
-                    new_z=i[2]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+2]
-                    new_coords.append([new_x,new_y,new_z])
-                    try:
-                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(self.atoms[numi].get_id(),self.atoms[numi].get_name(),self.atoms[numi].get_parent().get_name(),self.atoms[numi].get_parent().get_parent().get_id(),self.atoms[numi].get_parent().get_id(),round(new_x,3),round(new_y,3),round(new_z,3),self.atoms[numi].get_occupancy(),self.atoms[numi].get_bfactor(),'',self.atoms[numi].get_element(),''))
-                    except:
-                        fh.write("ATOM  %5s %-4s %3s %1s%4s    %8s%8s%8s%6s%6s         %-4s%2s%2s\n"%(numi,'CA','UNK','A',numi,round(new_x,3),round(new_y,3),round(new_z,3),1,0,'','C',''))
-                fh.write('ENDMDL')
-            
+    
+        movement = [ numpy.sin(k*(1.0/float(n))*2*numpy.pi) for k in range(0,n+1,1) ]
+        ModelsOfTheProtein = []
+        for j in movement:
+            AtomsOfTheFrame = {}
+            for numi,i in enumerate(x0):
+                new_x=i[0]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+0]
+                new_y=i[1]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+1]
+                new_z=i[2]+scale*j*self.eigen_vectors[:,mode_number][(numi*3)+2]
+                new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
+                currentatm = Atom(self.atoms[numi].get_id() , self.atoms[numi].get_name(), numpy.array([new_x,new_y,new_z]), self.atoms[numi].get_occupancy(), self.atoms[numi].get_bfactor(), self.atoms[numi].get_element(),self.atoms[numi].get_charge(), self.atoms[numi].get_parent() )
+                AtomsOfTheFrame[numi] = currentatm
+
+            ModelsOfTheProtein.append( Model(j, AtomsOfTheFrame, None, None, None, None) )
+        Annotations = self.atoms[0].get_parent().get_parent().get_parent().get_parent().get_data()
+        prot = Protein(str(mode_number), ModelsOfTheProtein)
+        prot.set_data(Annotations)
+        prot.write_structure( str(mode_number)+'.'+ftype )            
         return True
