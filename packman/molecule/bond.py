@@ -40,14 +40,16 @@ class Bond():
         type (str)                    : Bond can be either of the following type: (covalent, ionic, hydrogen or other)
         electrons (tuple)             : A python tuple containing information about shared electrons (eg.... (1,1) means the electrons shared between a single hydrocarbon bond if the atom1 is carbon and atom2 is hydrogen touple order here is (atom1, atom2).
     """
-    def __init__(self, id, atom1, atom2, source=None , type='covalent',electrons=(None,None)):
+    def __init__(self, id, atom1, atom2, type, source=None):
         self.__id = id
-        self.__allowed_bond_types = ['covalent', 'ionic', 'hydrogen', 'other']
+        self.__allowed_bond_types = ['covalent', 'covalent-single', 'covalent-double', 'covalent-triple' , 'ionic', 'hydrogen', 'other']
         self.__atom1 = atom1
         self.__atom2 = atom2
         self.__type = type
-        self.__electrons = electrons
         self.__source = source
+
+        #Properties are the entities that are not included in the PDB files and are obtained by calculations
+        self.__properties = {}
     
     #Get Functions
     def get_id(self):
@@ -74,17 +76,6 @@ class Bond():
         """
         return self.__type
     
-    def get_electrons(self):
-        """Get the information about the electron shared in the bond
-
-        Note:
-            - In the output tuple, order is (atom1, atom2)
-
-        Returns:
-            electron information (tuple) if successful; None otherwise
-        """
-        return self.__electrons
-    
     def get_source(self):
         """Get the source of the information of the created bond.
 
@@ -92,7 +83,24 @@ class Bond():
             source (str): Source of information for the given bond.
         """
         return self.__source
+    
+    def get_property(self,property_name):
+        """Get the Property of the given 'Bond'.
 
+        Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+
+        Args:
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+        """
+        try:
+            return self.__properties[property_name]
+        except:
+            logging.warning('The Property Name provided is not assigned.')
+    
     #Set Functions
     def set_atoms(self, new_pair):
         """Set the atoms involved in the bond.
@@ -119,18 +127,23 @@ class Bond():
         else:
             logging.warning( 'Invalid bond type. Allowed types: '+', '.join(self.__allowed_bond_types) )
 
-    def set_electrons(self,new_electrons):
-        """Set the electron information.
+    def set_property(self,property_name,value):
+        """Set the Property of the given 'Bond'.
 
-        There can be only two atoms involved in the electron sharing for now.
-
+        Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
+        Properties are like pinboards. You can pin anything to the object with a key as a pin.
+        
         Args:
-            new_electrons (tuple) : A python tuple containing information about shared electrons (eg.... (1,1) means the electrons shared between a single hydrocarbon bond if the atom1 is carbon and atom2 is hydrogen touple order here is (atom1, atom2).
+            property_name (object): The 'Key' or a name the user wants to assign to to the property
+            value (object):         The value the user wants to assign to the property
+        
+        Note:
+            - Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
         """
-        if(type(new_electrons)==tuple and len(new_electrons)==2):
-            self.__electrons = new_electrons
-        else:
-            logging.warning('There can be only two atoms involved in the electron sharing in the python tuple object. eg... (1,1) means the electrons shared between a single hydrocarbon bond if the atom1 is carbon and atom2 is hydrogen touple order here is (atom1, atom2).')
+        try:
+            self.__properties[property_name] = value
+        except:
+            logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
 
     #Calculate Functions

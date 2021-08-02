@@ -21,6 +21,8 @@ Authors:
 
 import numpy
 
+import logging
+
 
 class Atom():
     """This class contains the information about the 'Atom' object (packman.molecule.Atom).
@@ -59,6 +61,7 @@ class Atom():
 
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
+        self.__Bonds = []
 
     #Get Functions
     def get_id(self):
@@ -158,7 +161,7 @@ class Atom():
         return self.get_parent().get_domain_id()
     
     def get_property(self,property_name):
-        """Get the Property of the given 'Chain'.
+        """Get the Property of the given 'Atom'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
         Properties are like pinboards. You can pin anything to the object with a key as a pin.
@@ -173,6 +176,14 @@ class Atom():
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
+    
+    def get_bonds(self):
+        """Get the bonds for the given 'Atom'
+
+        Returns:
+            list of packman.molecule.Bond if successful; [] otherwise.
+        """
+        return self.__Bonds
 
     #Set Functions
     def set_id(self,new_id):
@@ -273,6 +284,16 @@ class Atom():
         except:
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
+    def set_bond(self,new_bond):
+        """Set the atom to the given 'Atom'
+
+        Args:
+            new_bond (packman.molecule.Bond) : Add new bond to the given 'Atom'
+        
+        Note:
+            - Yet to add the functionality to delete the specific bonds.
+        """
+        self.__Bonds.append(new_bond)
 
     #Calculation Functions
     def calculate_distance(self,another_atom):
