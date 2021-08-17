@@ -227,7 +227,36 @@ class Chain():
         for i in sorted(self.__Residues.keys()):
             for j in self.__Residues[i].get_atoms():
                 yield j
+    
+    def get_atom(self, idx):
+        """Get the atom of the given ID.
 
+        Note: - This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
+              - If the PDB file is constructed manually/ has multiple atoms of the same ID, the first instance of the atom with that id is returned. Please avoid saving two atoms with same ID in a same structure file in a given frame/model.
+
+        Args:
+            idx (int): Get atom by the id
+        
+        Returns:
+            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+        """
+        the_atom = None
+        for i in self.__Residues:
+            the_atom =  self.__Residues[i].get_atom(idx)
+            if(the_atom!=None):
+                break
+            
+        if(the_atom==None):
+            for i in self.__HetMols:
+                the_atom =  self.__HetMols[i].get_atom(idx)
+                if(the_atom!=None):
+                    break
+        if(the_atom!=None):
+            return the_atom
+        else:
+            logging.info('The atom with the given ID is not found in the Residues/HetMols')
+            return None
+            
     def get_residues(self):
         """Get the generator of corresponding 'Residue' objects of the 'Chain'
 
@@ -286,6 +315,27 @@ class Chain():
         counter = 0
         self.__AllBonds = []
         self.__ChainGraph = Graph()
+
+        #CONECT Records from annotations
+        for i in self.get_parent().get_parent().get_data():
+            if(i[0:6]=='CONECT'):
+                #Information on the following line is obtained from: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html and http://www.bmsc.washington.edu/CrystaLinks/man/pdb/part_69.html
+                other_atoms = [ (11,16,'covalent'), (16,21,'covalent'), (21,26,'covalent'), (26,31,'covalent'), (31,36,'hydrogen'), (36,41,'hydrogen'), (41,46,'salt-bridge'), (46,51,'hydrogen'), (51,56,'hydrogen'), (56,61,'salt-bridge') ]
+                main_atom = self.get_atom( int(i[6:11]) )
+                for j in other_atoms:
+                    try:
+                        temp_atom = self.get_atom(int(i[j[0]:j[1]]))
+                        counter+=1
+                        bond = Bond(counter, main_atom, temp_atom, j[2], source='CONECT-section')
+                        self.__AllBonds.append(bond)
+                        main_atom.set_bond(bond)
+                        temp_atom.set_bond(bond)
+                        self.__ChainGraph.add_node( main_atom.get_id() )
+                        self.__ChainGraph.add_node( temp_atom.get_id() )
+                        self.__ChainGraph.add_edge( main_atom.get_id(), temp_atom.get_id() , id = counter )
+                    except:
+                        None
+                
 
         for i in resi:
             try:

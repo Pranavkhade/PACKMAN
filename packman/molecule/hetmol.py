@@ -20,6 +20,7 @@ Authors:
 
 import numpy
 
+import logging
 
 class HetMol():
     """This class contains the information about the 'HetMol' object (packman.molecule.Residue).
@@ -43,6 +44,7 @@ class HetMol():
         self.__parent=parent
         self.__Atoms=None
         self.__domain_id=None
+        self.__Atoms_Names = {}
 
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
@@ -59,6 +61,7 @@ class HetMol():
         except:
             self.__Atoms={}
             self.__Atoms[id]=Atom
+        self.__Atoms_Names[Atom.get_name()] = Atom
     
     #Get Functions
     def get_id(self):
@@ -147,6 +150,23 @@ class HetMol():
             new_parent (packman.molecule.Chain): The parent 'Chain' User wishes to assign to the given 'HetMol'
         """
         self.__parent=new_parent
+    
+    def get_atom(self,key):
+        """Get the specific Atom by id/name. Please note that this is different than get_atoms()
+
+        Args:
+            key (int/str): Get atom by the id/name
+        
+        Returns:
+            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+        """
+        try:
+            return self.__Atoms[key]
+        except KeyError:
+            try:
+                return self.__Atoms_Names[key]
+            except:
+                return None 
 
     def set_domain_id(self,new_domain_id):
         """Set the Domain Identifier of the given 'HetMol'.

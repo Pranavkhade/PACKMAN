@@ -91,16 +91,19 @@ class Residue():
     def get_atom(self,key):
         """Get the specific Atom by id/name. Please note that this is different than get_atoms()
 
-        Note:
-            - Consider replacing iterations to something else in future for the better performance.
-
         Args:
             key (int/str): Get atom by the id/name
+        
+        Returns:
+            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
         """
         try:
             return self.__Atoms[key]
-        except:
-            return self.__Atoms_Names[key]
+        except KeyError:
+            try:
+                return self.__Atoms_Names[key]
+            except:
+                return None
 
     def get_atoms(self):
         """Get the generator of corresponding 'Atom' objects of the 'Residue'
