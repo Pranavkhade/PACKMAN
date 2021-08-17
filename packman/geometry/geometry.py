@@ -30,7 +30,7 @@ def Circumsphere(Tetrahydron):
     Given any four three dimentional points, this function calculates the features of the circumsphere having the given four points on it's surface.
     
     Args:
-        Tetrahydron ([type]): [description]
+        Tetrahydron ([packman.molecule.Atom] or [[X,Y,Z]]): Either packman.molecule.Atom objects or 3D corrdinates. 
     
     Returns:
         [Centre, Radius] (float): The 3D coordinates of the geometrical center of the given four points, Radius of the circumsphere made up of given four points in that order.
@@ -59,6 +59,7 @@ def AlphaShape( atoms, alpha, get_graph=False, write_objfile=None ):
     Given set of atoms as 'Atom' (packman.molecule.Atom) object(s) and the alpha value, this class will calculate and return the alpha shape tessellations. It will also write the .obj file if the filename is provided as an input.
 
     Notes:
+        * Tip: If you do not want to use the function multiple times to save computation, calculate it once with alpha = float('Inf') and then use the tessellations to calculate radius and save it as a dictionary to retrieve. Tessellations with any cutoff.
         * For more information on the alpha shape, read the following paper:
             EdelsbrunnerandE. P. M ̈ucke.Three-dimensional alpha shapes.
             Manuscript UIUCDCS-R-92-1734, Dept.Comput.Sci. ,Univ.Illinois, Urbana-Champaign, IL, 1992.
