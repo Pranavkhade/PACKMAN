@@ -15,6 +15,7 @@ class TestMolecule(unittest.TestCase):
         
     def tearDown(self):
         rm('DCI_pymol_output.txt')
+        rm('packman/tests/data/4hla.cif_CH_Score.png')
         logging.info('DCI Test Done.')
 
 if(__name__=='__main__'):
