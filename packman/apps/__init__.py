@@ -22,3 +22,4 @@ Todo:
 from .predict_hinge import predict_hinge, hinge_cli
 from .hdanm import hdanm_cli
 from .calculate_entropy import entropy_cli
+from .dci import DCI, dci_cli

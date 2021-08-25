@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""The PACKMAN Command-line Interface (CLI) and Graphical User Interface (GUI) host file.
+"""The PACKMAN Command-line Interface (CLI)
 
 How to use::
     python -m packman gui #(For GUI)
@@ -14,7 +14,7 @@ import traceback
 import logging
 
 from .. import molecule
-from ..apps import hinge_cli, hdanm_cli, entropy_cli
+from ..apps import hinge_cli, hdanm_cli, entropy_cli, dci_cli
 
 import operator
 import argparse
@@ -36,7 +36,7 @@ def IO():
     Returns:
         Namespace: Various arguments in various formats
     """
-    parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)\n\nFollowing Apps Available: \n1. hinge \n2. entropy\n\nHow to run an app: python -m packman <app name>\nExample: python -m packman hinge', formatter_class=argparse.RawTextHelpFormatter )
+    parser=argparse.ArgumentParser(description='PACKMAN: PACKing and Motion ANalysis. (https://github.com/Pranavkhade/PACKMAN)\n\nFollowing Apps Available: \n1. hinge \n2. hdanm\n3. entropy\n4. dci\n\nHow to run an app: python -m packman <app name>\nExample: python -m packman hinge', formatter_class=argparse.RawTextHelpFormatter )
     subparsers = parser.add_subparsers(dest='command')
 
     #Hinge Prediction
@@ -72,6 +72,14 @@ def IO():
     entropy_app_io.add_argument('--probe_size',metavar='Size surface probe radius',type=float,default=1.4, help='Recommended: 1.4 (radius of a water molecule), Please refer to the paper for more details')
     entropy_app_io.add_argument('--onspherepoints',metavar='Number of points on a sphere',type=int,default=30, help='Recommended: 30. Number of points to be generated around each point for the surface (Read the Publication for more details)')
 
+    #DCI
+    dci_app_io = subparsers.add_parser('dci')
+    dci_app_io.add_argument('-pdbid','--pdbid', metavar='PDB_ID', type=str, help='If provided, the PBD with this ID will be downloaded and saved to FILENAME.')
+    dci_app_io.add_argument('filename', metavar='FILENAME', help='Path and filename of the PDB file.')
+    dci_app_io.add_argument('-chain','--chain', help='Enter The Chain ID', default=None)
+    dci_app_io.add_argument('-cutoff','--cutoff', type=float, help='Enter the cutoff for DCI. (Read the Publication for more details)', default=7.0)
+    dci_app_io.add_argument('-n_com','--n_com', type=int, help='Enter the number of communities. (Read the Publication for more details)', default=None)
+
     # web server parameters
     web_server_group = parser.add_argument_group('Web server parameters', 'Used by the web form')
     web_server_group.add_argument('--outputfile', type=argparse.FileType('w', 1), default=sys.stdout, help='Path and filename write output to')
@@ -97,6 +105,10 @@ def load_cli():
     """
     args=IO()
 
+    if(args.command==None):
+        logging.error('Please provide the appropriate input. Enter "python -m packman -h" for more details.')
+        exit()
+
     logging.basicConfig(stream=args.logfile)
 
     if(args.pdbid is not None):
@@ -115,6 +127,8 @@ def load_cli():
         hdanm_cli(args,mol)
     elif(args.command == 'entropy'):
         entropy_cli(args,mol)
+    elif(args.command == 'dci'):
+        dci_cli(args,mol)
 
     return True
 

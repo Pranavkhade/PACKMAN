@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+"""The PACKMAN Graphical User Interface (GUI) host file.
+
+How to use::
+    python -m packman gui #(For GUI)
+    python -m packman     #(For CLI)
+
+Authors:
+    * Pranav Khade(https://github.com/Pranavkhade)
+"""
 
 '''
 ##################################################################################################

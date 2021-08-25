@@ -3,7 +3,9 @@
 Using hd-ANM to study the global dynamics of the molecular structures
 =====================================================================
 
-This tutorial aims to get the user to familiarize with the concept of hdANM API. Please note that the hdANM is also available with GUI.
+This tutorial aims to get the user to familiarize with the concept of hdANM API. Please note that the hdANM is also available with GUI, CLI (:ref:`tutorials_hdnam_api`) and the webserver.
+
+PACKMAN hdANM Analysis Web Server: https://hdanm.bb.iastate.edu/
 
 How to cite::
 
