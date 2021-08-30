@@ -17,18 +17,17 @@ Authors:
     * Pranav Khade (https://github.com/Pranavkhade)
 """
 import numpy
-import more_itertools as mit
 from sklearn.metrics import calinski_harabasz_score as chs
 from scipy.cluster.hierarchy import ward, fcluster
 
 from ..anm import ANM
-from ..molecule import load_structure, download_structure, Protein
+from ..molecule import Protein
 
 class DCI():
     """This class contains the code for DCI analysis.
 
     Notes:
-        * Tutorial:
+        * Tutorial: 
         * Webserver: 
         * Publication:
     
@@ -92,15 +91,14 @@ class DCI():
         return res_store
         
     def get_range(self, iterable):
-        """
-
-        """
-        for group in mit.consecutive_groups(iterable):
-            group = list(group)
-            if len(group) == 1:
-                yield group[0]
+        first = last = iterable[0]
+        for n in iterable[1:]:
+            if n - 1 == last:
+                last = n
             else:
-                yield group[0], group[-1]
+                yield first, last
+                first = last = n
+        yield first, last
     
     def get_n_communities(self, dist_mat, n):
         """
