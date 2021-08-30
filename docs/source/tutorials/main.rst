@@ -15,7 +15,9 @@ Graphical User Interface (GUI)
 Command Line Interface (CLI)
 ----------------------------
 #. :ref:`tutorials_hinge_prediction_cli`
+#. :ref:`tutorials_hdanm_cli`
 #. :ref:`tutorials_entropy_cli`
+#. :ref:`tutorials_dci_cli`
 
 Application Programming Interface (API)
 ---------------------------------------

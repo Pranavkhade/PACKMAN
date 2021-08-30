@@ -6,7 +6,7 @@ Entropy Analysis CLI
 
 This tutorial familiarises users with the Command-line Interface (CLI) of the Entropy Analysis. The same functionality is also available in the PACKMAN API ( :ref:`tutorials_entropy_api` ) and GUI (:ref:`tutorials_gui`).
 
-PACKMAN Entropy Analysis Web Server: <link>
+PACKMAN Entropy Analysis Web Server: * Packing Entropy: https://packing-entropy.bb.iastate.edu/
 
 How to cite::
 
