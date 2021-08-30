@@ -16,6 +16,8 @@ Authors:
     * Ambuj Kumar  (ambuj@iastate.edu)
     * Pranav Khade (https://github.com/Pranavkhade)
 """
+import logging
+
 import numpy
 from sklearn.metrics import calinski_harabasz_score as chs
 from scipy.cluster.hierarchy import ward, fcluster
@@ -61,7 +63,7 @@ class DCI():
         self.pdbid = mol.get_id()
 
         
-        self.GNM()
+        self.calculate_kirchoff()
         self.calculate_decomposition()
         self.calculate_crosscorrelation()
         dist_mat = 1-self.C
@@ -75,8 +77,10 @@ class DCI():
         
     #Get functions
     def get_labels(self, community_obj):
-        """
+        """Get the dictionary of individual cluster labels for each residue. 
 
+        Args:
+            community_obj ([int]) : Output from hierarchical clustering.
         """
         res_store = dict()
         for label, atm in zip(community_obj, self.atoms):
@@ -91,6 +95,14 @@ class DCI():
         return res_store
         
     def get_range(self, iterable):
+        """Get the consequent numbers in the list.
+
+        Args:
+            iterable ([int]) : Array containing iterable.
+        
+        Returns:
+            first, last (int,int) : First and Last element of the consequent numbers.
+        """
         first = last = iterable[0]
         for n in iterable[1:]:
             if n - 1 == last:
@@ -101,45 +113,53 @@ class DCI():
         yield first, last
     
     def get_n_communities(self, dist_mat, n):
-        """
+        """Get the number of communities
+
+        Args:
+            dist_mat (numpy.array) : Crosscorelation based euclidean distance.
+            n (int)                : Number of desired community.
+        
+        Returns:
+            label ([int]) : Label assigned to each residue.
         """
         Data = numpy.triu(dist_mat)
         Z = ward(Data)
         label = fcluster(Z, n, criterion='maxclust')
         return label
         
-    def get_movies(self):
-        """
-        """
-        model = ANM(coords = self.coords, atoms = self.atoms)
-        model.calculate_hessian()
-        model.calculate_decomposition()
-        model.calculate_movie(mode_number=6, scale=20.0, n=20)
-        model.calculate_movie(mode_number=7, scale=20.0, n=20)
-        model.calculate_movie(mode_number=8, scale=20.0, n=20)
-        model.calculate_movie(mode_number=9, scale=20.0, n=20)
-        model.calculate_movie(mode_number=10, scale=20.0, n=20)
-        return True
-    
     def get_cluster_labels(self):
-        """
+        """Get the cluster label of the 'most optimal' community (Read the paper for more details)
+
+        Returns:
+            best_community ([int]) : cluster label of the 'most optimal' community
         """
         return self.best_community
     
-    def get_cc(self):
-        """
+    def get_crosscorrelation(self):
+        """Get the cross-correlation.
+
+        Returns:
+            C (numpy.array) : Cross-correlation matrix.
         """
         return self.C
     
     def get_communities(self):
-        """
+        """Get all the communities generated using DCI.
+
+        Returns:
+            store_comminities (dict) : List of communities with number of communities as a key.
         """
         return self.store_communities
     
-                
-    # Model
-    def GNM(self):
-        gamma = 1.0
+    #Calculate functions
+    def calculate_kirchoff(self, gamma = 1.0):
+        """Calculate the Gaussian Network Model (GNM) Kirchoff Matrix.
+
+        The matrix is stored in the self.GNM_MAT variable.
+
+        Returns:
+            True if successful; None otherwise.
+        """
         n_atoms=len(self.coords)
         self.GNM_MAT=numpy.zeros((n_atoms, n_atoms), float)
         for i in range(len(self.coords)):
@@ -153,18 +173,24 @@ class DCI():
                     self.GNM_MAT[j, i] = -gamma
                     self.GNM_MAT[i, i] = self.GNM_MAT[i, i] + gamma
                     self.GNM_MAT[j, j] = self.GNM_MAT[j, j] + gamma
-        
         return True
     
-    #Calculate functions
     def calculate_decomposition(self):
-        """
+        """Eigen decomposition calculation.
+
+        Access the eigen values and eigen vectors with self.eigen_values and self.eigen_vectors
+
+        Returns:
+            True if successful; None otherwise.
         """
         self.eigen_values, self.eigen_vectors = numpy.linalg.eigh(self.GNM_MAT)
         return True
     
     def calculate_crosscorrelation(self):
-        """
+        """Calculate the cross-correlation. (Read the paper for more details)
+
+        Returns:
+            True if successful; None otherwise.
         """
         n = len(self.atoms)
         EVec=self.eigen_vectors.T
@@ -178,6 +204,8 @@ class DCI():
 
     def calculate_windows(self, iterable):
         """Yield range of consecutive numbers.
+
+        Internal Function. (printing operation)
         """
         store_chain = dict()
         for i in sorted(iterable):
@@ -193,8 +221,17 @@ class DCI():
             
         return store_chain
     
-    def calculate_cluster(self, dist_mat):
-        """
+    def calculate_cluster(self, dist_mat, max_iter=21):
+        """Calculates the best possible communities/clusters.
+
+        self.store_score calculated CH score for every clustering number. (Read the paper for more details)
+
+        Args:
+            dist_mat (numpy.array) : 1 - cross-correlation matrix.
+            max_iter (int)         : Maximum number of iterations for cluster counts.
+        
+        Returns:
+            True if successful; None otherwise.
         """
         best_score = 0
         dist_mat = numpy.sqrt(2*(dist_mat))
@@ -202,7 +239,7 @@ class DCI():
         Z = ward(Data)
         self.store_communities = dict()
         self.store_score = dict()
-        for i in range(2, 21):
+        for i in range(2, max_iter):
             label = fcluster(Z, i, criterion='maxclust')
             self.store_communities[i] = label
             score = chs(dist_mat, label)
@@ -217,7 +254,12 @@ class DCI():
         
         
     def calculate_CH_plot(self):
-        """
+        """Calculate CH plot for the cluster numbers.
+
+        File is saved as pdbid_CH_Score.png in the present working directory. Please check the filename for invalid characters if there are errors.
+
+        Returns:
+            True if successful; None otherwise.
         """
         import matplotlib.pyplot as plt
 
@@ -231,13 +273,19 @@ class DCI():
         return True
     
     def calcualte_pymol_commands(self,filename='DCI_pymol_output.txt'):
-        """
+        """Write all the communities in py-mol importable format.
+
+        Args:
+            filename (str) : filename for the output text file.
+        
+        Returns:
+            True if successful; None otherwise.
         """
         with open(filename, "w") as fp:
+            fp.write('Please check the generated plot fore the best CH score and corresponding community count.\n')
             for key, dynamic_community in self.store_communities.items():
                 fp.write("#############################################################\n\n")
-                fp.write("Clustering iteration id - C%s\n" %(key-1))
-                fp.write("number of communities - %s\n" %(len(list(set(dynamic_community)))))
+                fp.write("Number of communities - %s\n" %(len(list(set(dynamic_community)))))
                 fp.write("CH Score - %s\n" %self.store_score[key])
                 clust = self.get_labels(dynamic_community)
             
@@ -259,6 +307,7 @@ class DCI():
                             
                         fp.write("%s and chain %s\n" %(statement, inkey))
                     fp.write("----------------------------------------------------------\n\n")
+        return True
     
 
 def dci_cli(args,mol):
