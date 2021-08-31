@@ -73,8 +73,6 @@ class DCI():
         else:
             self.calculate_cluster(dist_mat)
         
-        self.calcualte_pymol_commands()
-        
     #Get functions
     def get_labels(self, community_obj):
         """Get the dictionary of individual cluster labels for each residue. 
@@ -271,7 +269,7 @@ class DCI():
         plt.savefig(self.pdbid+'_CH_Score.png')
         return True
     
-    def calcualte_pymol_commands(self,filename='DCI_pymol_output.txt'):
+    def calcualte_pymol_commands( self, file=open('DCI_pymol_output.txt','w') ):
         """Write all the communities in py-mol importable format.
 
         Args:
@@ -280,7 +278,7 @@ class DCI():
         Returns:
             True if successful; None otherwise.
         """
-        with open(filename, "w") as fp:
+        with file as fp:
             fp.write('Please check the generated plot fore the best CH score and corresponding community count.\n')
             for key, dynamic_community in self.store_communities.items():
                 fp.write("#############################################################\n\n")
@@ -315,4 +313,5 @@ def dci_cli(args,mol):
     n_com  = args.n_com
 
     model = DCI( mol, cutoff = cutoff, chain = chain, n_com = n_com )
+    model.calcualte_pymol_commands( file = args.outputfile )
     return True
