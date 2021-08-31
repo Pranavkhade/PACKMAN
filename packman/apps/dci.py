@@ -249,7 +249,6 @@ class DCI():
                 best_score = score
         
         self.store_score = dict(sorted(self.store_score.items(), key=lambda item: item[1])[::-1])
-        self.calculate_CH_plot()
         return True
         
         
