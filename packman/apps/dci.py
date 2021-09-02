@@ -67,6 +67,9 @@ class DCI():
         self.calculate_decomposition()
         self.calculate_crosscorrelation()
         dist_mat = 1-self.C
+
+        #Global vars
+        self.store_communities = dict()
         
         if n_com:
             self.get_n_communities(dist_mat, n_com)
@@ -123,6 +126,7 @@ class DCI():
         Data = numpy.triu(dist_mat)
         Z = ward(Data)
         label = fcluster(Z, n, criterion='maxclust')
+        self.store_communities[n] = label
         return label
         
     def get_cluster_labels(self):
@@ -235,7 +239,6 @@ class DCI():
         dist_mat = numpy.sqrt(2*(dist_mat))
         Data = numpy.triu(dist_mat)
         Z = ward(Data)
-        self.store_communities = dict()
         self.store_score = dict()
         for i in range(2, max_iter):
             label = fcluster(Z, i, criterion='maxclust')
