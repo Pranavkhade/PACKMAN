@@ -70,6 +70,7 @@ class DCI():
 
         #Global vars
         self.store_communities = dict()
+        self.store_score = dict()
         
         if n_com:
             self.get_n_communities(dist_mat, n_com)
@@ -127,6 +128,7 @@ class DCI():
         Z = ward(Data)
         label = fcluster(Z, n, criterion='maxclust')
         self.store_communities[n] = label
+        self.store_score[n] = 'user-key'
         return label
         
     def get_cluster_labels(self):
