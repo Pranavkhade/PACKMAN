@@ -102,6 +102,35 @@ class Model():
         """
         for i in sorted(self.__AllAtoms.keys()):yield self.__AllAtoms[i]
     
+    def get_atom(self, idx):
+        """Get the atom of the given ID.
+
+        Note: - This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
+              - If the PDB file is constructed manually/ has multiple atoms of the same ID, the first instance of the atom with that id is returned. Please avoid saving two atoms with same ID in a same structure file in a given frame/model.
+
+        Args:
+            idx (int): Get atom by the id
+        
+        Returns:
+            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+        """
+        the_atom = None
+        for i in self.__AllResidues:
+            the_atom =  self.__AllResidues[i].get_atom(idx)
+            if(the_atom!=None):
+                break
+            
+        if(the_atom==None):
+            for i in self.__AllHetMols:
+                the_atom =  self.__AllHetMols[i].get_atom(idx)
+                if(the_atom!=None):
+                    break
+        if(the_atom!=None):
+            return the_atom
+        else:
+            logging.info('The atom with the given ID is not found in this Model')
+            return None
+    
     def get_chain(self,ChainID):
         """Get the corresponding 'Chain' object
 

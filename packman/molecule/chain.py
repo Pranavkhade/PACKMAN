@@ -318,13 +318,14 @@ class Chain():
 
         #CONECT Records from annotations
         for i in self.get_parent().get_parent().get_data():
+            #PDB FILE
             if(i[0:6]=='CONECT'):
-                #Information on the following line is obtained from: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html and http://www.bmsc.washington.edu/CrystaLinks/man/pdb/part_69.html
+                #Information on the following line is obtained from: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html and http://www.bmsc.washington.edu/CrystaLinks/man/pdb/part_69.html and https://mmcif.wwpdb.org/docs/pdb_to_pdbx_correspondences.html#CONECT
                 other_atoms = [ (11,16,'covalent'), (16,21,'covalent'), (21,26,'covalent'), (26,31,'covalent'), (31,36,'hydrogen'), (36,41,'hydrogen'), (41,46,'salt-bridge'), (46,51,'hydrogen'), (51,56,'hydrogen'), (56,61,'salt-bridge') ]
                 main_atom = self.get_atom( int(i[6:11]) )
                 for j in other_atoms:
                     try:
-                        temp_atom = self.get_atom(int(i[j[0]:j[1]]))
+                        temp_atom = self.get_parent().get_atom(int(i[j[0]:j[1]]))
                         counter+=1
                         bond = Bond(counter, main_atom, temp_atom, j[2], source='CONECT-section')
                         self.__AllBonds.append(bond)
@@ -335,6 +336,30 @@ class Chain():
                         self.__ChainGraph.add_edge( main_atom.get_id(), temp_atom.get_id() , id = counter )
                     except:
                         None
+        
+        #CIF FILE (https://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v50.dic/Categories/struct_conn.html)
+        if(counter==0):
+            data = '\n'.join(self.get_parent().get_parent().get_data())
+
+            for i in data.split('#\nloop_\n'):
+                if(i[:12] == '_struct_conn' ):
+                    col_seq = []
+                    for j in i.split('#'):
+                        if(j[:12] == '_struct_conn' ):
+                            for k in j.split('\n'):
+                                try:
+                                    if(k[0]=='_'):
+                                        col_seq.append( k )
+                                    else:
+                                        temp_dict = {col_seq[numl]:l for numl,l in enumerate(k.split())}
+                                        for l in self.get_parent().get_chains():
+                                            #print(l.get_id(),l[temp_dict['_struct_conn.ptnr1_auth_seq_id']])
+                                            print(l)
+
+                                        print( temp_dict['_struct_conn.ptnr1_auth_seq_id'], self.get_parent().get_atom( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) ).get_name() )
+                                except Exception as e:
+                                    print(str(e))
+                                    None
                 
 
         for i in resi:

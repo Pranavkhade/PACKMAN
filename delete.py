@@ -8,7 +8,7 @@ from packman.molecule import load_structure
 def main():
     #print("--- %s seconds ---" % (time.time() - start_time))
 
-    mol = load_structure('1exr.pdb')
+    mol = load_structure('1exr.cif')
     #print("--- %s seconds ---" % (time.time() - start_time))
 
     mol[0]['A'].calculate_bonds()

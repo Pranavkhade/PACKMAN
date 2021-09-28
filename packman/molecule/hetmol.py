@@ -95,7 +95,7 @@ class HetMol():
             generator of 'Atom' objects if successful, None otherwise.
         """
         for i in sorted(self.__Atoms.keys()):yield self.__Atoms[i]
-    
+
     def get_domain_id(self):
         """Get the Domain Identifier of the given 'HetMol'. Hinge Prediction is Necessary for this option.
 
