@@ -31,6 +31,8 @@ from .atom import Atom
 from .hetmol import HetMol
 from .hetatom import HetAtom
 
+#delete
+import traceback
 
 '''
 ##################################################################################################
@@ -280,9 +282,9 @@ def load_cif(filename):
 
                             #Connect objects to each other to create a tree (Ideally should not happen every iteration)
                             #HetMol Added to the chain
-                            AllChains[FrameNumber-1][ChainID].__setitem__( HetMolNumber, AllHetAtoms[FrameNumber-1][str(HetMolNumber)+ChainID], Type='HetMol' )
+                            AllChains[FrameNumber-1][ChainID].__setitem__( HetMolNumber, AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID], Type='HetMol' )
                             #Atom added to the HetMol
-                            AllHetAtoms[FrameNumber-1][str(HetMolNumber)+ChainID].__setitem__( AtomID, AllAtoms[FrameNumber-1][AtomID] )
+                            AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID].__setitem__( AtomID, AllHetAtoms[FrameNumber-1][AtomID] )
 
                         #Annotations additions
                         else:
@@ -294,7 +296,7 @@ def load_cif(filename):
                             #    except:
                             #        subsection_data[ column_indices[n_cols] ] = []
                             #        subsection_data[ column_indices[n_cols] ].append(cols)
-                except:
+                except Exception as e:
                     None
             if(AllAnnotations[-1]!='#'): AllAnnotations.append('#')
         AllAnnotations.append('loop_')

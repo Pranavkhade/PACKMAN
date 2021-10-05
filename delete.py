@@ -11,7 +11,9 @@ def main():
     mol = load_structure('1exr.cif')
     #print("--- %s seconds ---" % (time.time() - start_time))
 
-    mol[0]['A'].calculate_bonds()
+
+    #Although the bonds are in the part of the chain, the model object should have the function as the inter chain bonds can exist
+    mol[0].calculate_bonds()
     #print( mol[0]['A'].get_bonds() )
     #print("--- %s seconds ---" % (time.time() - start_time))
 

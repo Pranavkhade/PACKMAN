@@ -20,12 +20,40 @@ Todo:
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
+#Bond information
+aa_connectivity= {
+'ALA': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'HB1', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('OXT', 'HXT', 'SING')],
+'ARG': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD', 'SING'), ('CG', 'HG2', 'SING'), ('CG', 'HG3', 'SING'), ('CD', 'NE', 'SING'), ('CD', 'HD2', 'SING'), ('CD', 'HD3', 'SING'), ('NE', 'CZ', 'SING'), ('NE', 'HE', 'SING'), ('CZ', 'NH1', 'SING'), ('CZ', 'NH2', 'DOUB'), ('NH1', 'HH11', 'SING'), ('NH1', 'HH12', 'SING'), ('NH2', 'HH21', 'SING'), ('NH2', 'HH22', 'SING'), ('OXT', 'HXT', 'SING')],
+'ASN': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'OD1', 'DOUB'), ('CG', 'ND2', 'SING'), ('ND2', 'HD21', 'SING'), ('ND2', 'HD22', 'SING'), ('OXT', 'HXT', 'SING')],
+'ASP': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'OD1', 'DOUB'), ('CG', 'OD2', 'SING'), ('OD2', 'HD2', 'SING'), ('OXT', 'HXT', 'SING'), ('"SYSTEMATIC', 'NAME"', 'ACDLabs')],
+'CYS': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'SG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('SG', 'HG', 'SING'), ('OXT', 'HXT', 'SING')],
+'GLN': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD', 'SING'), ('CG', 'HG2', 'SING'), ('CG', 'HG3', 'SING'), ('CD', 'OE1', 'DOUB'), ('CD', 'NE2', 'SING'), ('NE2', 'HE21', 'SING'), ('NE2', 'HE22', 'SING'), ('OXT', 'HXT', 'SING')],
+'GLU': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD', 'SING'), ('CG', 'HG2', 'SING'), ('CG', 'HG3', 'SING'), ('CD', 'OE1', 'DOUB'), ('CD', 'OE2', 'SING'), ('OE2', 'HE2', 'SING'), ('OXT', 'HXT', 'SING'), ('"SYSTEMATIC', 'NAME"', 'ACDLabs')],
+'GLY': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'HA2', 'SING'), ('CA', 'HA3', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('OXT', 'HXT', 'SING')],
+'HIS': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'ND1', 'SING'), ('CG', 'CD2', 'DOUB'), ('ND1', 'CE1', 'DOUB'), ('ND1', 'HD1', 'SING'), ('CD2', 'NE2', 'SING'), ('CD2', 'HD2', 'SING'), ('CE1', 'NE2', 'SING'), ('CE1', 'HE1', 'SING'), ('NE2', 'HE2', 'SING'), ('OXT', 'HXT', 'SING')],
+'ILE': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG1', 'SING'), ('CB', 'CG2', 'SING'), ('CB', 'HB', 'SING'), ('CG1', 'CD1', 'SING'), ('CG1', 'HG12', 'SING'), ('CG1', 'HG13', 'SING'), ('CG2', 'HG21', 'SING'), ('CG2', 'HG22', 'SING'), ('CG2', 'HG23', 'SING'), ('CD1', 'HD11', 'SING'), ('CD1', 'HD12', 'SING'), ('CD1', 'HD13', 'SING'), ('OXT', 'HXT', 'SING')],
+'LEU': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD1', 'SING'), ('CG', 'CD2', 'SING'), ('CG', 'HG', 'SING'), ('CD1', 'HD11', 'SING'), ('CD1', 'HD12', 'SING'), ('CD1', 'HD13', 'SING'), ('CD2', 'HD21', 'SING'), ('CD2', 'HD22', 'SING'), ('CD2', 'HD23', 'SING'), ('OXT', 'HXT', 'SING')],
+'LYS': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD', 'SING'), ('CG', 'HG2', 'SING'), ('CG', 'HG3', 'SING'), ('CD', 'CE', 'SING'), ('CD', 'HD2', 'SING'), ('CD', 'HD3', 'SING'), ('CE', 'NZ', 'SING'), ('CE', 'HE2', 'SING'), ('CE', 'HE3', 'SING'), ('NZ', 'HZ1', 'SING'), ('NZ', 'HZ2', 'SING'), ('NZ', 'HZ3', 'SING'), ('OXT', 'HXT', 'SING')],
+'MET': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'SD', 'SING'), ('CG', 'HG2', 'SING'), ('CG', 'HG3', 'SING'), ('SD', 'CE', 'SING'), ('CE', 'HE1', 'SING'), ('CE', 'HE2', 'SING'), ('CE', 'HE3', 'SING'), ('OXT', 'HXT', 'SING')],
+'PHE': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD1', 'DOUB'), ('CG', 'CD2', 'SING'), ('CD1', 'CE1', 'SING'), ('CD1', 'HD1', 'SING'), ('CD2', 'CE2', 'DOUB'), ('CD2', 'HD2', 'SING'), ('CE1', 'CZ', 'DOUB'), ('CE1', 'HE1', 'SING'), ('CE2', 'CZ', 'SING'), ('CE2', 'HE2', 'SING'), ('CZ', 'HZ', 'SING'), ('OXT', 'HXT', 'SING')],
+'PRO': [('N', 'CA', 'SING'), ('N', 'CD', 'SING'), ('N', 'H', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD', 'SING'), ('CG', 'HG2', 'SING'), ('CG', 'HG3', 'SING'), ('CD', 'HD2', 'SING'), ('CD', 'HD3', 'SING'), ('OXT', 'HXT', 'SING')],
+'SER': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'OG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('OG', 'HG', 'SING'), ('OXT', 'HXT', 'SING')],
+'THR': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'OG1', 'SING'), ('CB', 'CG2', 'SING'), ('CB', 'HB', 'SING'), ('OG1', 'HG1', 'SING'), ('CG2', 'HG21', 'SING'), ('CG2', 'HG22', 'SING'), ('CG2', 'HG23', 'SING'), ('OXT', 'HXT', 'SING')],
+'TRP': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD1', 'DOUB'), ('CG', 'CD2', 'SING'), ('CD1', 'NE1', 'SING'), ('CD1', 'HD1', 'SING'), ('CD2', 'CE2', 'DOUB'), ('CD2', 'CE3', 'SING'), ('NE1', 'CE2', 'SING'), ('NE1', 'HE1', 'SING'), ('CE2', 'CZ2', 'SING'), ('CE3', 'CZ3', 'DOUB'), ('CE3', 'HE3', 'SING'), ('CZ2', 'CH2', 'DOUB'), ('CZ2', 'HZ2', 'SING'), ('CZ3', 'CH2', 'SING'), ('CZ3', 'HZ3', 'SING'), ('CH2', 'HH2', 'SING'), ('OXT', 'HXT', 'SING')],
+'TYR': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG', 'SING'), ('CB', 'HB2', 'SING'), ('CB', 'HB3', 'SING'), ('CG', 'CD1', 'DOUB'), ('CG', 'CD2', 'SING'), ('CD1', 'CE1', 'SING'), ('CD1', 'HD1', 'SING'), ('CD2', 'CE2', 'DOUB'), ('CD2', 'HD2', 'SING'), ('CE1', 'CZ', 'DOUB'), ('CE1', 'HE1', 'SING'), ('CE2', 'CZ', 'SING'), ('CE2', 'HE2', 'SING'), ('CZ', 'OH', 'SING'), ('OH', 'HH', 'SING'), ('OXT', 'HXT', 'SING')],
+'VAL': [('N', 'CA', 'SING'), ('N', 'H', 'SING'), ('N', 'H2', 'SING'), ('CA', 'C', 'SING'), ('CA', 'CB', 'SING'), ('CA', 'HA', 'SING'), ('C', 'O', 'DOUB'), ('C', 'OXT', 'SING'), ('CB', 'CG1', 'SING'), ('CB', 'CG2', 'SING'), ('CB', 'HB', 'SING'), ('CG1', 'HG11', 'SING'), ('CG1', 'HG12', 'SING'), ('CG1', 'HG13', 'SING'), ('CG2', 'HG21', 'SING'), ('CG2', 'HG22', 'SING'), ('CG2', 'HG23', 'SING'), ('OXT', 'HXT', 'SING')],
+}
 
 from ..entropy import PackingEntropy
+from .bond import Bond
 
 import numpy
 import logging
 
+
+#remove
+import traceback
+from networkx import Graph
 
 class Model():
     """This class contains the information about the 'Chain' object (packman.molecule.Chain).
@@ -406,6 +434,124 @@ class Model():
             PackingEntropy(self.get_atoms(), chains=chains, probe_size=probe_size, onspherepoints=onspherepoints)
         else:
             logging.warning("Please provide the valid type for the Entropy Calculation.")
+    
+    def calculate_bonds(self):
+        """Calculate the bonds in the given 'Model'.
+
+        Currently, bonds are only calculated based on the following RCSB PDB resource file:
+        http://ftp.wwpdb.org/pub/pdb/data/monomers/aa-variants-v1.cif.gz
+        """
+        counter = 0
+        self.__AllBonds = []
+        self.__ChainGraph = Graph()
+
+        #PDB File CONECT Records from annotations
+        for i in self.get_parent().get_data():
+            if(i[0:6]=='CONECT'):
+                #Information on the following line is obtained from: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html and http://www.bmsc.washington.edu/CrystaLinks/man/pdb/part_69.html and https://mmcif.wwpdb.org/docs/pdb_to_pdbx_correspondences.html#CONECT
+                other_atoms = [ (11,16,'covalent'), (16,21,'covalent'), (21,26,'covalent'), (26,31,'covalent'), (31,36,'hydrogen'), (36,41,'hydrogen'), (41,46,'salt-bridge'), (46,51,'hydrogen'), (51,56,'hydrogen'), (56,61,'salt-bridge') ]
+                main_atom = self.get_atom( int(i[6:11]) )
+                for j in other_atoms:
+                    try:
+                        temp_atom = self.get_atom(int(i[j[0]:j[1]]))
+                        counter+=1
+                        bond = Bond(counter, main_atom, temp_atom, j[2], source='CONECT-section')
+                        self.__AllBonds.append(bond)
+                        main_atom.set_bond(bond)
+                        temp_atom.set_bond(bond)
+                        self.__ChainGraph.add_node( main_atom.get_id() )
+                        self.__ChainGraph.add_node( temp_atom.get_id() )
+                        self.__ChainGraph.add_edge( main_atom.get_id(), temp_atom.get_id() , id = counter )
+                    except:
+                        None
+        
+        
+        #CIF FILE (https://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v50.dic/Categories/struct_conn.html)
+        if(counter==0):
+            data = '\n'.join(self.get_parent().get_data())
+
+            for i in data.split('#\nloop_\n'):
+                if(i[:12] == '_struct_conn' ):
+                    col_seq = []
+                    for j in i.split('#'):
+                        if(j[:12] == '_struct_conn' ):
+                            for k in j.split('\n'):
+                                try:
+                                    if(k[0]=='_'):
+                                        col_seq.append( k )
+                                    else:
+                                        temp_dict = {col_seq[numl]:l for numl,l in enumerate(k.split())}
+                                        #Actual approach: find chains -> residue/hetatm -> get the atom with the same name
+                                        chain1, chain2 = self[temp_dict['_struct_conn.ptnr1_label_asym_id']], self[temp_dict['_struct_conn.ptnr2_label_asym_id']]
+
+                                        ptnr1 = chain1.get_residue( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) )
+                                        if(ptnr1==None):
+                                            ptnr1 = chain1.get_hetmol( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) )
+                                            if(ptnr1==None):
+                                                ptnr1 = chain1.get_hetmol( temp_dict['_struct_conn.ptnr1_label_comp_id']+temp_dict['_struct_conn.ptnr1_auth_seq_id'] )
+
+                                        ptnr2 = chain2.get_residue( int(temp_dict['_struct_conn.ptnr2_auth_seq_id']) )
+                                        if(ptnr2==None):
+                                            ptnr2 = chain2.get_hetmol( int(temp_dict['_struct_conn.ptnr2_auth_seq_id']) )
+                                            if(ptnr2==None):
+                                                ptnr2 = chain2.get_hetmol( temp_dict['_struct_conn.ptnr2_label_comp_id']+temp_dict['_struct_conn.ptnr2_auth_seq_id'] )
+
+
+                                        print(temp_dict)
+                                        #print(temp_dict['_struct_conn.ptnr1_label_comp_id'], temp_dict['_struct_conn.ptnr2_label_comp_id'])
+
+
+
+                                except Exception as e:
+                                    print(chain1.get_id(),chain2.get_id(),str(e))
+                                    None
+                
+
+        #Generate bonds from the default settings (No connect records)
+        for chain in self.get_chains():
+            try:
+                resi = [i for i in chain.get_residues()]
+            except:
+                logging.info('Residues are not found for bonds without CONNECT records (default bonds) for the chain: '+str(chain.get_id()))
+                continue
+            #This section is for the default bonds (Not in the connect record)
+            for i in resi:
+                try:
+                    for j in aa_connectivity[i.get_name()]:
+                        try:
+                            atom1, atom2 =  i.get_atom(j[0]), i.get_atom(j[1])
+                            if(atom1!=None and atom2!=None and atom1.get_parent().get_parent().get_id() == atom2.get_parent().get_parent().get_id() ):
+                                counter += 1
+                                if(j[2]=='SING'):
+                                    bond = Bond(counter, atom1, atom2, 'covalent-single', source='RCSB/aa-variants-v1.cif')
+                                elif(j[2]=='DOUB'):
+                                    bond = Bond(counter, atom1, atom2, 'covalent-double', source='RCSB/aa-variants-v1.cif')
+                                else:
+                                    bond = Bond(counter, atom1, atom2, 'covalent', source='RCSB/aa-variants-v1.cif')
+                                self.__AllBonds.append(bond)
+                                atom1.set_bond(bond)
+                                atom2.set_bond(bond)
+                                self.__ChainGraph.add_node( atom1.get_id() )
+                                self.__ChainGraph.add_node( atom2.get_id() )
+                                self.__ChainGraph.add_edge( atom1.get_id(), atom2.get_id() , id = counter )
+                        except Exception as e:
+                            #Bond pair not found
+                            None
+                except:
+                    logging.warn('Residue Number|Name|Chain '+str(i.get_id())+'|'+str(i.get_name())+'|'+str(i.get_parent().get_id())+' is not a standard amino acid; sidechain bonds are not calculated.')
+
+            #Peptide bonds (Assumption: All the reisudes are in the incremental/decremental order)
+            for i in range(0,len(resi)-1):
+                if( abs(resi[i].get_id() - resi[i+1].get_id()) == 1 ):
+                    counter+=1
+                    C, N = resi[i].get_atom('C'), resi[i+1].get_atom('N')
+                    bond = Bond(counter, C, N, 'covalent-single', source='PACKMAN Peptide Bond calculation' )
+                    self.__AllBonds.append(bond)
+                    C.set_bond(bond)
+                    N.set_bond(bond)
+                    self.__ChainGraph.add_edge( C.get_id(), N.get_id() , id = counter )
+                else:
+                    logging.info('The peptide bond following residue is missing: '+str(resi[i].get_id())+' Chain: '+resi[i].get_parent().get_id())
 
     #Check Function
     def check_clashes(self,distance=0.77):
