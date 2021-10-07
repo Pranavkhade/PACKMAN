@@ -86,7 +86,7 @@ class TestMolecule(unittest.TestCase):
         self.assertIsNotNone( Residues[0].get_centerofgravity() )
     
     def test_Bond(self):
-        self.assertEqual( len([i for i in self.mol[0].calculate_bonds()]) , 1542 )
+        self.assertEqual( len([i.get_id() for i in self.mol[0].get_bonds()]) , 1542 )
     
     def tearDown(self):
         logging.info('Molecule Test Done.')
