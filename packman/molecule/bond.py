@@ -42,7 +42,7 @@ class Bond():
     """
     def __init__(self, id, atom1, atom2, type, source=None):
         self.__id = id
-        self.__allowed_bond_types = ['covalent', 'covalent-single', 'covalent-double', 'covalent-triple' , 'ionic', 'hydrogen', 'salt-bridge', 'other']
+        self.__allowed_bond_types = ['non-covalent', 'covalent', 'covalent-single', 'covalent-double', 'covalent-triple' , 'ionic', 'hydrogen', 'salt-bridge', 'other']
         self.__atom1 = atom1
         self.__atom2 = atom2
         self.__type = type

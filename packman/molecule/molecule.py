@@ -31,8 +31,6 @@ from .atom import Atom
 from .hetmol import HetMol
 from .hetatom import HetAtom
 
-#delete
-import traceback
 
 '''
 ##################################################################################################
@@ -208,8 +206,12 @@ def load_cif(filename):
                                 AllChains.append( {} )
                                 AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
                             
-                            #Initiate Residue
-                            ResidueNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
+                            #Initiate Residue (Use one of two ids, if both are absent, think of something in future)
+                            try:
+                                ResidueNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
+                            except:
+                                ResidueNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+
                             ResidueName   = _[ column_names['_atom_site.label_comp_id'] ]
                             try:
                                 if( str(ResidueNumber)+ChainID not in AllResidues[FrameNumber-1].keys() ): AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] = Residue( ResidueNumber, ResidueName, AllChains[FrameNumber-1][ChainID] )
@@ -251,19 +253,21 @@ def load_cif(filename):
                                 AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
                             
                             
-                            #Initiate HetMol
-                            #print('All ok till here', _[ column_names['_atom_site.label_seq_id'] ])
+                            #Initiate HetMol (In case there is absense of ids, line number becomes residue id)
                             try:
                                 HetMolNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
                             except:
-                                HetMolNumber = 'HOH'+str(n_line)
+                                try:
+                                    HetMolNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+                                except:
+                                    HetMolNumber = n_line
 
                             HetMolName   = _[ column_names['_atom_site.label_comp_id'] ]
                             try:
                                 if( str(HetMolNumber)+ChainID not in AllHetMols[FrameNumber-1].keys() ): AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = HetMol( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
                             except:
                                 AllHetMols.append( {} )
-                                AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = Residue( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
+                                AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = HetMol( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
                             
                             #Initiate Atom
                             AtomID = int(_[ column_names['_atom_site.id'] ])
@@ -298,22 +302,23 @@ def load_cif(filename):
                             #        subsection_data[ column_indices[n_cols] ].append(cols)
                 except Exception as e:
                     None
-            if(AllAnnotations[-1]!='#'): AllAnnotations.append('#')
+            try:
+                if(AllAnnotations[-1]!='#'): AllAnnotations.append('#')
+            except:
+                logging.info('Annotations are missing from the mmCIF file.')
         AllAnnotations.append('loop_')
             
-    
+    total_models = max([len(AllAtoms),len(AllHetAtoms)])
         
     AllModels =[]
-    for i in range(0,len(AllAtoms)):
+    for i in range(0,total_models):
         #In case protein part is missing
         try:
             current_atoms    = AllAtoms[i]
             current_residues = AllResidues[i]
-            current_chains   = AllChains[i]
         except:
             current_atoms    = [None]
             current_residues = [None]
-            current_chains   = [None]
 
         #In case the hetatoms are not present at all
         try:
@@ -322,6 +327,13 @@ def load_cif(filename):
         except:
             current_hetatms = [None]
             current_hetmols = [None]
+        
+        #In case the chains are missing
+        try:
+            current_chains  = AllChains[i]
+        except:
+            current_chains  = [None]
+
 
         AllModels.append( Model(i+1, current_atoms, current_residues, current_chains, current_hetatms, current_hetmols) )
         for j in AllModels[i].get_chains(): j.set_parent(AllModels[i])
@@ -349,7 +361,12 @@ def load_cif(filename):
     prot = Protein( filename, AllModels )
     prot.set_data(AllAnnotations)
     #Setting parent to the model object
-    for i in prot: i.set_parent(prot)
+    for i in prot:
+        i.set_parent(prot)
+        try:
+            i.calculate_bonds()
+        except:
+            logging.warning('Model.calculate_bonds() failed for MODEL: '+str(i.get_id()))
     return prot
 
 

@@ -50,9 +50,7 @@ from .bond import Bond
 import numpy
 import logging
 
-
-#remove
-import traceback
+#Think how the graph can be improved
 from networkx import Graph
 
 class Model():
@@ -233,7 +231,31 @@ class Model():
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
+    
+    def get_bonds(self):
+        """Return all the bonds in the given 'Model'.
 
+        Returns:
+            generator of packman.molecule.Bond objects if successful, None otherwise.
+        """
+        try:
+            for i in self.__AllBonds: yield self.__AllBonds[i]
+        except:
+            logging.warning('Failed to return the bonds.')
+            
+    def get_bond(self,idx):
+        """Return the specific bond with specific ID.
+
+        Args:
+            idx (int): Get the 'Bond' by the id
+        
+        Returns:
+            packman.molecule.Bond object if successful, None otherwise.
+        """
+        try:
+            return self.__AllBonds[idx]
+        except:
+            logging.warning('Failed to return the bond. Please check the ID.')
 
     #Compute Functions
     def get_calpha(self):
@@ -442,7 +464,7 @@ class Model():
         http://ftp.wwpdb.org/pub/pdb/data/monomers/aa-variants-v1.cif.gz
         """
         counter = 0
-        self.__AllBonds = []
+        self.__AllBonds = {}
         self.__ChainGraph = Graph()
 
         #PDB File CONECT Records from annotations
@@ -456,7 +478,7 @@ class Model():
                         temp_atom = self.get_atom(int(i[j[0]:j[1]]))
                         counter+=1
                         bond = Bond(counter, main_atom, temp_atom, j[2], source='CONECT-section')
-                        self.__AllBonds.append(bond)
+                        self.__AllBonds[counter]= bond
                         main_atom.set_bond(bond)
                         temp_atom.set_bond(bond)
                         self.__ChainGraph.add_node( main_atom.get_id() )
@@ -483,7 +505,7 @@ class Model():
                                         temp_dict = {col_seq[numl]:l for numl,l in enumerate(k.split())}
                                         #Actual approach: find chains -> residue/hetatm -> get the atom with the same name
                                         chain1, chain2 = self[temp_dict['_struct_conn.ptnr1_label_asym_id']], self[temp_dict['_struct_conn.ptnr2_label_asym_id']]
-
+                                                                                
                                         ptnr1 = chain1.get_residue( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) )
                                         if(ptnr1==None):
                                             ptnr1 = chain1.get_hetmol( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) )
@@ -495,17 +517,33 @@ class Model():
                                             ptnr2 = chain2.get_hetmol( int(temp_dict['_struct_conn.ptnr2_auth_seq_id']) )
                                             if(ptnr2==None):
                                                 ptnr2 = chain2.get_hetmol( temp_dict['_struct_conn.ptnr2_label_comp_id']+temp_dict['_struct_conn.ptnr2_auth_seq_id'] )
+                                        
+                                        if(ptnr1!=None and ptnr2!=None):
+                                            atm1 = ptnr1.get_atom(temp_dict['_struct_conn.ptnr1_label_atom_id'])
+                                            atm2 = ptnr2.get_atom(temp_dict['_struct_conn.ptnr2_label_atom_id'])
 
+                                            cif_vocab2pacman= {'covale':'covalent' , 'disulf':'covalent-single', 'hydrog':'hydrogen', 'metalc':'non-covalent'}
 
-                                        print(temp_dict)
-                                        #print(temp_dict['_struct_conn.ptnr1_label_comp_id'], temp_dict['_struct_conn.ptnr2_label_comp_id'])
-
-
+                                            bond_type = None
+                                            try:        
+                                                bond_type = cif_vocab2pacman[temp_dict['_struct_conn.conn_type_id']]
+                                            except:
+                                                bond_type = 'other'
+                                            
+                                            counter+=1
+                                            bond = Bond(counter, atm1, atm2, bond_type, source='CONECT-section')
+                                            self.__AllBonds[counter]= bond
+                                            atm1.set_bond(bond)
+                                            atm2.set_bond(bond)
+                                            self.__ChainGraph.add_node( atm1.get_id() )
+                                            self.__ChainGraph.add_node( atm2.get_id() )
+                                            self.__ChainGraph.add_edge( atm1.get_id(), atm2.get_id() , id = counter )
+                                        else:
+                                            logging.warn('Some atom(s) are not identified correctly in the mmCIF file.')
 
                                 except Exception as e:
-                                    print(chain1.get_id(),chain2.get_id(),str(e))
+                                    #Check whats up with string error (very minor)
                                     None
-                
 
         #Generate bonds from the default settings (No connect records)
         for chain in self.get_chains():
@@ -528,7 +566,7 @@ class Model():
                                     bond = Bond(counter, atom1, atom2, 'covalent-double', source='RCSB/aa-variants-v1.cif')
                                 else:
                                     bond = Bond(counter, atom1, atom2, 'covalent', source='RCSB/aa-variants-v1.cif')
-                                self.__AllBonds.append(bond)
+                                self.__AllBonds[counter]= bond
                                 atom1.set_bond(bond)
                                 atom2.set_bond(bond)
                                 self.__ChainGraph.add_node( atom1.get_id() )
@@ -546,7 +584,7 @@ class Model():
                     counter+=1
                     C, N = resi[i].get_atom('C'), resi[i+1].get_atom('N')
                     bond = Bond(counter, C, N, 'covalent-single', source='PACKMAN Peptide Bond calculation' )
-                    self.__AllBonds.append(bond)
+                    self.__AllBonds[counter]= bond
                     C.set_bond(bond)
                     N.set_bond(bond)
                     self.__ChainGraph.add_edge( C.get_id(), N.get_id() , id = counter )

@@ -189,16 +189,23 @@ class Chain():
 
     #Calculation Functions
     def get_atoms(self):
-        """Get the generator of corresponding 'atom' objects of the 'Chain'
+        """Get the generator of corresponding 'atom' objects of the residues of the 'Chain'
 
         Returns:
             generator of 'atom' objects if successful, None otherwise.
-        
-        Note:
-            find a way to deal with hetatoms
         """
         for i in sorted(self.__Residues.keys()):
             for j in self.__Residues[i].get_atoms():
+                yield j
+    
+    def get_hetatoms(self):
+        """Get the generator of corresponding 'atom' objects of the hetmols of the 'Chain'
+
+        Returns:
+            generator of 'atom' objects if successful, None otherwise.
+        """
+        for i in sorted(self.__HetMols.keys()):
+            for j in self.__HetMols[i].get_atoms():
                 yield j
     
     def get_atom(self, idx):
@@ -260,7 +267,6 @@ class Chain():
             residue (:py:class:`packman.molecule.HetMol`): HetMol of the given ID if successful; None otherwise.
         """
         for i in self.get_hetmols():
-            #print([j.get_id() for j in i.get_atoms()],i.get_id(),idx)
             if(i.get_id() == idx):
                 return i
                 break
