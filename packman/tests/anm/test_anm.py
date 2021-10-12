@@ -31,7 +31,7 @@ class TestMolecule(unittest.TestCase):
         #self.assertIsNotNone( [i for i in self.Model.get_crosscorrelation_matrix()] )
     
     def test_ANM_Compliance(self):
-        self.ANM_MODEL = ANM([i.get_location() for i in self.calpha],atoms=self.calpha)
+        self.ANM_MODEL = ANM(self.calpha)
 
         self.assertTrue( self.ANM_MODEL.calculate_hessian() )
         self.assertTrue( self.ANM_MODEL.calculate_decomposition() )

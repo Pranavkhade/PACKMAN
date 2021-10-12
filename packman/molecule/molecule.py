@@ -19,7 +19,7 @@ Authors:
 """
 
 import numpy
-import warnings
+import logging
 
 from .protein import Protein
 from .model import Model
@@ -134,7 +134,7 @@ def load_pdb(filename):
 
     if(len(Models)>2):
         #NMR
-        warnings.warn('Multiple models/frames are detected (B-Factor field is turned to a calculated parameter)',UserWarning)
+        logging.warning('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
         All_Coords=[]
         for i in Models:
             All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))
@@ -206,8 +206,12 @@ def load_cif(filename):
                                 AllChains.append( {} )
                                 AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
                             
-                            #Initiate Residue
-                            ResidueNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
+                            #Initiate Residue (Use one of two ids, if both are absent, think of something in future)
+                            try:
+                                ResidueNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
+                            except:
+                                ResidueNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+
                             ResidueName   = _[ column_names['_atom_site.label_comp_id'] ]
                             try:
                                 if( str(ResidueNumber)+ChainID not in AllResidues[FrameNumber-1].keys() ): AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] = Residue( ResidueNumber, ResidueName, AllChains[FrameNumber-1][ChainID] )
@@ -223,6 +227,15 @@ def load_cif(filename):
                             bfactor = float(_[ column_names['_atom_site.B_iso_or_equiv'] ])
                             Element = _[ column_names['_atom_site.type_symbol'] ]
                             Charge = _[ column_names['_atom_site.pdbx_formal_charge'] ]
+
+                            #If particular atom is already present, dont add it again; alternate id must be present (_atom_site.label_alt_id)
+                            try:
+                                if( AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID].get_atom(AtomName)!= None ):
+                                    continue
+                            except Exception as e:
+                                #Alternate atom exists
+                                None
+
                             try:
                                 AllAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] )
                             except:
@@ -249,19 +262,21 @@ def load_cif(filename):
                                 AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
                             
                             
-                            #Initiate HetMol
-                            #print('All ok till here', _[ column_names['_atom_site.label_seq_id'] ])
+                            #Initiate HetMol (In case there is absense of ids, line number becomes residue id)
                             try:
                                 HetMolNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
                             except:
-                                HetMolNumber = 'HOH'+str(n_line)
+                                try:
+                                    HetMolNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+                                except:
+                                    HetMolNumber = n_line
 
                             HetMolName   = _[ column_names['_atom_site.label_comp_id'] ]
                             try:
                                 if( str(HetMolNumber)+ChainID not in AllHetMols[FrameNumber-1].keys() ): AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = HetMol( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
                             except:
                                 AllHetMols.append( {} )
-                                AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = Residue( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
+                                AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = HetMol( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
                             
                             #Initiate Atom
                             AtomID = int(_[ column_names['_atom_site.id'] ])
@@ -272,6 +287,14 @@ def load_cif(filename):
                             Element = _[ column_names['_atom_site.type_symbol'] ]
                             Charge = _[ column_names['_atom_site.pdbx_formal_charge'] ]
 
+                            #If particular atom is already present, dont add it again; alternate id must be present (_atom_site.label_alt_id)
+                            try:
+                                if( AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID].get_atom(AtomName)!= None ):
+                                    continue
+                            except Exception as e:
+                                #Alternate atom exists
+                                None
+
                             try:
                                 AllHetAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] )
                             except:
@@ -280,9 +303,9 @@ def load_cif(filename):
 
                             #Connect objects to each other to create a tree (Ideally should not happen every iteration)
                             #HetMol Added to the chain
-                            AllChains[FrameNumber-1][ChainID].__setitem__( HetMolNumber, AllHetAtoms[FrameNumber-1][str(HetMolNumber)+ChainID], Type='HetMol' )
+                            AllChains[FrameNumber-1][ChainID].__setitem__( HetMolNumber, AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID], Type='HetMol' )
                             #Atom added to the HetMol
-                            AllHetAtoms[FrameNumber-1][str(HetMolNumber)+ChainID].__setitem__( AtomID, AllAtoms[FrameNumber-1][AtomID] )
+                            AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID].__setitem__( AtomID, AllHetAtoms[FrameNumber-1][AtomID] )
 
                         #Annotations additions
                         else:
@@ -294,24 +317,25 @@ def load_cif(filename):
                             #    except:
                             #        subsection_data[ column_indices[n_cols] ] = []
                             #        subsection_data[ column_indices[n_cols] ].append(cols)
-                except:
+                except Exception as e:
                     None
-            if(AllAnnotations[-1]!='#'): AllAnnotations.append('#')
+            try:
+                if(AllAnnotations[-1]!='#'): AllAnnotations.append('#')
+            except:
+                logging.info('Annotations are missing from the mmCIF file.')
         AllAnnotations.append('loop_')
             
-    
+    total_models = max([len(AllAtoms),len(AllHetAtoms)])
         
-    AllModels =[]
-    for i in range(0,len(AllAtoms)):
+    AllModels = []
+    for i in range(0,total_models):
         #In case protein part is missing
         try:
             current_atoms    = AllAtoms[i]
             current_residues = AllResidues[i]
-            current_chains   = AllChains[i]
         except:
             current_atoms    = [None]
             current_residues = [None]
-            current_chains   = [None]
 
         #In case the hetatoms are not present at all
         try:
@@ -320,6 +344,13 @@ def load_cif(filename):
         except:
             current_hetatms = [None]
             current_hetmols = [None]
+        
+        #In case the chains are missing
+        try:
+            current_chains  = AllChains[i]
+        except:
+            current_chains  = [None]
+
 
         AllModels.append( Model(i+1, current_atoms, current_residues, current_chains, current_hetatms, current_hetmols) )
         for j in AllModels[i].get_chains(): j.set_parent(AllModels[i])
@@ -327,7 +358,7 @@ def load_cif(filename):
 
     if(len(AllModels)>2):
         #NMR
-        warnings.warn('Multiple models/frames are detected (B-Factor field is turned to a calculated parameter)',UserWarning)
+        logging.warning('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
         All_Coords=[]
         for i in AllModels:
             All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))
@@ -347,7 +378,12 @@ def load_cif(filename):
     prot = Protein( filename, AllModels )
     prot.set_data(AllAnnotations)
     #Setting parent to the model object
-    for i in prot: i.set_parent(prot)
+    for i in prot:
+        i.set_parent(prot)
+        try:
+            i.calculate_bonds()
+        except:
+            logging.warning('Model.calculate_bonds() failed for MODEL: '+str(i.get_id()))
     return prot
 
 

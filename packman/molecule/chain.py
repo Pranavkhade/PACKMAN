@@ -22,9 +22,9 @@ Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
 
-
 import numpy
 import logging
+
 
 
 class Chain():
@@ -45,8 +45,8 @@ class Chain():
     
     def __init__(self,id):
         self.__id = id
-        self.__Residues = None
-        self.__HetMols = None
+        self.__Residues = {}
+        self.__HetMols = {}
         self.__parent = None
         #More Features
         self.__Hinges = []
@@ -59,13 +59,11 @@ class Chain():
             try:
                 self.__Residues[Number]=Entity
             except:
-                self.__Residues={}
                 self.__Residues[Number]=Entity
         elif(Type=='HetMol'):
             try:
                 self.__HetMols[Number]=Entity
             except:
-                self.__HetMols={}
                 self.__HetMols[Number]=Entity
 
     def __getitem__(self,Number,Type=None):
@@ -136,6 +134,16 @@ class Chain():
         except:
             logging.warning('The Property Name provided is not assigned.')
     
+    def get_bonds(self):
+        """Get the Bonds in the given 'Chain'
+
+        Please check out calculate_bonds() for more information on the bond calculations.
+        """
+        try:
+            yield self.__AllBonds
+        except:
+            logging.warn('Bonds are not calculated yet. Use calculate_bond()')
+    
     #Set Functions
     def set_id(self,new_id):
         """Set the ID of the given 'Chain'
@@ -181,18 +189,88 @@ class Chain():
 
     #Calculation Functions
     def get_atoms(self):
-        """Get the generator of corresponding 'atom' objects of the 'Chain'
+        """Get the generator of corresponding 'atom' objects of the residues of the 'Chain'
 
         Returns:
             generator of 'atom' objects if successful, None otherwise.
-        
-        Note:
-            find a way to deal with hetatoms
         """
         for i in sorted(self.__Residues.keys()):
             for j in self.__Residues[i].get_atoms():
                 yield j
+    
+    def get_hetatoms(self):
+        """Get the generator of corresponding 'atom' objects of the hetmols of the 'Chain'
 
+        Returns:
+            generator of 'atom' objects if successful, None otherwise.
+        """
+        for i in sorted(self.__HetMols.keys()):
+            for j in self.__HetMols[i].get_atoms():
+                yield j
+    
+    def get_atom(self, idx):
+        """Get the atom of the given ID.
+
+        Note: - This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
+              - If the PDB file is constructed manually/ has multiple atoms of the same ID, the first instance of the atom with that id is returned. Please avoid saving two atoms with same ID in a same structure file in a given frame/model.
+
+        Args:
+            idx (int): Get atom by the id
+        
+        Returns:
+            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+        """
+        the_atom = None
+        for i in self.__Residues:
+            the_atom =  self.__Residues[i].get_atom(idx)
+            if(the_atom!=None):
+                break
+            
+        if(the_atom==None):
+            for i in self.__HetMols:
+                the_atom =  self.__HetMols[i].get_atom(idx)
+                if(the_atom!=None):
+                    break
+        if(the_atom!=None):
+            return the_atom
+        else:
+            logging.info('The atom with the given ID is not found in the Residues/HetMols')
+            return None
+    
+    def get_residue(self,idx):
+        """Get the residue of the given ID.
+
+        Note: - This function is different from :py:func:`packman.molecule.chain.get_residues`
+              - If the PDB file is constructed manually/ has multiple residues of the same ID, the first instance of the residue with that id is returned. Please avoid saving two residues with same ID in a same structure file in a given frame/model.
+
+        Args:
+            idx (int): Get residue by the id
+        
+        Returns:
+            residue (:py:class:`packman.molecule.Residue`): Residue of the given ID if successful; None otherwise.
+        """
+        for i in self.get_residues():
+            if(i.get_id() == idx):
+                return i
+                break
+
+    def get_hetmol(self,idx):
+        """Get the hetmol of the given ID.
+
+        Note: - This function is different from :py:func:`packman.molecule.chain.get_hetmols`
+              - If the PDB file is constructed manually/ has multiple hetmol of the same ID, the first instance of the hetmol with that id is returned. Please avoid saving two hetmol with same ID in a same structure file in a given frame/model.
+
+        Args:
+            idx (int): Get hetmol by the id
+        
+        Returns:
+            residue (:py:class:`packman.molecule.HetMol`): HetMol of the given ID if successful; None otherwise.
+        """
+        for i in self.get_hetmols():
+            if(i.get_id() == idx):
+                return i
+                break
+    
     def get_residues(self):
         """Get the generator of corresponding 'Residue' objects of the 'Chain'
 

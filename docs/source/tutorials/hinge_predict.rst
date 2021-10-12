@@ -43,11 +43,11 @@ Code Example::
     #If the backbone atoms of the ALL chains needs to be studied,
     #backbone=[]
     #for i in [i.get_id() for i in mol[0].get_chains()]:
-    #        backbone.append( [k for j in mol[0][i].get_backbone() for k in j if k is not None] )
+    #        backbone.extend( [k for j in mol[0][i].get_backbone() for k in j if k is not None] )
         
     
     #If the backbone atoms of the specific chain 'A' needs to be studied,
-    backbone = [j for i in mol[0][chain].get_backbone() for j in i if j is not None]
+    backbone = [j for i in mol[0]['A'].get_backbone() for j in i if j is not None]
 
 Step 2: Hinge Prediction
 ------------------------
@@ -79,5 +79,5 @@ The following code can access all such hinges for all alpha values explored::
     mol[0]['A'].get_hinges()
 
     #If you are browsing atoms and not sure about the chain
-    atoms[0].get_parent().get_parent().get_hinges()
+    backbone[0].get_parent().get_parent().get_hinges()
 

@@ -45,6 +45,7 @@ class Residue():
         self.__parent = parent
         self.__Atoms = None
         self.__domain_id = None
+        self.__Atoms_Names = {}
 
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
@@ -60,6 +61,7 @@ class Residue():
         except:
             self.__Atoms={}
             self.__Atoms[id]=Atom
+        self.__Atoms_Names[Atom.get_name()] = Atom
     
     #Get Functions
     def get_id(self):
@@ -86,6 +88,23 @@ class Residue():
         """
         return self.__parent
     
+    def get_atom(self,key):
+        """Get the specific Atom by id/name. Please note that this is different than get_atoms()
+
+        Args:
+            key (int/str): Get atom by the id/name
+        
+        Returns:
+            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+        """
+        try:
+            return self.__Atoms[key]
+        except KeyError:
+            try:
+                return self.__Atoms_Names[key]
+            except:
+                return None
+
     def get_atoms(self):
         """Get the generator of corresponding 'Atom' objects of the 'Residue'
 
