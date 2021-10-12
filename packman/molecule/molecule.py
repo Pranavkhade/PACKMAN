@@ -227,6 +227,14 @@ def load_cif(filename):
                             bfactor = float(_[ column_names['_atom_site.B_iso_or_equiv'] ])
                             Element = _[ column_names['_atom_site.type_symbol'] ]
                             Charge = _[ column_names['_atom_site.pdbx_formal_charge'] ]
+
+                            #If particular atom is already present, dont add it again; alternate id must be present (_atom_site.label_alt_id)
+                            try:
+                                if( AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID].get_atom(AtomName)!= None ):
+                                    continue
+                            except Exception as e:
+                                logging.warning('Problem with alternate atom handling.')
+
                             try:
                                 AllAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] )
                             except:

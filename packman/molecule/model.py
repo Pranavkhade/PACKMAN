@@ -51,7 +51,8 @@ import numpy
 import logging
 
 #Think how the graph can be improved
-from networkx import Graph
+from networkx import Graph, bridges, draw, connected_components
+
 
 class Model():
     """This class contains the information about the 'Chain' object (packman.molecule.Chain).
@@ -457,15 +458,213 @@ class Model():
         else:
             logging.warning("Please provide the valid type for the Entropy Calculation.")
     
+    def calculate_torsion(self, bond, neighbor1=None, neighbor2=None, radians=True):
+        """Calculate the torsion angle of the given covalent bond with the corresponding selected neighbors.
+
+        Note:
+            At least four atoms are needed to form two planes that can measure the torsional angles; therefore, along with the two bond atoms, the user needs to provide the additional two atoms that are ideally non-mutual neighbors of the atoms in the bond.
+
+        Args:
+            bond      (packman.molecule.Bond)     : The bond user wishes to calculate torsion angle to.
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
+            radians   (True/False)                : Return value of the angle in radians (returns value in degrees if False; Default : True)
+        
+        Returns:
+            The torsion angle in radians/degrees if sucessful, None otherwise.
+        """
+        assert type(bond) == Bond, 'The bond varible should be a packman.molecule.Bond object'
+
+        try:
+            if(self.__AllBonds=={}):
+                logging.warning('Please check if the Model.calculate_bonds() was executed successfully.')
+                return None
+        except:
+            logging.warning('Please check if the Model.calculate_bonds() was executed successfully.')
+            return None
+        
+        atom1, atom2 = bond.get_atoms()
+
+        if( neighbor1 == None ):
+            logging.error('neighbour1 not selected. Options available for neighbour1: ' +  ', '.join( [str(i) for i in self.__ModelGraph[atom1.get_id()] if i != atom2.get_id() ] ) )
+            return None
+
+        if( neighbor2 == None ):
+            logging.error('neighbour2 not selected. Options available for neighbour2: ' + ', '.join( [str(i) for i in self.__ModelGraph[atom2.get_id()] if i != atom1.get_id() ]  ) )
+            return None
+        
+        if(type(neighbor1)==int):
+            neighbor1 = self.__AllAtoms[neighbor1]
+        elif(type(neighbor1)==type(atom1)):
+            None
+        else:
+            logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
+            return None
+        
+        if(type(neighbor2)==int):
+            neighbor2 = self.__AllAtoms[neighbor2]
+        elif(type(neighbor2)==type(atom2)):
+            None
+        else:
+            logging.error('neighbour2 should either be an integer or a packman.molecule.Atom object.')
+            return None
+
+        #Actual code
+        b0 = -1.0*(atom1.get_location() - neighbor1.get_location())
+        b1 = atom2.get_location() - atom1.get_location()
+        b2 = neighbor2.get_location() - atom2.get_location()
+        b1 /= numpy.linalg.norm(b1)
+        v = b0 - numpy.dot(b0, b1)*b1
+        w = b2 - numpy.dot(b2, b1)*b1
+        x = numpy.dot(v, w)
+        y = numpy.dot(numpy.cross(b1, v), w)
+        radang=numpy.arctan2(y, x)
+        if(radians):
+            return radang
+        else:
+            return numpy.rad2deg(radang)
+    
+    def calculate_rotation(self, bond, theta, neighbor1=None, neighbor2=None, radians=True):
+        """Calculate the rotation the given covalent bond with the corresponding selected neighbors.
+
+        Note:
+            At least four atoms are needed to form two planes that change the torsional angles; therefore, along with the two bond atoms, the user needs to provide the additional two atoms that are ideally non-mutual neighbors of the atoms in the bond.
+
+        Args:
+            bond      (packman.molecule.Bond)     : The bond user wishes to rotate.
+            theta     (int)                       : Set the torsional angle (see the 'radians' parameter description)
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
+            radians   (True/False)                : Parameter 'theta' will be assuned to be in Radians if True, Degrees will be assumed when False. ( Default : True)
+        
+        Returns:
+            The torsion angle in radians if sucessful, None otherwise.
+        """
+        assert type(bond) == Bond, 'The bond varible should be a packman.molecule.Bond object'
+
+        try:
+            if(self.__AllBonds=={}):
+                logging.warning('Please check if the Model.calculate_bonds() was executed successfully.')
+                return None
+        except:
+            logging.warning('Please check if the Model.calculate_bonds() was executed successfully.')
+            return None
+        
+        atom1, atom2 = bond.get_atoms()
+
+        if( neighbor1 == None ):
+            logging.error('neighbour1 not selected. Options available for neighbour1: ' +  ', '.join( [str(i) for i in self.__ModelGraph[atom1.get_id()] if i != atom2.get_id() ] ) )
+            return None
+
+        if( neighbor2 == None ):
+            logging.error('neighbour2 not selected. Options available for neighbour2: ' + ', '.join( [str(i) for i in self.__ModelGraph[atom2.get_id()] if i != atom1.get_id() ]  ) )
+            return None
+        
+        if(type(neighbor1)==int):
+            neighbor1 = self.__AllAtoms[neighbor1]
+        elif(type(neighbor1)==type(atom1)):
+            None
+        else:
+            logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
+            return None
+        
+        if(type(neighbor2)==int):
+            neighbor2 = self.__AllAtoms[neighbor2]
+        elif(type(neighbor2)==type(atom2)):
+            None
+        else:
+            logging.error('neighbour2 should either be an integer or a packman.molecule.Atom object.')
+            return None
+
+        if(radians):
+            None
+        else:
+            theta = numpy.deg2rad(theta)
+        
+        #Actual code
+        current_torsion = self.calculate_torsion(bond, neighbor1=neighbor1, neighbor2=neighbor2, radians=True)
+
+
+        rotang = current_torsion - theta
+        
+
+        #Find the section to rotate
+        test = self.__ModelGraph.copy()
+        test.remove_edge( atom1.get_id(), atom2.get_id() )
+        before_components = [j for j in connected_components(self.__ModelGraph)]
+        after_componets = [j for j in connected_components(test)]
+        #Changed components tell you what parts have been changed
+        changed_components = []
+        for i in after_componets:
+            if(i in before_components):
+                #All the unchanged componets after breaking the bridge
+                None
+            else:
+                changed_components.append(i)
+
+        #Smaller component will be rotated to keep computational intensity low
+        to_rotate = list(changed_components[min((len(l), i) for i, l in enumerate(changed_components))[1]])
+
+        #Setting up rotation matrix
+        sn=numpy.sin(rotang)
+        cs=numpy.cos(rotang)
+        t=1-cs
+
+        v2x = atom1.get_location()[0] - atom2.get_location()[0]
+        v2y = atom1.get_location()[1] - atom2.get_location()[1]
+        v2z = atom1.get_location()[2] - atom2.get_location()[2]
+        #Normalize the rotation vector
+        mag=numpy.sqrt(numpy.square(v2x)+numpy.square(v2y)+numpy.square(v2z))
+        x = float(v2x)/mag
+        y = float(v2y)/mag
+        z = float(v2z)/mag
+        #set up the rotation matrix
+        m=numpy.zeros(9)
+        m[0]= t*x*x + cs
+        m[1]= t*x*y + sn*z
+        m[2]= t*x*z - sn*y
+        m[3]= t*x*y - sn*z
+        m[4]= t*y*y + cs
+        m[5]= t*y*z + sn*x
+        m[6]= t*x*z + sn*y
+        m[7]= t*y*z - sn*x
+        m[8]= t*z*z + cs
+
+        #Rotate The Atoms
+        tx = atom1.get_location()[0]
+        ty = atom1.get_location()[1]
+        tz = atom1.get_location()[2]
+
+        #Set the angles
+        for i in to_rotate:
+            try:
+                COORDS = self.__AllAtoms[i].get_location()
+                COORDS[0]-=tx
+                COORDS[1]-=ty
+                COORDS[2]-=tz
+                x=COORDS[0]*m[0]+COORDS[1]*m[1]+COORDS[2]*m[2]
+                y=COORDS[0]*m[3]+COORDS[1]*m[4]+COORDS[2]*m[5]
+                z=COORDS[0]*m[6]+COORDS[1]*m[7]+COORDS[2]*m[8]
+                COORDS[0]=x
+                COORDS[1]=y
+                COORDS[2]=z
+                COORDS[0]+=tx
+                COORDS[1]+=ty
+                COORDS[2]+=tz
+                self.__AllAtoms[i].set_location( numpy.array(COORDS) )
+            except:
+                logging.warning('Failed to rotate Atom: '+str(self.__AllAtoms[i].get_id()))
+
+
     def calculate_bonds(self):
         """Calculate the bonds in the given 'Model'.
 
         Currently, bonds are only calculated based on the following RCSB PDB resource file:
         http://ftp.wwpdb.org/pub/pdb/data/monomers/aa-variants-v1.cif.gz
         """
-        counter = 0
+        counter = -1
         self.__AllBonds = {}
-        self.__ChainGraph = Graph()
+        self.__ModelGraph = Graph()
 
         #PDB File CONECT Records from annotations
         for i in self.get_parent().get_data():
@@ -478,18 +677,19 @@ class Model():
                         temp_atom = self.get_atom(int(i[j[0]:j[1]]))
                         counter+=1
                         bond = Bond(counter, main_atom, temp_atom, j[2], source='CONECT-section')
-                        self.__AllBonds[counter]= bond
+                        self.__AllBonds[counter] = bond
                         main_atom.set_bond(bond)
                         temp_atom.set_bond(bond)
-                        self.__ChainGraph.add_node( main_atom.get_id() )
-                        self.__ChainGraph.add_node( temp_atom.get_id() )
-                        self.__ChainGraph.add_edge( main_atom.get_id(), temp_atom.get_id() , id = counter )
+                        self.__ModelGraph.add_node( main_atom.get_id() )
+                        self.__ModelGraph.add_node( temp_atom.get_id() )
+                        if(bond.get_type().split('-')[0]=='covalent'):
+                            self.__ModelGraph.add_edge( main_atom.get_id(), temp_atom.get_id() , id = counter )
                     except:
                         None
         
         
         #CIF FILE (https://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v50.dic/Categories/struct_conn.html)
-        if(counter==0):
+        if(counter==-1):
             data = '\n'.join(self.get_parent().get_data())
 
             for i in data.split('#\nloop_\n'):
@@ -532,12 +732,13 @@ class Model():
                                             
                                             counter+=1
                                             bond = Bond(counter, atm1, atm2, bond_type, source='CONECT-section')
-                                            self.__AllBonds[counter]= bond
+                                            self.__AllBonds[counter] = bond
                                             atm1.set_bond(bond)
                                             atm2.set_bond(bond)
-                                            self.__ChainGraph.add_node( atm1.get_id() )
-                                            self.__ChainGraph.add_node( atm2.get_id() )
-                                            self.__ChainGraph.add_edge( atm1.get_id(), atm2.get_id() , id = counter )
+                                            self.__ModelGraph.add_node( atm1.get_id() )
+                                            self.__ModelGraph.add_node( atm2.get_id() )
+                                            if(bond.get_type().split('-')[0]=='covalent'):
+                                                self.__ModelGraph.add_edge( atm1.get_id(), atm2.get_id() , id = counter )
                                         else:
                                             logging.warn('Some atom(s) are not identified correctly in the mmCIF file.')
 
@@ -566,12 +767,14 @@ class Model():
                                     bond = Bond(counter, atom1, atom2, 'covalent-double', source='RCSB/aa-variants-v1.cif')
                                 else:
                                     bond = Bond(counter, atom1, atom2, 'covalent', source='RCSB/aa-variants-v1.cif')
-                                self.__AllBonds[counter]= bond
+                                self.__AllBonds[counter] = bond
                                 atom1.set_bond(bond)
                                 atom2.set_bond(bond)
-                                self.__ChainGraph.add_node( atom1.get_id() )
-                                self.__ChainGraph.add_node( atom2.get_id() )
-                                self.__ChainGraph.add_edge( atom1.get_id(), atom2.get_id() , id = counter )
+
+                                self.__ModelGraph.add_node( atom1.get_id() )
+                                self.__ModelGraph.add_node( atom2.get_id() )
+                                if(bond.get_type().split('-')[0]=='covalent'):
+                                    self.__ModelGraph.add_edge( atom1.get_id(), atom2.get_id() , id = counter )
                         except Exception as e:
                             #Bond pair not found
                             None
@@ -584,12 +787,26 @@ class Model():
                     counter+=1
                     C, N = resi[i].get_atom('C'), resi[i+1].get_atom('N')
                     bond = Bond(counter, C, N, 'covalent-single', source='PACKMAN Peptide Bond calculation' )
-                    self.__AllBonds[counter]= bond
+                    self.__AllBonds[counter] = bond
                     C.set_bond(bond)
                     N.set_bond(bond)
-                    self.__ChainGraph.add_edge( C.get_id(), N.get_id() , id = counter )
+                    self.__ModelGraph.add_edge( C.get_id(), N.get_id() , id = counter )
                 else:
-                    logging.info('The peptide bond following residue is missing: '+str(resi[i].get_id())+' Chain: '+resi[i].get_parent().get_id())
+                    logging.warning('The peptide bond following residue is missing: '+str(resi[i].get_id())+' Chain: '+resi[i].get_parent().get_id())
+        
+        try:
+            None
+            #Successful run
+            '''
+            set_to = -90
+            print('Before:', self.calculate_torsion(common_bond, neighbor1=227, neighbor2=231, radians=False) )
+            self.calculate_rotation(common_bond, set_to, neighbor1=227, neighbor2=231, radians=False)
+            print('Set:',set_to)
+            print('After:', self.calculate_torsion(common_bond, neighbor1=227, neighbor2=231, radians=False) )
+            '''
+        except Exception as e:
+            print(str(e))
+
 
     #Check Function
     def check_clashes(self,distance=0.77):
