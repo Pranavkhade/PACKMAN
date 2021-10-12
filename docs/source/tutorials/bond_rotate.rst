@@ -1,7 +1,7 @@
 .. _tutorials_bond_rotate:
 
-Using the Molecule submodule to rotate specific bonds
-=====================================================
+Rotate specific bonds
+=====================
 
 This tutorial helps users how to rotate specific bonds using Molecule submodule
     

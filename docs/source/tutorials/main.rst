@@ -24,3 +24,7 @@ Application Programming Interface (API)
 #. :ref:`tutorials_compliance`
 #. :ref:`tutorials_hdANM`
 #. :ref:`tutorials_entropy_api`
+
+Utilities (API)
+---------------
+#. :ref:`tutorials_bond_rotate`
