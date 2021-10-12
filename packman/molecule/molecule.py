@@ -233,7 +233,8 @@ def load_cif(filename):
                                 if( AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID].get_atom(AtomName)!= None ):
                                     continue
                             except Exception as e:
-                                logging.warning('Problem with alternate atom handling.')
+                                #Alternate atom exists
+                                None
 
                             try:
                                 AllAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] )
@@ -286,6 +287,14 @@ def load_cif(filename):
                             Element = _[ column_names['_atom_site.type_symbol'] ]
                             Charge = _[ column_names['_atom_site.pdbx_formal_charge'] ]
 
+                            #If particular atom is already present, dont add it again; alternate id must be present (_atom_site.label_alt_id)
+                            try:
+                                if( AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID].get_atom(AtomName)!= None ):
+                                    continue
+                            except Exception as e:
+                                #Alternate atom exists
+                                None
+
                             try:
                                 AllHetAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] )
                             except:
@@ -318,7 +327,7 @@ def load_cif(filename):
             
     total_models = max([len(AllAtoms),len(AllHetAtoms)])
         
-    AllModels =[]
+    AllModels = []
     for i in range(0,total_models):
         #In case protein part is missing
         try:

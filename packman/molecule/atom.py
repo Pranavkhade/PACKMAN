@@ -23,6 +23,8 @@ import numpy
 
 import logging
 
+from packman import molecule
+
 
 class Atom():
     """This class contains the information about the 'Atom' object (packman.molecule.Atom).
@@ -184,6 +186,25 @@ class Atom():
             list of packman.molecule.Bond if successful; [] otherwise.
         """
         return self.__Bonds
+    
+    def get_bond(self,atom2):
+        """Get the specific bond with the specific atom.
+
+        Args:
+            atom2 (packman.molecule.Atom/ int) : 'Atom' object or the atom id.
+
+        Returns:
+            Bond (packman.molecule.Bond) if successful, None if bond does not exist.
+        """
+        if(type(atom2) == type(self)):
+            None
+        elif(type(atom2) ==int):
+            Model = self.get_parent().get_parent().get_parent()
+            atom2 = Model.get_atom(atom2)
+        else:
+            logging.warning('The atom2 parameter should either be an integer (atom id) or a packman.molecule.Atom object.')
+
+        return list(set(self.get_bonds()).intersection( atom2.get_bonds() ))[0]
 
     #Set Functions
     def set_id(self,new_id):

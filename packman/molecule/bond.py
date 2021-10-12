@@ -101,6 +101,23 @@ class Bond():
         except:
             logging.warning('The Property Name provided is not assigned.')
     
+    def get_torsion(self, neighbor1=None, neighbor2=None, radians=True):
+        """Calculate the torsion angle of the given covalent bond with the corresponding selected neighbors.
+
+        Note:
+            At least four atoms are needed to form two planes that can measure the torsional angles; therefore, along with the two bond atoms, the user needs to provide the additional two atoms that are ideally non-mutual neighbors of the atoms in the bond.
+
+        Args:
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
+            radians   (True/False)                : Return value of the angle in radians (returns value in degrees if False; Default : True)
+        
+        Returns:
+            The torsion angle in radians/degrees if sucessful, None otherwise.
+        """
+        Model = self.__atom1.get_parent().get_parent().get_parent()
+        return Model.get_torsion(self, neighbor1=neighbor1, neighbor2=neighbor2, radians=radians)
+    
     #Set Functions
     def set_atoms(self, new_pair):
         """Set the atoms involved in the bond.
@@ -144,6 +161,23 @@ class Bond():
             self.__properties[property_name] = value
         except:
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
+    
+    def set_torsion(self, theta, neighbor1=None, neighbor2=None, radians=True):
+        """Set the torsion for the given covalent bond with the corresponding selected neighbors.
 
+        Note:
+            At least four atoms are needed to form two planes that change the torsional angles; therefore, along with the two bond atoms, the user needs to provide the additional two atoms that are ideally non-mutual neighbors of the atoms in the bond.
+
+        Args:
+            theta     (int)                       : Set the torsional angle (see the 'radians' parameter description)
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
+            neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
+            radians   (True/False)                : Parameter 'theta' will be assuned to be in Radians if True, Degrees will be assumed when False. ( Default : True)
+        
+        Returns:
+            True if successful, None otherwise
+        """
+        Model = self.__atom1.get_parent().get_parent().get_parent()
+        return Model.set_torsion(self, theta, neighbor1=neighbor1, neighbor2=neighbor2, radians=radians)
 
     #Calculate Functions
