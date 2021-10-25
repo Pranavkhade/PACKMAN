@@ -30,4 +30,4 @@ Application Programming Interface (API)
 Utilities (API)
 ---------------
 #. :ref:`tutorials_bond_rotate`
-#. :ref:`_tutorials_alpha_shape`
+#. :ref:`tutorials_alpha_shape`
