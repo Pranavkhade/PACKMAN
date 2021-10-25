@@ -23,6 +23,8 @@ INSTALLATION
 1. Installing with pip (Recommended)::
 
     pip install py-packman
+    #OR
+    #python -m pip install py-packman
     
 2. Installing from source::
 

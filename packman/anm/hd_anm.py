@@ -2,7 +2,11 @@
 """The 'hdANM' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'hdANM' object documentation for details.
+Please read the 'hdANM' object documentation and the publication for details.
+
+Citation::
+
+    Pranav M. Khade, Domenico Scaramozzino, Ambuj Kumar, Giuseppe Lacidogna, Alberto Carpinteri, Robert L. Jernigan, hdANM: a new comprehensive dynamics model for protein hinges, Biophysical Journal, 2021, https://doi.org/10.1016/j.bpj.2021.10.017
 
 About .hng File:
 - hdANM requires the information about hinges and domains in the .hng format.
@@ -19,19 +23,15 @@ Example of .hng file for PDBID 1EXR::
 
 Above format means that there are two domains (D1 and D2) separated by a hinge (H1). D1 stretches from residue 1 to 70; D2 stretches from 90 to 148 and hinge H1 is in the middle.
 
-
-
 Example::
 
     from packman.anm import hdANM
     help( hdANM )
 
 Notes:
-    * Tutorial:
+    * Tutorial: https://py-packman.readthedocs.io/en/latest/tutorials/hdANM.html#tutorials-hdanm
 
 Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
     * Finish optimizing the performance.
     * Add publication details in the Notes
     * Make sure that parameter to the ANM is changed from [float] to packman.molecule.atom

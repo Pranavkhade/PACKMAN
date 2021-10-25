@@ -9,7 +9,7 @@ PACKMAN hdANM Analysis Web Server: https://hdanm.bb.iastate.edu/
 
 How to cite::
 
-    Paper Under Review.
+    Pranav M. Khade, Domenico Scaramozzino, Ambuj Kumar, Giuseppe Lacidogna, Alberto Carpinteri, Robert L. Jernigan, hdANM: a new comprehensive dynamics model for protein hinges, Biophysical Journal, 2021, https://doi.org/10.1016/j.bpj.2021.10.017
 
 
 Note: If PACKMAN is not installed, please follow the link: https://github.com/Pranavkhade/PACKMAN
