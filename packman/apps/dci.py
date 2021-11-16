@@ -274,7 +274,7 @@ class DCI():
         plt.savefig(self.pdbid+'_CH_Score.png')
         return True
     
-    def calcualte_pymol_commands( self, file=open('DCI_pymol_output.txt','w') ):
+    def calcualte_pymol_commands( self, output_file ):
         """Write all the communities in py-mol importable format.
 
         Args:
@@ -283,7 +283,8 @@ class DCI():
         Returns:
             True if successful; None otherwise.
         """
-        with file as fp:
+
+        with output_file as fp:
             fp.write('Please check the generated plot fore the best CH score and corresponding community count.\n')
             for key, dynamic_community in self.store_communities.items():
                 fp.write("#############################################################\n\n")
@@ -318,5 +319,5 @@ def dci_cli(args,mol):
     n_com  = args.n_com
 
     model = DCI( mol, cutoff = cutoff, chain = chain, n_com = n_com )
-    model.calcualte_pymol_commands( file = args.outputfile )
+    model.calcualte_pymol_commands( args.outputfile )
     return True

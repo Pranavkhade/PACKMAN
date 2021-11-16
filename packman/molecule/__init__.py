@@ -9,15 +9,13 @@ such as HingePrediction, Compliance and Right Domain ANM. The molecule module ca
 as Atom, Residue, Chain, Model and Protein. Please read the documentation and tutorials for more details.
 
 Notes:
-    * Tutorial link: 
+    * Tutorial link: https://py-packman.readthedocs.io/en/latest/tutorials/molecule.html#tutorials-molecule
 
 Example:
-    To Load the 
-    
-    >>>from packman import molecule
-    >>>molecule.download_structure('1prw','1prw.pdb')
-    >>>molecule.load_structure('1prw.pdb')
-    <packman.molecule.protein.Protein object at Memory>
+    To Load the molecule::
+        from packman import molecule
+        molecule.download_structure('1prw','1prw.pdb')
+        mol = molecule.load_structure('1prw.pdb')
 
 Todo:
     * Add new features
@@ -40,6 +38,5 @@ from .atom import Atom
 from .bond import Bond
 
 from .hetmol import HetMol
-from .hetatom import HetAtom
 
 from .annotations import Hinge

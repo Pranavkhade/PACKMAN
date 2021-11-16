@@ -386,7 +386,7 @@ class hdANM_GUI(tk.Frame):
         self.Label8 = tk.Label(parent, text="Mass of the residue")
 
         #Input
-        self.Text1.insert(END,"hdANM is a comprehensive Elastic Network Model. Please read the paper for more details.\n\nCitation:\n\nPaper Submitted.\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid)" )
+        self.Text1.insert(END,"hdANM is a comprehensive Elastic Network Model. Please read the paper for more details.\n\nCitation:\n\nPranav M. Khade, Domenico Scaramozzino, Ambuj Kumar, Giuseppe Lacidogna, Alberto Carpinteri, Robert L. Jernigan, \nhdANM: a new comprehensive dynamics model for protein hinges,\nBiophysical Journal, 2021, https://doi.org/10.1016/j.bpj.2021.10.017.\n\nNOTE: Please specify filename with appropriate extension (.pdb/.cif); if the file specified is not present, it will be downloaded automatically.(if the PDB ID is valid)" )
         self.Text1.config(state=DISABLED)
         
         self.Box1 = tk.Entry(parent)

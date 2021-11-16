@@ -9,6 +9,12 @@ Please note that there are webservers available for majority of publications in 
 
 PACKMAN Hinge Prediction Web Server: https://packman.bb.iastate.edu/
 
+How to cite::
+
+    Pranav M. Khade, Ambuj Kumar, Robert L. Jernigan, Characterizing and Predicting Protein Hinges for 
+    Mechanistic Insight, Journal of Molecular Biology, Volume 432, Issue 2, 2020, Pages 508-522,
+    ISSN 0022-2836, https://doi.org/10.1016/j.jmb.2019.11.018.
+
 QUICK ALGORITHM OVERVIEW
 ------------------------
 .. image:: ../../_static/gallary/hinge_prediction_algorithm_method1.jpg

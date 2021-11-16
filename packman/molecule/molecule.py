@@ -29,7 +29,6 @@ from .residue import Residue
 from .atom import Atom
 
 from .hetmol import HetMol
-from .hetatom import HetAtom
 
 
 '''
