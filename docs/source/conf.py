@@ -15,6 +15,9 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import packman
 
+# -- Sphinx information  -----------------------------------------------------
+master_doc = 'index'
+
 # -- Project information -----------------------------------------------------
 
 project = 'py-PACKMAN'
