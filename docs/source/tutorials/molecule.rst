@@ -39,7 +39,7 @@ Protein to Atom Example::
 
     #Selecting 1st frame (Multiple frames can exist if the structure is obtained from NMR 
     #or is a trajectory)
-    First_Frame = Model[0]
+    First_Frame = Protein[0]
 
     #Get All the Chains from the first frame
     for i in First_Frame.get_chains():
