@@ -108,7 +108,7 @@ class HomePage(tk.Frame):
         
         #Input
         self.Text1 = tk.Text(parent, height=10)
-        self.Text1.insert(END,"1. Tutorials: https://py-packman.readthedocs.io/en/latest/index.html\n2. GitHub: https://github.com/Pranavkhade/PACKMAN\n3. Online Hinge Prediction Server: https://packman.bb.iastate.edu/\n4. Online hdANM Server: https://hdanm.bb.iastate.edu/\n5. Reference for Hinge Prediction: https://doi.org/10.1016/j.jmb.2019.11.018\n6. Reference for Compliance: https://doi.org/10.1002/prot.25968\n7. Reference for hd-ANM: Coming Soon")
+        self.Text1.insert(END,"1. Tutorials: https://py-packman.readthedocs.io/en/latest/index.html\n2. GitHub: https://github.com/Pranavkhade/PACKMAN\n3. Online Hinge Prediction Server: https://packman.bb.iastate.edu/\n4. Online hdANM Server: https://hdanm.bb.iastate.edu/\n5. Online Voronoi Entropy Server: https://packing-entropy.bb.iastate.edu/")
         self.Text1.config(state=DISABLED)
 
         self.all_objects = self.__dict__
@@ -138,7 +138,7 @@ class HingePrediction(tk.Frame):
         self.Text1 =  tk.Text(parent, height=10)
         self.Label1 = tk.Label(parent, text="Hinge Prediction")
         self.Label2 = tk.Label(parent, text="Note: Keep increasing the Alpha Value if hinges do not show up in the results.", borderwidth=2, relief="groove")
-        self.Label3 = tk.Label(parent, text="Filename:")
+        self.Label3 = tk.Label(parent, text="Filename/PDB ID:")
         self.Label4 = tk.Label(parent, text="Chain ID:")
         self.Label5 = tk.Label(parent, text="Alpha Value:")
         self.Label6 = tk.Label(parent, text="Number of Eccentricity Clusters:")
@@ -384,7 +384,7 @@ class hdANM_GUI(tk.Frame):
         self.Label1 = tk.Label(parent, text="hdANM")
         self.Label2 = tk.Label(parent, text="Note: .hng file can be obtained from the 'Hinge Prediction' section. ", borderwidth=2, relief="groove")
 
-        self.Label3 = tk.Label(parent, text="PDB ID:")
+        self.Label3 = tk.Label(parent, text="Filename/PDB ID:")
         self.Label4 = tk.Label(parent, text="Chain ID:")
         
         self.Label5 = tk.Label(parent, text="Cutoff Value")
@@ -590,7 +590,7 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         self.Text1 =  tk.Text(parent, height=10)
         self.Label1 = tk.Label(parent, text="Entropy")
         self.Label2 = tk.Label(parent, text="Note: Important information in the section above. (Use scrolling)", borderwidth=2, relief="groove")
-        self.Label3 = tk.Label(parent, text="Filename:")
+        self.Label3 = tk.Label(parent, text="Filename/PDB ID:")
         self.Label4 = tk.Label(parent, text="Chain IDs (comma separated):")
         self.Label5 = tk.Label(parent, text="Probe size:")
         self.Label6 = tk.Label(parent, text="On Sphere Points:")
