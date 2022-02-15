@@ -278,7 +278,7 @@ class DCI():
         """Write all the communities in py-mol importable format.
 
         Args:
-            filename (str) : filename for the output text file.
+            output_file (file) : output file.
         
         Returns:
             True if successful; None otherwise.
