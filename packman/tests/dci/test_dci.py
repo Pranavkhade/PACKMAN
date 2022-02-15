@@ -12,7 +12,7 @@ class TestMolecule(unittest.TestCase):
 
     def test_DCI(self):
         obj = DCI(self.mol)
-        obj.calcualte_pymol_commands( open('DCI_pymol_output.txt','wb') )
+        obj.calcualte_pymol_commands( open('DCI_pymol_output.txt','w') )
         
     def tearDown(self):
         rm('DCI_pymol_output.txt')
