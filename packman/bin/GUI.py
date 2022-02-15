@@ -26,6 +26,7 @@ try:
     import tkinter as tk
     from tkinter.messagebox import showinfo, showerror
     from tkinter import N, S, E, W, Grid, END, BooleanVar, StringVar, DISABLED
+    from tkinter.filedialog import askopenfilename
 except:
     print("The Python version doesn't the (built in) tkinter package. Please make sure you are using right Python interpreter. ( try: python3 -m packman gui )")
 
@@ -78,7 +79,7 @@ class top_menu(tk.Frame):
     def __init__(self,parent):
         number_of_buttons = 4
         Canvas_top_menu = tk.Canvas(parent)
-        Canvas_top_menu.grid(row=0,column=0,columnspan=3, sticky=E+W )
+        Canvas_top_menu.grid(row=0,column=0,columnspan=4, sticky=E+W )
 
         for i in range(0,number_of_buttons):
             Grid.columnconfigure(Canvas_top_menu, i, weight=1)
@@ -107,7 +108,7 @@ class HomePage(tk.Frame):
         
         #Input
         self.Text1 = tk.Text(parent, height=10)
-        self.Text1.insert(END,"1. Tutorials: https://py-packman.readthedocs.io/en/latest/index.html\n2. GitHub: https://github.com/Pranavkhade/PACKMAN\n3. Online Hinge Prediction Server: https://packman.bb.iastate.edu/\n4. Online hdANM Server: https://hdanm.bb.iastate.edu/\n5. Reference for Hinge Prediction: https://doi.org/10.1016/j.jmb.2019.11.018\n6. Reference for Compliance: https://doi.org/10.1002/prot.25968\n7. Reference for hd-ANM: Coming Soon")
+        self.Text1.insert(END,"1. Tutorials: https://py-packman.readthedocs.io/en/latest/index.html\n2. GitHub: https://github.com/Pranavkhade/PACKMAN\n3. Online Hinge Prediction Server: https://packman.bb.iastate.edu/\n4. Online hdANM Server: https://hdanm.bb.iastate.edu/\n5. Online Voronoi Entropy Server: https://packing-entropy.bb.iastate.edu/")
         self.Text1.config(state=DISABLED)
 
         self.all_objects = self.__dict__
@@ -137,7 +138,7 @@ class HingePrediction(tk.Frame):
         self.Text1 =  tk.Text(parent, height=10)
         self.Label1 = tk.Label(parent, text="Hinge Prediction")
         self.Label2 = tk.Label(parent, text="Note: Keep increasing the Alpha Value if hinges do not show up in the results.", borderwidth=2, relief="groove")
-        self.Label3 = tk.Label(parent, text="Filename:")
+        self.Label3 = tk.Label(parent, text="Filename/PDB ID:")
         self.Label4 = tk.Label(parent, text="Chain ID:")
         self.Label5 = tk.Label(parent, text="Alpha Value:")
         self.Label6 = tk.Label(parent, text="Number of Eccentricity Clusters:")
@@ -156,14 +157,15 @@ class HingePrediction(tk.Frame):
         self.Box4.insert(END, '4')
         self.Box5.insert(END, '5')
 
+        self.Browse1 = tk.Button(parent, text = "Browse", command = lambda: self.browseFiles() )
         self.Button1 = tk.Button(parent, text = "Run", command = lambda: self.run_PACKMAN() )
 
         self.all_objects = self.__dict__
 
     def show(self):
-        self.Text1.grid(row=2,columnspan=3,sticky=E+W, padx=10, pady=10 )
-        self.Label1.grid(row=1,columnspan=3,sticky=E+W, padx=10, pady=10 )
-        self.Label2.grid(row=3,columnspan=3,sticky=E+W, padx=10, pady=10 )
+        self.Text1.grid(row=2,columnspan=4,sticky=E+W, padx=10, pady=10 )
+        self.Label1.grid(row=1,columnspan=4,sticky=E+W, padx=10, pady=10 )
+        self.Label2.grid(row=3,columnspan=4,sticky=E+W, padx=10, pady=10 )
         self.Label3.grid(row=4,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label4.grid(row=5,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label5.grid(row=6,column=0,sticky=N+S+E+W, padx=10, pady=10 )
@@ -176,6 +178,7 @@ class HingePrediction(tk.Frame):
         self.Box4.grid(row=7,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         self.Box5.grid(row=8,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         
+        self.Browse1.grid(row=4,column=3,sticky=N+S+E+W, padx=10, pady=10 )
         self.Button1.grid(row=9, column=2)
     
     def hide(self):
@@ -184,6 +187,11 @@ class HingePrediction(tk.Frame):
                 self.all_objects[i].grid_forget()
             except:
                 continue
+    
+    def browseFiles(self):
+        filename = askopenfilename( title = "Select a File", filetypes = [ ('mmCIF','*.cif'),('PDB','*.pdb'),("All files", "*") ] )
+        self.Box1.delete(0,END)
+        self.Box1.insert(END,filename)
     
     def run_PACKMAN(self):
         """
@@ -255,7 +263,7 @@ class HingePrediction(tk.Frame):
 
         tk.Label(canvas1_frame1, text = 'NOTE: Please check in front of the hinges you want to keep and click on the "Save HNG file" button to generate input file for hdANM. Please provide a valid filename\n Tip: p-value ideally should be <0.05 ').grid(row=0,columnspan=5)
         tk.Label(canvas1_frame1, text = 'Hinge ID').grid(row=1,column=0,sticky=N+S+E+W, padx=10, pady=10 )
-        tk.Label(canvas1_frame1, text = 'PDB ID').grid(row=1,column=1,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(canvas1_frame1, text = 'PDB ID/Filename').grid(row=1,column=1,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(canvas1_frame1, text = 'Chain ID').grid(row=1,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(canvas1_frame1, text = 'Residue IDs').grid(row=1,column=3,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(canvas1_frame1, text = 'p-value').grid(row=1,column=4,sticky=N+S+E+W, padx=10, pady=10 )
@@ -376,7 +384,7 @@ class hdANM_GUI(tk.Frame):
         self.Label1 = tk.Label(parent, text="hdANM")
         self.Label2 = tk.Label(parent, text="Note: .hng file can be obtained from the 'Hinge Prediction' section. ", borderwidth=2, relief="groove")
 
-        self.Label3 = tk.Label(parent, text="PDB ID:")
+        self.Label3 = tk.Label(parent, text="Filename/PDB ID:")
         self.Label4 = tk.Label(parent, text="Chain ID:")
         
         self.Label5 = tk.Label(parent, text="Cutoff Value")
@@ -400,14 +408,16 @@ class hdANM_GUI(tk.Frame):
         self.Box5.insert(END, 'output.hng')
         self.dropdown1 = tk.OptionMenu(parent, self.mass_type, "Molecular Weight", "Unit", "Atomics Mass")
 
+        self.Browse1 = tk.Button(parent, text = "Browse", command = lambda: self.browseFiles(1, filetypes = [ ('mmCIF','*.cif'),('PDB','*.pdb'),("All files", "*") ] ) )
+        self.Browse2 = tk.Button(parent, text = "Browse", command = lambda: self.browseFiles(5, filetypes = [ ('HNG','*.hng'),("All files", "*") ]) )
         self.Button1 = tk.Button(parent, text = "Run", command = lambda: self.run_hdANM() )
 
         self.all_objects = self.__dict__
     
     def show(self):
-        self.Text1.grid(row=2,columnspan=3,sticky=N+S+E+W, padx=10, pady=10 )
-        self.Label1.grid(row=1,columnspan=3,sticky=N+S+E+W, padx=10, pady=10 )
-        self.Label2.grid(row=3,columnspan=3,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Text1.grid(row=2,columnspan=4,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Label1.grid(row=1,columnspan=4,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Label2.grid(row=3,columnspan=4,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label3.grid(row=4,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label4.grid(row=5,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label5.grid(row=6,column=0,sticky=N+S+E+W, padx=10, pady=10 )
@@ -423,6 +433,8 @@ class hdANM_GUI(tk.Frame):
         self.Box5.grid(row=8,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         self.dropdown1.grid(row=9,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         
+        self.Browse1.grid(row=4,column=3,sticky=N+S+E+W, padx=10, pady=10 )
+        self.Browse2.grid(row=8,column=3,sticky=N+S+E+W, padx=10, pady=10 )
         self.Button1.grid(row=10, column=2)
     
     
@@ -433,6 +445,16 @@ class hdANM_GUI(tk.Frame):
             except:
                 continue
     
+    def browseFiles(self,fill_box_num,filetypes):
+        filename = askopenfilename( title = "Select a File", filetypes=filetypes )
+        if(fill_box_num==1):
+            self.Box1.delete(0,END)
+            self.Box1.insert(END,filename)
+        elif(fill_box_num==5):
+            self.Box5.delete(0,END)
+            self.Box5.insert(END,filename)
+
+
     def run_hdANM(self):
         try:
             mol = molecule.load_structure(self.Box1.get())
@@ -568,7 +590,7 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         self.Text1 =  tk.Text(parent, height=10)
         self.Label1 = tk.Label(parent, text="Entropy")
         self.Label2 = tk.Label(parent, text="Note: Important information in the section above. (Use scrolling)", borderwidth=2, relief="groove")
-        self.Label3 = tk.Label(parent, text="Filename:")
+        self.Label3 = tk.Label(parent, text="Filename/PDB ID:")
         self.Label4 = tk.Label(parent, text="Chain IDs (comma separated):")
         self.Label5 = tk.Label(parent, text="Probe size:")
         self.Label6 = tk.Label(parent, text="On Sphere Points:")
@@ -587,14 +609,15 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         self.Box4.insert(END, '30')
         self.Box5.insert(END, 'voronoi_packing_entropy_output.txt')
 
+        self.Browse1 = tk.Button(parent, text = "Browse", command = lambda: self.browseFiles() )
         self.Button1 = tk.Button(parent, text = "Run", command = lambda: self.run_Entropy() )
 
         self.all_objects = self.__dict__
 
     def show(self):
-        self.Text1.grid(row=2,columnspan=3,sticky=E+W, padx=10, pady=10 )
-        self.Label1.grid(row=1,columnspan=3,sticky=E+W, padx=10, pady=10 )
-        self.Label2.grid(row=3,columnspan=3,sticky=E+W, padx=10, pady=10 )
+        self.Text1.grid(row=2,columnspan=4,sticky=E+W, padx=10, pady=10 )
+        self.Label1.grid(row=1,columnspan=4,sticky=E+W, padx=10, pady=10 )
+        self.Label2.grid(row=3,columnspan=4,sticky=E+W, padx=10, pady=10 )
         self.Label3.grid(row=4,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label4.grid(row=5,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         self.Label5.grid(row=6,column=0,sticky=N+S+E+W, padx=10, pady=10 )
@@ -607,6 +630,7 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
         self.Box4.grid(row=7,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         self.Box5.grid(row=8,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         
+        self.Browse1.grid(row=4,column=3,sticky=N+S+E+W, padx=10, pady=10 )
         self.Button1.grid(row=9, column=2)
     
     def hide(self):
@@ -615,6 +639,12 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
                 self.all_objects[i].grid_forget()
             except:
                 continue
+    
+    def browseFiles(self):
+        filename = askopenfilename( title = "Select a File", filetypes = [ ('mmCIF','*.cif'),('PDB','*.pdb'),("All files", "*") ] )
+        self.Box1.delete(0,END)
+        self.Box1.insert(END,filename)
+
     
     def run_Entropy(self):
         """
