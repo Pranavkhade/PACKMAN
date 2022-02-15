@@ -8,6 +8,9 @@ This module is the base of the tool packman. It is used as a base module for all
 such as HingePrediction, Compliance and Right Domain ANM. The molecule module can also be an API to utilize the objects such
 as Atom, Residue, Chain, Model and Protein. Please read the documentation and tutorials for more details.
 
+Citation:
+    Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python Toolbox for Structural Bioinformatics, Bioinformatics Advances, 2022;, vbac007, https://doi.org/10.1093/bioadv/vbac007
+
 Notes:
     * Tutorial link: https://py-packman.readthedocs.io/en/latest/tutorials/molecule.html#tutorials-molecule
 

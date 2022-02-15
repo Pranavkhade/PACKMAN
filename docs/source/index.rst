@@ -28,6 +28,7 @@ Web Servers
 
 Publications
 ------------
+- PACKMAN-molecule (https://doi.org/10.1093/bioadv/vbac007)
 - Hinge Prediction (https://doi.org/10.1016/j.jmb.2019.11.018)
 - Structural Compliance (https://doi.org/10.1002/prot.25968)
 - hdANM (https://doi.org/10.1016/j.bpj.2021.10.017)

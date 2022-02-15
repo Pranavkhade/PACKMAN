@@ -4,6 +4,9 @@
 This is file information, not the class information. This information is only for the API developers.
 Please read the 'Model' object documentation for details.
 
+Citation:
+    Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python Toolbox for Structural Bioinformatics, Bioinformatics Advances, 2022;, vbac007, https://doi.org/10.1093/bioadv/vbac007
+
 Example::
 
     from packman.molecule import Model
