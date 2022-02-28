@@ -249,19 +249,20 @@ class HingePrediction(tk.Frame):
         pop_up1 = tk.Toplevel()
         pop_up1.title('PACKMAN Results')
 
+        total_columns_in_canvas1 = 8
         Canvas1 = tk.Canvas(pop_up1)
-        Canvas1.grid(row=0,column=0,columnspan=6,sticky=N+S+E+W, padx=10, pady=10 )
+        Canvas1.grid(row=0,column=0,columnspan=total_columns_in_canvas1,sticky=N+S+E+W, padx=10, pady=10 )
 
         #Scrollbar
         vsb = tk.Scrollbar(pop_up1, orient="vertical", command=Canvas1.yview)
-        vsb.grid(row=0, column=7, rowspan=10 , sticky=N+S)
+        vsb.grid(row=0, column=total_columns_in_canvas1, rowspan=10 , sticky=N+S)
         Canvas1.configure(yscrollcommand=vsb.set)
 
         #Frame
         canvas1_frame1 = tk.Frame(Canvas1)
         Canvas1.create_window((0, 0), window=canvas1_frame1, anchor='nw')
 
-        tk.Label(canvas1_frame1, text = 'NOTE: Please check in front of the hinges you want to keep and click on the "Save HNG file" button to generate input file for hdANM. Please provide a valid filename\n Tip: p-value ideally should be <0.05 ').grid(row=0,columnspan=5)
+        tk.Label(canvas1_frame1, text = 'NOTE: Please check in front of the hinges you want to keep and click on the "Save HNG file" button to generate input file for hdANM. Please provide a valid filename\n Tip: p-value ideally should be <0.05 ').grid(row=0,columnspan=total_columns_in_canvas1)
         tk.Label(canvas1_frame1, text = 'Hinge ID').grid(row=1,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(canvas1_frame1, text = 'PDB ID/Filename').grid(row=1,column=1,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(canvas1_frame1, text = 'Chain ID').grid(row=1,column=2,sticky=N+S+E+W, padx=10, pady=10 )
