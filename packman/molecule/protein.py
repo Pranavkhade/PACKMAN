@@ -113,12 +113,24 @@ class Protein():
             filename (str): Name of the output file user wishes to assign.
         """
         #Annotations
-        open(filename,'w').write('')
+        open(filename,'w').write('data_'+filename+'\n#\n')
         fh=open(filename,'a')
         if(self.__Data != None):
-            for i in self.__Data:
+            
+            #To check what was the input format so that annotation can be written accordingly (currently only supports PDB an mmCIF) | if first line has '#' or '_', it is assumed to be mmCIF file; PDB otherwise.
+            input_ftype = None
+            first_characters_of_annotations = [i[0] for i in self.__Data if i != '']
+            if('#' in first_characters_of_annotations and '_' in first_characters_of_annotations):
+                input_ftype = 'cif'
+            else:
+                input_ftype = 'pdb'
+            
+            for numi,i in enumerate(self.__Data):
                 try:
-                    fh.write(i+'\n')
+                    if(input_ftype=='cif'):
+                        fh.write(i+'\n')
+                    elif(input_ftype=='pdb'):
+                        fh.write( '_annotation_index_'+str(numi)+' "'+i+'"\n' )
                 except:
                     None
         fh.write('#\nloop_\n')
@@ -130,7 +142,9 @@ class Protein():
         
         for num_,_ in enumerate(self):
             for i in _.get_atoms():
-                fh.write("ATOM\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%( i.get_id(), i.get_element(), i.get_name(), '.' , i.get_parent().get_name(), i.get_parent().get_parent().get_id() , '1', i.get_parent().get_id(), '?', around(i.get_location()[0],decimals=3).real, around(i.get_location()[1],decimals=3).real, around(i.get_location()[2],decimals=3).real, i.get_occupancy(), round(i.get_bfactor(),2), i.get_charge(), i.get_parent().get_id(), i.get_parent().get_name(), i.get_parent().get_parent().get_id(), i.get_name(), num_+1  ) )
+                local_charge = i.get_charge()
+                if(i.get_charge()=='  '): local_charge = '?'
+                fh.write("ATOM\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%( i.get_id(), i.get_element(), i.get_name(), '.' , i.get_parent().get_name(), i.get_parent().get_parent().get_id() , '1', i.get_parent().get_id(), '?', around(i.get_location()[0],decimals=3).real, around(i.get_location()[1],decimals=3).real, around(i.get_location()[2],decimals=3).real, i.get_occupancy(), round(i.get_bfactor(),2), local_charge, i.get_parent().get_id(), i.get_parent().get_name(), i.get_parent().get_parent().get_id(), i.get_name(), num_+1  ) )
         
         fh.flush()
         fh.close()
