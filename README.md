@@ -43,6 +43,10 @@ python3 -m packman gui
 
 For the CLI and API, please read the tutorials & documentation.
 
+REPORTING ISSUES
+----------------
+[Click here](https://github.com/Pranavkhade/PACKMAN/issues/new) to report issues with any aspect of the package. Please search for the resolved issues first.
+
 WEB SERVERS
 -----------
 * [Hinge Prediction Web Server](https://packman.bb.iastate.edu/)
