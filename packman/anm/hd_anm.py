@@ -40,7 +40,6 @@ Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
 
-from re import S
 import logging
 from .. import molecule, Atom, Model, Protein
 from ..constants import amino_acid_molecular_weight
