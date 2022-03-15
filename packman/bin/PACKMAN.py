@@ -61,6 +61,7 @@ def IO():
     hd_anm_io.add_argument("--scale", type=int, default=2, help='movie scale')
     hd_anm_io.add_argument("--frames", type=int, default=10, help='number of frames')
     hd_anm_io.add_argument("--modes", type=int, default=10, help='how many modes')
+    hd_anm_io.add_argument("--ca_to_aa", action=argparse.BooleanOptionalAction, type=bool, default=False, help='Project CA motion on all atoms.')
     hd_anm_io.add_argument("--make_tar", action='store_true', help='package output files into a tar.gz file')
 
     #Entropy
