@@ -26,7 +26,7 @@ def hdanm_cli(args,mol):
         numpy.savetxt("eigenvectors.csv", Model.get_eigenvectors(), delimiter=",")
 
         for i in range(6,6+args.modes,1):
-            Model.calculate_movie(i,scale=args.scale,n=args.frames)
+            Model.calculate_movie(i,scale=args.scale,n=args.frames,ca_to_aa=args.ca_to_aa)
 
     if args.make_tar:
 

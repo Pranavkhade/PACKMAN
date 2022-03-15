@@ -14,6 +14,7 @@ Authors:
 #                                             GUI                                                #
 ##################################################################################################
 '''
+from xmlrpc.client import boolean
 import numpy
 import logging
 
@@ -27,9 +28,27 @@ try:
     from tkinter.messagebox import showinfo, showerror
     from tkinter import N, S, E, W, Grid, END, BooleanVar, StringVar, DISABLED
     from tkinter.filedialog import askopenfilename
+    import codecs
+    import os.path
 except:
     print("The Python version doesn't the (built in) tkinter package. Please make sure you are using right Python interpreter. ( try: python3 -m packman gui )")
 
+
+#read and get_version is to print the PACKMAN version on the GUI
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    '''To find out the version of the 
+    '''
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 class Skeleton(tk.Tk):
     def __init__(self,frame_name):
@@ -54,14 +73,14 @@ class Skeleton(tk.Tk):
 
         #Icon for windows
         try:
-            self.iconbitmap(False,'logo.ico')
+            self.iconbitmap(False, os.path.abspath(os.path.dirname(__file__)+'/logo.ico') )
         except:
             None
         
         self.show_frame(frame_name)
 
         try:
-            self.title_content = "PACKMAN GUI"
+            self.title_content = "PACKMAN "+get_version( os.path.abspath(os.path.dirname(__file__)).replace('bin','__init__.py') )+" GUI"
             self.title( self.title_content )
         except:
             self.title_content = "PACKMAN GUI"
@@ -533,6 +552,7 @@ class hdANM_GUI(tk.Frame):
         tk.Label(pop_up1, text="Mode Number").grid(row=8,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(pop_up1, text="Number of Frames").grid(row=9,column=0,sticky=N+S+E+W, padx=10, pady=10 )
         tk.Label(pop_up1, text="Movie Scale").grid(row=10,column=0,sticky=N+S+E+W, padx=10, pady=10 )
+        tk.Label(pop_up1, text="Project C-Alpha motions to all atoms").grid(row=11,column=0,sticky=N+S+E+W, padx=10, pady=10 )
 
         user_projection_choise = StringVar(pop_up1)
         user_projection_choise.set("Curvilinear")
@@ -545,13 +565,16 @@ class hdANM_GUI(tk.Frame):
         n_frames.insert(END,10)
         n_scale  = tk.Entry(pop_up1)
         n_scale.grid(row=10,column=2,sticky=N+S+E+W, padx=10, pady=10 )
-        n_scale.insert(END,2)
+        n_scale.insert(END,10)
 
+        #C-Alpha to all atom projection
+        ca_to_aa = BooleanVar()
+        n_ca_to_aa = tk.Checkbutton(pop_up1, variable=ca_to_aa, onvalue=True, offvalue= False)
+        n_ca_to_aa.grid(row=11,column=2,sticky=N+S+E+W, padx=10, pady=10 )
+      
+        self.save_movie_button = tk.Button(pop_up1,text='Save Movie',command=lambda : save_movie( n_mode, n_frames, n_scale, user_projection_choise.get(), ca_to_aa ) )
+        self.save_movie_button.grid(row=12,column=2,sticky=N+S+E+W, padx=10, pady=10 )
         
-        self.save_movie_button = tk.Button(pop_up1,text='Save Movie',command=lambda : save_movie( n_mode, n_frames, n_scale, user_projection_choise.get() ) )
-        self.save_movie_button.grid(row=11,column=2,sticky=N+S+E+W, padx=10, pady=10 )
-        
-
         def save_matrix(choise):
             if(choise  == "hdANM Eigen Vectors"):
                 numpy.savetxt("hdANM Eigen Vectors.csv",Model.get_eigenvectors(),delimiter=",")
@@ -561,7 +584,7 @@ class hdANM_GUI(tk.Frame):
                 showinfo('Notification','hdANM Eigen Values.csv file saved!')
             return True
         
-        def save_movie(n_mode, n_frames, n_scale, projection):
+        def save_movie(n_mode, n_frames, n_scale, projection, ca_to_aa):
             try:
                 n_mode = int(n_mode.get())
                 n_frames = int(n_frames.get())
@@ -570,9 +593,9 @@ class hdANM_GUI(tk.Frame):
                 showinfo('Notification','Please check the parameters.\n\nMode Number (int)\nNumber of Frames (int)\nMovie Scale (float)')
 
             if(projection == "Curvilinear"):
-                Model.calculate_movie(n_mode, n=n_frames,scale=n_scale,extrapolation="curvilinear")
+                Model.calculate_movie(n_mode, n=n_frames,scale=n_scale,extrapolation="curvilinear",ca_to_aa=ca_to_aa.get())
             elif(projection =="Linear"):
-                Model.calculate_movie(n_mode, n=n_frames,scale=n_scale,extrapolation="linear")
+                Model.calculate_movie(n_mode, n=n_frames,scale=n_scale,extrapolation="linear",ca_to_aa=ca_to_aa.get())
             showinfo('Notification',str(n_mode)+'.pdb /.cif movie generated & saved.')
             return True
         

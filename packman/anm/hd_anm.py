@@ -40,6 +40,8 @@ Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
 
+from re import S
+import logging
 from .. import molecule, Atom, Model, Protein
 from ..constants import amino_acid_molecular_weight
 from ..constants import atomic_weight
@@ -551,7 +553,7 @@ class hdANM:
 
                 self.crosscorrelation_matrix[i][j] = trace_H_inv_ij / numpy.sqrt( trace_H_inv_ii*trace_H_inv_jj )
 
-    def calculate_movie(self, mode_number, scale=1.5, n=20, extrapolation="curvilinear", ftype='cif'):
+    def calculate_movie(self, mode_number, scale=1.5, n=20, extrapolation="curvilinear", ftype='cif', ca_to_aa=False):
         """This function generates the dynamic 3D projection of the normal modes obtained using hd-ANM. The 3D projection can be linearly extrapolated or curvilinearly extrapolated depending on the choices. The first frame is the original structure and the projection progresses in positive (+) direction, returning to original structure and then in negative direction (-) again returning to the original structure.
 
         Args:
@@ -560,6 +562,7 @@ class hdANM:
             n (int)                             : Number of frames in output (should be =>8 and ideally multiple of 4)   Defaults to 20
             extrapolation (linear/curvilinear)  : Extrapolation method                                                   Defaults to "curvilinear"
             ftype (string)                      : Extension of the output file (.cif / .pdb)
+            ca_to_aa (boolean)                  : If only single atom type is used (often C-alpha atom only), enabling extrapolates the C-alpha motion to all the atoms. (Default: False)
 
         Note:
             - Scale and n parameters should be redesigned.
@@ -568,6 +571,11 @@ class hdANM:
         Returns:
             True if successful; false otherwise.
         """
+
+        if(ca_to_aa):
+            if(len(list(set([i.get_name() for i in self.atoms]))) > 1 ): logging.warning('Multiple atom types were detected, but the "ca_to_aa" option is still "True." If the model is not coarse-grained, consider making it "False." See the function description for more details.')
+        else:
+          if(len(list(set([i.get_name() for i in self.atoms]))) == 1 ): logging.info('A single type of atom is detected. Try enabling the "ca_to_aa" parameter. See the function description for more details.')
 
         x0=numpy.array([i.get_location() for i in self.atoms])
         d0=[i.get_domain_id() for i in self.atoms]
@@ -579,6 +587,7 @@ class hdANM:
             for j in movement:
                 HingeResidue=0
                 AtomsOfTheFrame = {}
+                non_model_atoms = 0 #Only when ca_to_aa option is enabled.
                 for numi,i in enumerate(x0):
                     if(d0[numi][0]=='D'):
                         D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
@@ -586,12 +595,31 @@ class hdANM:
                         new_x=i[0]+scale*j* ( D_delta_phi[0] + (D_delta_phi[4]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[1]-D_COM[1])) )
                         new_y=i[1]+scale*j* ( D_delta_phi[1] + (D_delta_phi[3]*(i[2]-D_COM[2])) - (D_delta_phi[5]*(i[0]-D_COM[0])) )
                         new_z=i[2]+scale*j* ( D_delta_phi[2] + (D_delta_phi[3]*(i[1]-D_COM[1])) - (D_delta_phi[4]*(i[0]-D_COM[0])) )
+                        if(ca_to_aa):
+                            for x in self.atoms[numi].get_parent().get_atoms():
+                                temp_new_x=x.get_location()[0]+scale*j* ( D_delta_phi[0] + (D_delta_phi[4]*(x.get_location()[2]-D_COM[2])) - (D_delta_phi[5]*(x.get_location()[1]-D_COM[1])) )
+                                temp_new_y=x.get_location()[1]+scale*j* ( D_delta_phi[1] + (D_delta_phi[3]*(x.get_location()[2]-D_COM[2])) - (D_delta_phi[5]*(x.get_location()[0]-D_COM[0])) )
+                                temp_new_z=x.get_location()[2]+scale*j* ( D_delta_phi[2] + (D_delta_phi[3]*(x.get_location()[1]-D_COM[1])) - (D_delta_phi[4]*(x.get_location()[0]-D_COM[0])) )
+
+                                non_model_atoms+=1
+                                AtomsOfTheFrame[len(x0)+non_model_atoms] = Atom(x.get_id() , x.get_name(), numpy.array([temp_new_x,temp_new_y,temp_new_z]), x.get_occupancy(), x.get_bfactor(), x.get_element(), x.get_charge(), x.get_parent() )
+                                
                     if(d0[numi][0]=='H'):
                         delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
                         new_x=i[0]+scale*j*delta[0]
                         new_y=i[1]+scale*j*delta[1]
                         new_z=i[2]+scale*j*delta[2]
                         HingeResidue+=1
+                        if(ca_to_aa):
+                            for x in self.atoms[numi].get_parent().get_atoms():
+                                temp_new_x=x.get_location()[0]+scale*j*delta[0]
+                                temp_new_y=x.get_location()[1]+scale*j*delta[1]
+                                temp_new_z=x.get_location()[2]+scale*j*delta[2]
+
+                                non_model_atoms+=1
+                                AtomsOfTheFrame[len(x0)+non_model_atoms] = Atom(x.get_id() , x.get_name(), numpy.array([temp_new_x,temp_new_y,temp_new_z]), x.get_occupancy(), x.get_bfactor(), x.get_element(), x.get_charge(), x.get_parent() )
+                                
+                    #All the atoms in the models (CA or all atom); Atoms from ca_to_aa option are not included.
                     new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
                     new_coords.append([new_x,new_y,new_z])
                     currentatm = Atom(self.atoms[numi].get_id() , self.atoms[numi].get_name(), numpy.array([new_x,new_y,new_z]), self.atoms[numi].get_occupancy(), self.atoms[numi].get_bfactor(), self.atoms[numi].get_element(),self.atoms[numi].get_charge(), self.atoms[numi].get_parent() )
@@ -611,6 +639,7 @@ class hdANM:
             for j in movement:
                 HingeResidue=0
                 AtomsOfTheFrame = {}
+                non_model_atoms = 0 #Only when ca_to_aa option is enabled.
                 for numi,i in enumerate(x0):
                     if(d0[numi][0]=='D'):
                         D_delta_phi= self.eigen_vectors[:,mode_number][self.domain_info[d0[numi]][0]*6 : (self.domain_info[d0[numi]][0]*6)+6]
@@ -633,7 +662,27 @@ class hdANM:
                         + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (i[0] -D_COM[0]) \
                         + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (i[1] -D_COM[1]) \
                         + ( numpy.cos(scale*j*Q_D_n)+ D_mu[2]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (i[2] -D_COM[2])
-                        
+
+                        if(ca_to_aa):
+                            for x in self.atoms[numi].get_parent().get_atoms():
+                                temp_new_x= D_COM[0]+ scale*j*D_delta_phi[0] \
+                                + ( numpy.cos(scale*j*Q_D_n)+ D_mu[0]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (x.get_location()[0] -D_COM[0]) \
+                                + ( D_mu[0]*D_mu[1]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[2]*numpy.sin(scale*j*Q_D_n) ) * (x.get_location()[1] -D_COM[1]) \
+                                + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (x.get_location()[2] -D_COM[2])
+                                
+                                temp_new_y= D_COM[1]+ scale*j*D_delta_phi[1] \
+                                + ( D_mu[0]*D_mu[1]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[2]*numpy.sin(scale*j*Q_D_n) ) * (x.get_location()[0] -D_COM[0]) \
+                                + ( numpy.cos(scale*j*Q_D_n)+D_mu[1]**2 * (1-numpy.cos(scale*j*Q_D_n)) )              * (x.get_location()[1] -D_COM[1]) \
+                                + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (x.get_location()[2] -D_COM[2])
+
+                                temp_new_z= D_COM[2]+ scale*j*D_delta_phi[2] \
+                                + ( D_mu[0]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) - D_mu[1]*numpy.sin(scale*j*Q_D_n) ) * (x.get_location()[0] -D_COM[0]) \
+                                + ( D_mu[1]*D_mu[2]*(1-numpy.cos(scale*j*Q_D_n)) + D_mu[0]*numpy.sin(scale*j*Q_D_n) ) * (x.get_location()[1] -D_COM[1]) \
+                                + ( numpy.cos(scale*j*Q_D_n)+ D_mu[2]**2 * (1-numpy.cos(scale*j*Q_D_n)) )             * (x.get_location()[2] -D_COM[2])
+
+                                non_model_atoms+=1
+                                AtomsOfTheFrame[len(x0)+non_model_atoms] = Atom(x.get_id() , x.get_name(), numpy.array([temp_new_x,temp_new_y,temp_new_z]), x.get_occupancy(), x.get_bfactor(), x.get_element(), x.get_charge(), x.get_parent() )
+
 
                     if(d0[numi][0]=='H'):
                         delta=self.eigen_vectors[:,mode_number][6*len(self.domain_info):][HingeResidue*3:(HingeResidue*3)+3]
@@ -641,6 +690,16 @@ class hdANM:
                         new_y=i[1]+scale*j*delta[1]
                         new_z=i[2]+scale*j*delta[2]
                         HingeResidue+=1
+
+                        if(ca_to_aa):
+                            for x in self.atoms[numi].get_parent().get_atoms():
+                                temp_new_x=x.get_location()[0]+scale*j*delta[0]
+                                temp_new_y=x.get_location()[1]+scale*j*delta[1]
+                                temp_new_z=x.get_location()[2]+scale*j*delta[2]
+                                
+                                non_model_atoms+=1
+                                AtomsOfTheFrame[len(x0)+non_model_atoms] = Atom(x.get_id() , x.get_name(), numpy.array([temp_new_x,temp_new_y,temp_new_z]), x.get_occupancy(), x.get_bfactor(), x.get_element(), x.get_charge(), x.get_parent() )
+
                     new_x , new_y, new_z = new_x.real , new_y.real , new_z.real
                     new_coords.append([new_x,new_y,new_z])
                     currentatm = Atom(self.atoms[numi].get_id() , self.atoms[numi].get_name(), numpy.array([new_x,new_y,new_z]), self.atoms[numi].get_occupancy(), self.atoms[numi].get_bfactor(), self.atoms[numi].get_element(),self.atoms[numi].get_charge(), self.atoms[numi].get_parent() )
