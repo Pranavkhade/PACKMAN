@@ -50,12 +50,7 @@ class ANM:
             gamma (float, optional): Spring Constant Value.                                      Defaults to 1.0.
             dr (float, optional)   : Distance Cutoff.                                            Defaults to 15.0.
             power (int, optional)  : Power of distance (mainly useful in non-parametric mode).   Defaults to 0.
-            pf (None, optional)    : Parameter free model?.                                      Defaults to None.
-        
-        Raises:
-            Exception: [description]
-            Exception: [description]
-            Exception: [description]
+            pf (None, optional)    : Parameter free model. (Check the dr and power params)       Defaults to None.
         """
     
     def __init__(self, atoms, gamma=1.0, dr=15.0, power=0, pf=None):

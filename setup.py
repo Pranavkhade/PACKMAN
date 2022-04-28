@@ -21,6 +21,7 @@ with open('README.md') as readme:
 PACKAGES=['packman',
           'packman.molecule',
           'packman.anm',
+          'packman.gnm',
           'packman.apps',
           'packman.bin',
           'packman.constants',
