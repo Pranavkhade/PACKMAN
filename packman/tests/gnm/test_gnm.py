@@ -13,7 +13,7 @@ class TestMolecule(unittest.TestCase):
 
     def test_GNM(self):
         self.Model=GNM(self.calpha,gamma=1,dr=7.3,power=1)
-        self.assertTrue( self.Model.calculate_kirchoff() )
+        self.assertTrue( self.Model.calculate_kirchhoff() )
         self.assertTrue( self.Model.calculate_decomposition() )
 
         self.assertIsNotNone( self.Model.get_eigenvalues() )
