@@ -60,16 +60,16 @@ class GNM:
         self.fluctuations       = None
 
     '''Get Functions'''
-    def get_kirchoff(self):
+    def get_kirchhoff(self):
         """Get the Hessian Matrix of the ANM model.
 
         Notes:
-            * Make sure that the GNM().calculate_kirchoff() is called before calling this function. (will return None otherwise)
+            * Make sure that the GNM().calculate_kirchhoff() is called before calling this function. (will return None otherwise)
         
         Returns:
             numpy.ndarray: Hessian matrix if successful; None otherwise
         """
-        return self.kirchoff
+        return self.kirchhoff
     
     def get_eigenvalues(self):
         """Get the Eigenvalues obtained by decomposing the Hessian Matrix of the ANM model.
@@ -97,16 +97,38 @@ class GNM:
         """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
         
         Notes:
-            * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
+            * Make sure that the GNM().calculate_kirchhoff(), GNM().calculate_decomposition() and GNM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
             numpy.ndarray: Eigenvectors if successful; None otherwise
         """
         return self.fluctuations
+    
+    def get_crosscorrelation(self):
+        """Get the crosscorrelations.
+
+        Notes:
+            * Make sure that the GNM().calculate_kirchhoff(), GNM().calculate_decomposition() and GNM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
+
+        Returns:
+            numpy.ndarray: 2D array of crosscorrelations
+        """
+        return self.crosscorrelation
+    
+    def get_pseudoinverse(self):
+        """Get the pseudoinverse of the Kirchhoff's matrix.
+
+        Notes:
+            * Make sure that the GNM().calculate_kirchhoff(), GNM().calculate_decomposition() and GNM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
+
+        Returns:
+            numpy.ndarray: 2D array of pseudoinverse
+        """
+        return self.pseduinverse
 
     '''Calculate Functions'''
-    def calculate_kirchoff(self, gamma = 1.0):
-        """Calculate the Gaussian Network Model (GNM) Kirchoff Matrix.
+    def calculate_kirchhoff(self, gamma = 1.0):
+        """Calculate the Gaussian Network Model (GNM) kirchhoff Matrix.
 
         The matrix is stored in the self.GNM_MAT variable.
         
@@ -114,7 +136,7 @@ class GNM:
             True if successful; None otherwise.
         """
         n_atoms=len(self.coords)
-        self.kirchoff = numpy.zeros((n_atoms, n_atoms), float)
+        self.kirchhoff = numpy.zeros((n_atoms, n_atoms), float)
         distance_mat = numpy.ones((n_atoms, n_atoms), float)
         for i in range(len(self.coords)):
             diff = self.coords[i+1:, :] - self.coords[i]
@@ -123,10 +145,10 @@ class GNM:
                 if s_ij <= self.dr**2:
                     diff_coords = diff[j]
                     j = j + i + 1
-                    self.kirchoff[i, j] = - gamma
-                    self.kirchoff[j, i] = - gamma
-                    self.kirchoff[i, i] = self.kirchoff[i, i] + gamma
-                    self.kirchoff[j, j] = self.kirchoff[j, j] + gamma
+                    self.kirchhoff[i, j] = - gamma
+                    self.kirchhoff[j, i] = - gamma
+                    self.kirchhoff[i, i] = self.kirchhoff[i, i] + gamma
+                    self.kirchhoff[j, j] = self.kirchhoff[j, j] + gamma
         
         return True
     
@@ -136,7 +158,7 @@ class GNM:
         Note:
             Eigen values and Eigen Vectors are calculated. use ANM().get_eigenvalues() and ANM().get_eigenvectors() to obtain them.
         """
-        self.eigen_values,self.eigen_vectors=numpy.linalg.eigh(self.kirchoff)
+        self.eigen_values,self.eigen_vectors=numpy.linalg.eigh(self.kirchhoff)
         return True
 
     def calculate_fluctuations(self, endmode=None):
@@ -162,11 +184,11 @@ class GNM:
                 logging.warning('Please provide valid input for the "endmode" parameter.')
 
 
-        pseduinverse = numpy.zeros(shape=(len(self.eigen_values),len(self.eigen_values)))
+        self.pseduinverse = numpy.zeros(shape=(len(self.eigen_values),len(self.eigen_values)))
         for i in range(1, stop_at):
-            pseduinverse = pseduinverse + ( (float(1) / self.eigen_values[i])*self.eigen_vectors[:,i]*self.eigen_vectors[:,i].transpose() )
+            self.pseduinverse = self.pseduinverse + ( (float(1) / self.eigen_values[i])*self.eigen_vectors[:,i]*self.eigen_vectors[:,i].transpose() )
 
-        self.fluctuations = pseduinverse.diagonal()
+        self.fluctuations = self.pseduinverse.diagonal()
         return True
     
     def calculate_crosscorrelation(self):
@@ -176,10 +198,9 @@ class GNM:
         """
         n = len(self.atoms)
         EVec=self.eigen_vectors.T
-        self.hessian_inv= numpy.matmul( numpy.matmul( EVec[1:].transpose() , numpy.diag(1/self.eigen_values[1:]) ) , EVec[1:] )
-        self.C = numpy.zeros((n , n))
+        self.pseduinverse= numpy.matmul( numpy.matmul( EVec[1:].transpose() , numpy.diag(1/self.eigen_values[1:]) ) , EVec[1:] )
+        self.crosscorrelation = numpy.zeros((n , n))
         for i in range(n):
             for j in range(n):
-                self.C[i, j] = float(self.hessian_inv[i, j])/numpy.sqrt(self.hessian_inv[i, i]*self.hessian_inv[j, j])
-                
+                self.crosscorrelation[i, j] = float(self.pseduinverse[i, j])/numpy.sqrt(self.pseduinverse[i, i]*self.pseduinverse[j, j])        
         return True
