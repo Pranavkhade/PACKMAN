@@ -2,7 +2,7 @@ numpy
 scipy
 networkx
 mlxtend
-sklearn
+scikit-learn
 sphinx-rtd-theme
 Sphinx
 sphinxcontrib-applehelp
