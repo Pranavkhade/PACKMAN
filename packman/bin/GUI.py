@@ -724,6 +724,7 @@ class Voronoi_Packing_Entropy_GUI(tk.Frame):
                     None
             try:
                 output_file.write('Total (Frame '+str(i.get_id())+')\t'+str(result.get_total_entropy())+'\n' )
+                output_file.write('Total Normalized Entropy (3N-6) (Frame '+str(i.get_id())+')\t'+str( result.get_total_entropy() / ( 3*len([j for j in i.get_atoms()]) -6 ) ) +'\n' )
             except:
                 None
         output_file.flush()
