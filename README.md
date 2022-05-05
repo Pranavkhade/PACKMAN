@@ -52,6 +52,7 @@ WEB SERVERS
 * [Hinge Prediction Web Server](https://packman.bb.iastate.edu/)
 * [hd-ANM Web Server](https://hdanm.bb.iastate.edu/)
 * [Packing Entropy Web Server](https://packing-entropy.bb.iastate.edu/)
+* [DCI web server](https://dci.bb.iastate.edu/)
 
 RELATED RESEARCH ARTICLES
 -------------------------
@@ -60,6 +61,7 @@ RELATED RESEARCH ARTICLES
 * [Compliance](https://doi.org/10.1002/prot.25968)
 * [hd-ANM](https://doi.org/10.1016/j.bpj.2021.10.017)
 * [Packing Entropy](coming_soon)
+* [DCI](https://doi.org/10.1093/bioinformatics/btac159)
 
 ACKNOWLEDGEMENTS
 ----------------

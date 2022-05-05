@@ -26,6 +26,7 @@ Application Programming Interface (API)
 #. :ref:`tutorials_compliance`
 #. :ref:`tutorials_hdANM`
 #. :ref:`tutorials_entropy_api`
+#. :ref:`tutorials_gnm_api`
 
 Utilities (API)
 ---------------

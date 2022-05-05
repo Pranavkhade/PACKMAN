@@ -58,6 +58,8 @@ class GNM:
             raise Exception("distance cutoff value cannot be zero or negative")
 
         self.fluctuations       = None
+        self.pseduinverse       = None
+        self.crosscorrelation   = None
 
     '''Get Functions'''
     def get_kirchhoff(self):

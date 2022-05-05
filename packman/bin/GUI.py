@@ -347,28 +347,28 @@ class HingePrediction(tk.Frame):
                     
                     select_count += 1
                     if(ALL_RESIDUES[ChainOfHinge][0]!=hinge_res_ids[0]):
-                        fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(ALL_RESIDUES[ChainOfHinge][0])+':'+str(hinge_res_ids[0]-1)+'\n' )
-                        fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'H'+str(select_count) +'\t'+ str(hinge_res_ids[0])+':'+str(hinge_res_ids[-1])+'\n' )
+                        fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(ALL_RESIDUES[ChainOfHinge][0])+':'+str(hinge_res_ids[0]-1)+'\n' )
+                        fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'H'+str(select_count) +'\t'+ str(hinge_res_ids[0])+':'+str(hinge_res_ids[-1])+'\n' )
                     else:
-                        fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'H'+str(select_count) +'\t'+ str(hinge_res_ids[0])+':'+str(hinge_res_ids[-1])+'\n' )
+                        fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'H'+str(select_count) +'\t'+ str(hinge_res_ids[0])+':'+str(hinge_res_ids[-1])+'\n' )
                     last_hinge_end = hinge_res_ids[-1]
                 elif( i.get() ):
                     hinge_res_ids = sorted([j.get_id() for j in current_hinge.get_elements()])
                     select_count += 1
-                    fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(hinge_res_ids[0]-1)+'\n' )
-                    fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'H'+str(select_count) +'\t'+ str(hinge_res_ids[0])+':'+str(hinge_res_ids[-1])+'\n' )
+                    fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(hinge_res_ids[0]-1)+'\n' )
+                    fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'H'+str(select_count) +'\t'+ str(hinge_res_ids[0])+':'+str(hinge_res_ids[-1])+'\n' )
                     last_hinge_end = hinge_res_ids[-1]
                 try:
                     if(ChainOfHinge != All_Hinges[numi+1].get_elements()[0].get_parent().get_id() ):
                         select_count += 1
-                        fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
+                        fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
                         last_hinge_end = 0
                 except:
                     None
 
             if(last_hinge_end != ALL_RESIDUES[ChainOfHinge][-1]):
                 select_count += 1
-                fh.write(self.Box1.get()+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
+                fh.write(self.Box1.get().split('/')[-1].replace(' ','+')+'_'+ChainOfHinge +'\t'+ 'D'+str(select_count) +'\t'+ str(last_hinge_end+1)+':'+str(ALL_RESIDUES[ChainOfHinge][-1])+'\n' )
             fh.flush()
             fh.close()
             showinfo('Notification',self.output_filename.get()+' file saved!')
