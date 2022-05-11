@@ -118,7 +118,7 @@ def load_hinge(filename):
 
     About .hng File:
     - hdANM requires the information about hinges and domains in the .hng format.
-    - Each column in the .hng file is tab delimited.
+    - Each column in the .hng file is TAB delimited.
     - Each row in the .hng file follows collowing pattern: 
 
     Filename_ChainID    Domain/HingeId   ResidueStartPosition:ResidueEndPosition
@@ -140,7 +140,7 @@ def load_hinge(filename):
     """
     HNGinfo={}
     for i in open(filename):
-        line=i.strip().split()
+        line=i.strip().split('\t')
         HNGinfo[ line[0]+'_'+line[1] ]=[float(j) for j in line[2].split(':')]
     return HNGinfo
 
