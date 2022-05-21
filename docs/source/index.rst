@@ -25,6 +25,7 @@ Web Servers
 - `Hinge Prediction <https://packman.bb.iastate.edu/>`_
 - `hdANM <https://hdanm.bb.iastate.edu/>`_
 - `Packing Entropy <https://packing-entropy.bb.iastate.edu/>`_
+- `DCI <https://dci.bb.iastate.edu/>`_
 
 Publications
 ------------
@@ -32,6 +33,7 @@ Publications
 - Hinge Prediction (https://doi.org/10.1016/j.jmb.2019.11.018)
 - Structural Compliance (https://doi.org/10.1002/prot.25968)
 - hdANM (https://doi.org/10.1016/j.bpj.2021.10.017)
+- DCI (https://doi.org/10.1093/bioinformatics/btac159)
 
 Project Goal
 ------------

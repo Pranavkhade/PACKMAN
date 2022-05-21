@@ -11,7 +11,7 @@ Citation:
 .. image:: ../../_static/gallary/molecule_graph.png
 
 
-Figure 1. The object hierarchy of the :mod:`packman.molecule` submodule.
+Figure 1. The object hierarchy of the :mod:`packman.molecule` submodule. (Figure taken from the paper cited at the top)
 
 
 Downloading & Loading
