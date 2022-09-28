@@ -163,6 +163,9 @@ def load_pdb(filename):
 def load_cif(filename):
     """
     Load the CIF (.cif) file into the 'Protein' Object.
+
+    Links::
+        1. https://www.rcsb.org/docs/general-help/identifiers-in-pdb
     """
 
     #Global Variables
@@ -199,9 +202,17 @@ def load_cif(filename):
                         if(_[0] == 'ATOM'):
                             #Initiate Model Number
                             FrameNumber = int(_[ column_names['_atom_site.pdbx_PDB_model_num'] ])
+
+                            #Flags for adding property to the atoms
+                            flags = [False, False, False, False]
                             
                             #Initiate Chain (Frame number, Chain)
-                            ChainID = _[ column_names['_atom_site.label_asym_id'] ]
+                            try:
+                                ChainID = _[ column_names['_atom_site.auth_asym_id'] ]
+                                flags[0] = True
+                            except:
+                                ChainID = _[ column_names['_atom_site.label_asym_id'] ]
+
                             try:
                                 if( ChainID not in AllChains[FrameNumber-1].keys() ): AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
                             except:
@@ -210,11 +221,17 @@ def load_cif(filename):
                             
                             #Initiate Residue (Use one of two ids, if both are absent, think of something in future)
                             try:
-                                ResidueNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
-                            except:
                                 ResidueNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+                                flags[1] = True
+                            except:
+                                ResidueNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
 
-                            ResidueName   = _[ column_names['_atom_site.label_comp_id'] ]
+                            #comp_id
+                            try:
+                                ResidueName   = _[ column_names['_atom_site.auth_comp_id'] ]
+                                flags[2] = True
+                            except:
+                                ResidueName   = _[ column_names['_atom_site.label_comp_id'] ]
                             try:
                                 if( str(ResidueNumber)+ChainID not in AllResidues[FrameNumber-1].keys() ): AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] = Residue( ResidueNumber, ResidueName, AllChains[FrameNumber-1][ChainID] )
                             except:
@@ -223,7 +240,11 @@ def load_cif(filename):
                             
                             #Initiate Atom
                             AtomID = int(_[ column_names['_atom_site.id'] ])
-                            AtomName = _[ column_names['_atom_site.label_atom_id'] ]
+                            try:
+                                AtomName = _[ column_names['_atom_site.auth_atom_id'] ]
+                                flags[3] = True
+                            except:
+                                AtomName = _[ column_names['_atom_site.label_atom_id'] ]
                             Coordinates = numpy.array( [ float(_[ column_names['_atom_site.Cartn_x'] ]), float(_[ column_names['_atom_site.Cartn_y'] ]), float(_[ column_names['_atom_site.Cartn_z'] ]) ] )
                             Occupancy = float(_[ column_names['_atom_site.occupancy'] ])
                             bfactor = float(_[ column_names['_atom_site.B_iso_or_equiv'] ])
@@ -244,6 +265,14 @@ def load_cif(filename):
                                 AllAtoms.append( {} )
                                 AllAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID] )
                             
+                            #Set Properties
+                            label_properties = ['label_asym_id','label_seq_id','label_comp_id','label_atom_id']
+                            for flagnum, label_property in enumerate(label_properties):
+                                try:
+                                    if( flags[flagnum] ): AllAtoms[FrameNumber-1][AtomID].set_property( '_atom_site.'+label_property, _[ column_names['_atom_site.'+label_property] ] )
+                                except:
+                                    None
+
                             #Connect objects to each other to create a tree (Ideally should not happen every iteration)
                             #Residue Added to the chain
                             AllChains[FrameNumber-1][ChainID].__setitem__( ResidueNumber, AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID], Type='Residue' )
@@ -255,8 +284,15 @@ def load_cif(filename):
                             #Initiate Model Number
                             FrameNumber = int(_[ column_names['_atom_site.pdbx_PDB_model_num'] ])
                             
+                            #Flags for adding property to the atoms
+                            flags = [False, False, False, False]
+
                             #Initiate Chain (Frame number, Chain)
-                            ChainID = _[ column_names['_atom_site.label_asym_id'] ]
+                            try:
+                                ChainID = _[ column_names['_atom_site.auth_asym_id'] ]
+                                flags[0] = True
+                            except:
+                                ChainID = _[ column_names['_atom_site.label_asym_id'] ]
                             try:
                                 if( ChainID not in AllChains[FrameNumber-1].keys() ): AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
                             except:
@@ -266,14 +302,20 @@ def load_cif(filename):
                             
                             #Initiate HetMol (In case there is absense of ids, line number becomes residue id)
                             try:
-                                HetMolNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
+                                HetMolNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+                                flags[1] = True
                             except:
                                 try:
-                                    HetMolNumber = int( _[ column_names['_atom_site.auth_seq_id'] ] )
+                                    HetMolNumber = int( _[ column_names['_atom_site.label_seq_id'] ] )
                                 except:
                                     HetMolNumber = n_line
 
-                            HetMolName   = _[ column_names['_atom_site.label_comp_id'] ]
+                            try:
+                                HetMolName   = _[ column_names['_atom_site.auth_comp_id'] ]
+                                flags[2] = True
+                            except:
+                                HetMolName   = _[ column_names['_atom_site.label_comp_id'] ]
+
                             try:
                                 if( str(HetMolNumber)+ChainID not in AllHetMols[FrameNumber-1].keys() ): AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] = HetMol( HetMolNumber, HetMolName, AllChains[FrameNumber-1][ChainID] )
                             except:
@@ -282,7 +324,11 @@ def load_cif(filename):
                             
                             #Initiate Atom
                             AtomID = int(_[ column_names['_atom_site.id'] ])
-                            AtomName = _[ column_names['_atom_site.label_atom_id'] ]
+                            try:
+                                AtomName = _[ column_names['_atom_site.auth_atom_id'] ]
+                                flags[3] = True
+                            except:
+                                AtomName = _[ column_names['_atom_site.label_atom_id'] ]
                             Coordinates = numpy.array( [ float(_[ column_names['_atom_site.Cartn_x'] ]), float(_[ column_names['_atom_site.Cartn_y'] ]), float(_[ column_names['_atom_site.Cartn_z'] ]) ] )
                             Occupancy = float(_[ column_names['_atom_site.occupancy'] ])
                             bfactor = float(_[ column_names['_atom_site.B_iso_or_equiv'] ])
@@ -302,6 +348,15 @@ def load_cif(filename):
                             except:
                                 AllHetAtoms.append( {} )
                                 AllHetAtoms[FrameNumber-1][AtomID] = Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge, AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID] )
+                            
+                            #Set Properties
+                            label_properties = ['label_asym_id','label_seq_id','label_comp_id','label_atom_id']
+                            for flagnum, label_property in enumerate(label_properties):
+                                try:
+                                    if( flags[flagnum] ): AllHetAtoms[FrameNumber-1][AtomID].set_property( '_atom_site.'+label_property, _[ column_names['_atom_site.'+label_property] ] )
+                                except:
+                                    None
+
 
                             #Connect objects to each other to create a tree (Ideally should not happen every iteration)
                             #HetMol Added to the chain
@@ -385,7 +440,7 @@ def load_cif(filename):
         try:
             i.calculate_bonds()
         except:
-            logging.warning('Model.calculate_bonds() failed for MODEL: '+str(i.get_id()))
+            logging.debug('Model.calculate_bonds() failed for MODEL: '+str(i.get_id()))
     return prot
 
 

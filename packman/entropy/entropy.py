@@ -94,7 +94,7 @@ class PackingEntropy():
     def calculate_spherepoints(self,atom):
         """Given a single point, this function generates point cloud around the given points.
         Args:
-            point ([float]) : 3D coordinate around which the sphere of point cloud to be generated.
+            atom ([packman.molecule.Atom]) : Atom object around which the sphere of point cloud to be generated.
         """
         point = atom.get_location()
         indices = numpy.arange(0, self.onspherepoints, dtype=float) + 0.5

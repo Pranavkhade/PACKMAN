@@ -60,10 +60,10 @@ RELATED RESEARCH ARTICLES
 * [Hinge Prediction](https://doi.org/10.1016/j.jmb.2019.11.018)
 * [Compliance](https://doi.org/10.1002/prot.25968)
 * [hd-ANM](https://doi.org/10.1016/j.bpj.2021.10.017)
-* [Packing Entropy](coming_soon)
+* [Packing Entropy](https://doi.org/10.1021/acsomega.2c00999)
 * [DCI](https://doi.org/10.1093/bioinformatics/btac159)
 
 ACKNOWLEDGEMENTS
 ----------------
 
-The development of the PACKMAN package is supported by [NSF](https://www.nsf.gov/) grant DBI 1661391. The authors also thank [ResearchIT@Iowa State University](https://researchit.las.iastate.edu/about-research-it-iowa-state-university) for helping with many aspects of computing.
+The development of the PACKMAN package webservers are supported by [NSF](https://www.nsf.gov/) grant DBI 1661391. The authors also thank [ResearchIT@Iowa State University](https://researchit.las.iastate.edu/about-research-it-iowa-state-university) for helping with many aspects of computing.
