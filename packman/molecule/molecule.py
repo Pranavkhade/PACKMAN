@@ -21,7 +21,6 @@ Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
 
-from math import fabs
 import numpy
 import logging
 
@@ -164,6 +163,9 @@ def load_pdb(filename):
 def load_cif(filename):
     """
     Load the CIF (.cif) file into the 'Protein' Object.
+
+    Links::
+        1. https://www.rcsb.org/docs/general-help/identifiers-in-pdb
     """
 
     #Global Variables
@@ -438,7 +440,7 @@ def load_cif(filename):
         try:
             i.calculate_bonds()
         except:
-            logging.warning('Model.calculate_bonds() failed for MODEL: '+str(i.get_id()))
+            logging.debug('Model.calculate_bonds() failed for MODEL: '+str(i.get_id()))
     return prot
 
 

@@ -3,6 +3,7 @@
 
 """
 
+import logging
 import numpy
 
 def superimporse(reference,target,use='calpha',ids=[],change_target=True):
@@ -178,3 +179,27 @@ def WriteOBJ(atoms,faces, fh):
         fh.write("f %i %i %i %i\n".encode()%(faces[0],faces[1],faces[2],faces[3]))
         #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
     return True
+
+def change_alphabet(AA):
+    """Converts three letter amino acid code to one letter and vise-versa
+
+    Args:
+        AA (string) : Three or one letter amino acid code.
+    
+    Returns:
+        AA (string) : Three or one letter amino acid code depending and opposite of the argument provided.
+    """
+    three_to_one_lookup = { 'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C', 'GLN': 'Q', 'GLU': 'E', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P', 'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V' }
+    one_to_three_lookup = {three_to_one_lookup[i]:i for i in three_to_one_lookup.keys()}
+
+    try:
+        return three_to_one_lookup[AA]
+    except:
+        try:
+            return one_to_three_lookup[AA]
+        except:
+            logging.warning('Amino acid code provided did not match any of three or one letter code')
+            if(len(AA)==3):
+                return 'X'
+            if(len(AA)==1):
+                return 'UNK'
