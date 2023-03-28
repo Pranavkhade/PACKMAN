@@ -15,6 +15,7 @@ jobs:
         python-version: 3.9
     - run: pip install git+https://github.com/pytest-dev/nose2pytest.git
     - run: nose2pytest --version ; nose2pytest -h
+    - run: pip install -e .
     - run: nose2pytest -v .
     - run: nose2pytest -w .
     - run: nose2pytest -v packman/tests/
@@ -29,6 +30,7 @@ jobs:
         python-version: 3.9
     - run: pip install pytest
     - run: pytest --version ; pytest --help
+    - run: pip install -e .
     - run: pytest
   ruff:
     runs-on: ubuntu-latest
@@ -37,4 +39,4 @@ jobs:
     - run: pip install --user ruff
     - run: ruff --format=github --select=E9,F63,F7 --target-version=py37 .
     - run: ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
-    - run: ruff --format=github --line-length=1100 --target-version=py37 .
+    - run: ruff --format=github --line-length=1100 --target-version=py37 --statistics .
