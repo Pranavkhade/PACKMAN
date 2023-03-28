@@ -25,6 +25,8 @@ Authors:
 import numpy
 import logging
 
+from ..utilities import change_alphabet
+
 
 class Residue():
     """This class contains the information about the 'Residue' object (packman.molecule.Residue).
@@ -165,6 +167,14 @@ class Residue():
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
+    
+    def get_changed_alphabet(self):
+        """Converts three letter amino acid code to one letter and vise-versa
+
+        Returns:
+            AA (string) : Three or one letter amino acid code depending and opposite of the argument provided.
+        """
+        return change_alphabet(self.get_name())
 
     #Set Functions
     def set_id(self,new_id):

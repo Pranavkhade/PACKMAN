@@ -29,6 +29,7 @@ class TestMolecule(unittest.TestCase):
         rm( 'test.pdb' )
 
         self.assertNotEqual( len([i for i in self.mol]) , 0 )
+        self.assertNotEqual( len( [i for i in self.mol.get_sequence()] ), 0 )
     
     def test_Model(self):
         #Basic
@@ -42,6 +43,7 @@ class TestMolecule(unittest.TestCase):
         self.assertNotEqual( len( [i for i in self.mol[0].get_atoms()] )   , 0 )
         self.assertNotEqual( len( [i for i in self.mol[0].get_calpha()] )  , 0 )
         self.assertNotEqual( len( [i for i in self.mol[0].get_backbone()] ), 0 )
+        self.assertNotEqual( len( [i for i in self.mol[0].get_sequence()] ), 0 )
     
     def test_Chain(self):
         #Basic
@@ -54,6 +56,7 @@ class TestMolecule(unittest.TestCase):
         self.assertNotEqual( len( [i for i in self.mol[0].get_atoms()] )   , 0 )
         self.assertNotEqual( len( [i for i in self.mol[0].get_calpha()] )  , 0 )
         self.assertNotEqual( len( [i for i in self.mol[0].get_backbone()] ), 0 )
+        self.assertNotEqual( len( [i for i in self.mol[0]['A'].get_sequence()] ), 0 )
     
     def test_Residue(self):
         #Basic

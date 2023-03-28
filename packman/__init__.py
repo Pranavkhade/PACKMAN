@@ -15,4 +15,4 @@ from .utilities import *
 
 
 #VERSION CHANGE HERE CHANGES IT IN docs AND setup.py
-__version__='1.4.6'
+__version__='1.4.7'
