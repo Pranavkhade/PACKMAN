@@ -14,8 +14,9 @@ jobs:
       with:
         python-version: 3.9
     - run: pip install git+https://github.com/pytest-dev/nose2pytest.git
-    - run: nose2pytest -h
+    - run: nose2pytest --version ; nose2pytest -h
     - run: nose2pytest -v .
     - run: nose2pytest -w .
+    - run: nose2pytest -v packman/tests/
     - run: git diff  # Copy this command's output into a file and `git apply nose2pytest.patch`
     - run: grep -r nose .  # nose2pytest does NOT remove the now unused imports
