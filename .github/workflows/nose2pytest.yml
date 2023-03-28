@@ -20,3 +20,21 @@ jobs:
     - run: nose2pytest -v packman/tests/
     - run: git diff  # Copy this command's output into a file and `git apply nose2pytest.patch`
     - run: grep -r nose .  # nose2pytest does NOT remove the now unused imports
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - run: pip install pytest
+    - run: pytest --version ; pytest --help
+    - run: pytest
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: pip install --user ruff
+    - run: ruff --format=github --select=E9,F63,F7 --target-version=py37 .
+    - run: ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
+    - run: ruff --format=github --line-length=1100 --target-version=py37 .
