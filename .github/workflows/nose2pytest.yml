@@ -13,7 +13,7 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: 3.9
-    - run: pip install nose2pytest
+    - run: pip install https://github.com/pytest-dev/nose2pytest.git
     - run: nose2pytest -h
     - run: nose2pytest -v .
     - run: nose2pytest -w .
