@@ -189,8 +189,10 @@ def change_alphabet(AA):
     Returns:
         AA (string) : Three or one letter amino acid code depending and opposite of the argument provided.
     """
-    three_to_one_lookup = { 'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C', 'GLN': 'Q', 'GLU': 'E', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P', 'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V' }
-    one_to_three_lookup = {three_to_one_lookup[i]:i for i in three_to_one_lookup.keys()}
+    from ..constants import Constants
+
+    three_to_one_lookup = Constants.THREE_LETTER_TO_ONE_LETTER
+    one_to_three_lookup = Constants.ONE_LETTER_TO_THREE_LETTER
 
     try:
         return three_to_one_lookup[AA]
@@ -198,7 +200,7 @@ def change_alphabet(AA):
         try:
             return one_to_three_lookup[AA]
         except:
-            logging.warning('Amino acid code provided did not match any of three or one letter code')
+            logging.warning('Amino acid code provided did not match any of three or one letter code; returning unknown amino acid code.')
             if(len(AA)==3):
                 return 'X'
             if(len(AA)==1):

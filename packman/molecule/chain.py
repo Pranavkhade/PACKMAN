@@ -309,6 +309,17 @@ class Chain():
         """
         return [i.get_backbone() for i in self.get_residues()]
     
+    def get_sequence(self):
+        """Get the Amino acid sequence of the chain. (Protein chains only)
+        
+        Returns:
+            FASTA format string of the chain sequence.
+        """
+        try:
+            return '>'+str(self.get_parent().get_parent().get_id())+'_'+str(self.get_parent().get_id())+'_'+str(self.get_id())+'\n'+''.join([resi.get_changed_alphabet() if len(resi.get_name())>1 else resi.get_name() for resi in self.get_residues()])
+        except:
+            logging.debug('Error in retriving chain sequence.')
+    
     def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
         """Calculate the entropy for the each amino acid will be returned.
     

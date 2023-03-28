@@ -136,7 +136,7 @@ def load_pdb(filename):
 
     if(len(Models)>2):
         #NMR
-        logging.warning('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
+        logging.debug('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
         All_Coords=[]
         for i in Models:
             All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))
@@ -415,7 +415,7 @@ def load_cif(filename):
 
     if(len(AllModels)>2):
         #NMR
-        logging.warning('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
+        logging.info('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
         All_Coords=[]
         for i in AllModels:
             All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))

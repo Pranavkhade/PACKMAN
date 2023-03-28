@@ -90,7 +90,10 @@ class Model():
         self.__properties = {}
 
     def __getitem__(self,ChainID):
-        return self.__AllChains[ChainID]
+        try:
+            return self.__AllChains[ChainID]
+        except KeyError:
+            logging.warning('Please provide a valid chain ID.')
     
     #Get Functions
     def get_id(self):
@@ -347,6 +350,14 @@ class Model():
             return radang
         else:
             return numpy.rad2deg(radang)
+    
+    def get_sequence(self):
+        """Get the Amino acid sequence of the chain. (Protein chains only)
+        
+        Returns:
+            FASTA format string of the chain sequence.
+        """
+        return '\n'.join( [chain.get_sequence() for chain in self.get_chains() if chain.get_sequence()!=''] )
     
         #Set Functions
     def set_id(self,new_id):
@@ -667,7 +678,7 @@ class Model():
                     N.set_bond(bond)
                     self.__ModelGraph.add_edge( C.get_id(), N.get_id() , id = counter )
                 else:
-                    logging.warning('The peptide bond following residue is missing: '+str(resi[i].get_id())+' Chain: '+resi[i].get_parent().get_id())
+                    logging.info('The peptide bond following residue is missing: '+str(resi[i].get_id())+' Chain: '+resi[i].get_parent().get_id())
         
         try:
             None

@@ -25,6 +25,7 @@ Authors:
 """
 
 from numpy import around
+from . import model
 
 class Protein():
     """This class contains the information about the 'Protein' object (packman.molecule.Protein).
@@ -60,6 +61,14 @@ class Protein():
         """
         return self.__id
 
+    def get_models(self):
+        """Get all the models at once. Useful for the iterations.
+
+        Returns:
+            Generator of all the models in the PDB file.
+        """
+        yield self.__Models
+
     def get_data(self):
         """Get the misc data (other than coordinates) from the file.
 
@@ -67,6 +76,23 @@ class Protein():
             Array of Strings
         """
         return self.__Data
+
+    def get_sequence(self, all_models = False):
+        """_summary_
+
+        Args:
+            all_models (bool, optional): Get sequence of the all frames; useless if sequence accross the models is identical. Defaults to False.
+
+        Returns:
+            Protein sequence in FASTA format.
+        """
+        for model in self:
+            try:
+                return model.get_sequence()
+            except:
+                None
+            if(all_models==False):
+                break
 
     #Set functions
     def set_data(self,data):
