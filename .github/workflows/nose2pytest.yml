@@ -39,4 +39,5 @@ jobs:
     - run: pip install --user ruff
     - run: ruff --format=github --select=E9,F63,F7 --target-version=py37 .
     - run: ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
-    - run: ruff --format=github --line-length=1100 --target-version=py37 --statistics .
+    - run: ruff --exit-zero --line-length=1100 --target-version=py37 --statistics . | sort -k 2
+    - run: ruff --format=github --line-length=1100 --target-version=py37 .
