@@ -10,32 +10,32 @@ on:
     branches: [ "master", "dev" ]
 
 jobs:
-  build:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: pip install --user ruff
+    - run: ruff --ignore=E402,E701,E711,E712,E722,E741,F401,F402,F403,F841
+                --exit-zero --line-length=1100 --target-version=py37 --statistics . | sort -k 2
+    - run: ruff --ignore=E402,E701,E711,E712,E722,E741,F401,F402,F403,F841
+                --format=github --line-length=1100 --target-version=py37 .
 
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7","3.8", "3.9"]
-
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pytest numpy scipy networkx mlxtend scikit-learn nose
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    #Lint testing is disabled for now.
-    #- name: Lint with flake8
-    #  run: |
-    #    # stop the build if there are Python syntax errors or undefined names
-    #    flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-    #    # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-    #    flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with nosetest
-      run: |
-        nosetests packman -a '!slow'
+        pip install --upgrade pip
+        pip install pytest
+    - run: pip install --editable .
+    - name: Test with pytest
+      run: pytest
