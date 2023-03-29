@@ -177,7 +177,7 @@ class GNM:
         return inverse.diagonal()
         '''
         #Initiate
-        if(endmode==None):
+        if(endmode is None):
             stop_at = len(self.eigen_values)
         else:
             try:

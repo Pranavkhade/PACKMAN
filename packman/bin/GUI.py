@@ -331,7 +331,7 @@ class HingePrediction(tk.Frame):
             ALL_RESIDUES = {}
             for i in mol[0].get_chains():
                 try:
-                    ALL_RESIDUES[i.get_id()] = sorted([i.get_id() for i in mol[0][i.get_id()].get_residues() if i!=None])
+                    ALL_RESIDUES[i.get_id()] = sorted([i.get_id() for i in mol[0][i.get_id()].get_residues() if i is not None])
                 except:
                     None
 

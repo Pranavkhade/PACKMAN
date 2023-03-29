@@ -86,12 +86,12 @@ class Protein():
         Returns:
             Protein sequence in FASTA format.
         """
-        for model in self:
+        for model_ in self:
             try:
-                return model.get_sequence()
-            except:
+                return model_.get_sequence()
+            except Exception:
                 None
-            if(all_models==False):
+            if(all_models is False):
                 break
 
     #Set functions
@@ -141,7 +141,7 @@ class Protein():
         #Annotations
         open(filename,'w').write('data_'+filename+'\n#\n')
         fh=open(filename,'a')
-        if(self.__Data != None):
+        if(self.__Data is not None):
             
             #To check what was the input format so that annotation can be written accordingly (currently only supports PDB an mmCIF) | if first line has '#' or '_', it is assumed to be mmCIF file; PDB otherwise.
             input_ftype = None

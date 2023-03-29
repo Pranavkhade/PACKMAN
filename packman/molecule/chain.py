@@ -226,15 +226,15 @@ class Chain():
         the_atom = None
         for i in self.__Residues:
             the_atom =  self.__Residues[i].get_atom(idx)
-            if(the_atom!=None):
+            if(the_atom is not None):
                 break
             
-        if(the_atom==None):
+        if(the_atom is None):
             for i in self.__HetMols:
                 the_atom =  self.__HetMols[i].get_atom(idx)
-                if(the_atom!=None):
+                if(the_atom is not None):
                     break
-        if(the_atom!=None):
+        if(the_atom is not None):
             return the_atom
         else:
             logging.info('The atom with the given ID is not found in the Residues/HetMols')

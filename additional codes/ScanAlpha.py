@@ -114,7 +114,7 @@ def main():
     mol = molecule.load_structure(filename)
 
 
-    if(chain==None):
+    if(chain is None):
         for i in [i.get_id() for i in mol[0].get_chains()]:
             backbone = [k for j in mol[0][i].get_backbone() for k in j if k is not None]
             output=hinge_scanner(backbone,filename,alpha_start,alpha_stop,step_size)

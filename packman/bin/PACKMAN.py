@@ -106,7 +106,7 @@ def load_cli():
     """
     args=IO()
 
-    if(args.command==None):
+    if(args.command is None):
         logging.error('Please provide the appropriate input. Enter "python -m packman -h" for more details.')
         exit()
 
