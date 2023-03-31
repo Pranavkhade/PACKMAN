@@ -321,7 +321,7 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',fil
         #If sorting is needed
         DomainNumber, flag = 0, True
         for i in AllChainResidues:
-            if(i.get_domain_id() == None):
+            if(i.get_domain_id() is None):
                 i.set_domain_id('DM'+str(DomainNumber))
                 flag=True
             elif(i.get_domain_id()[:2] == 'FL' and flag):

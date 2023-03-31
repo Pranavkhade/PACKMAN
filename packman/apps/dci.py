@@ -46,10 +46,10 @@ class DCI():
 
         if chain:
             self.atoms = [i for i in self.molObj[0][chain].get_calpha()]
-            collect_resi = [i.get_atoms() for i in self.molObj[0][chain].get_residues() if i.get_calpha() != None]
+            collect_resi = [i.get_atoms() for i in self.molObj[0][chain].get_residues() if i.get_calpha() is not None]
         else:
             self.atoms = [i for i in self.molObj[0].get_calpha()]
-            collect_resi = [i.get_atoms() for i in self.molObj[0].get_residues() if i.get_calpha() != None]
+            collect_resi = [i.get_atoms() for i in self.molObj[0].get_residues() if i.get_calpha() is not None]
             
         if n_com:
             if (n_com < 2) or (n_com > len(self.atoms)):

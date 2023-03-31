@@ -91,7 +91,7 @@ class hdANM:
 
         #Coords are in the same order as the atoms
         self.coords  = numpy.array([i.get_location() for i in atoms])
-        if self.pf != None and self.pf <= 0:
+        if self.pf is not None and self.pf <= 0:
             raise Exception("pf value cannot be zero or negative")
         if self.gamma <= 0:
             raise Exception("gamma value cannot be zero or negative")
@@ -500,7 +500,7 @@ class hdANM:
         """
         x0 = numpy.array([i.get_location() for i in self.atoms])
 
-        if(self.RT_eigen_vectors == None):
+        if(self.RT_eigen_vectors is None):
             self.calculate_RT_eigen_vectors()
         
         exploded_vectors = self.RT_eigen_vectors
@@ -525,7 +525,7 @@ class hdANM:
         """
         
             
-        if(self.RT_eigen_vectors == None):
+        if(self.RT_eigen_vectors is None):
             self.calculate_RT_eigen_vectors()
         EVec=self.get_RT_eigen_vectors().T
         if(n_modes=="all"):

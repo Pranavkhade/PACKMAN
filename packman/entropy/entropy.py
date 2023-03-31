@@ -33,7 +33,7 @@ class PackingEntropy():
         onspherepoints (int)            : Number of points to be generated around each point for the surface (Read the Publication for more details)
     """
     def __init__(self, atoms, chains=None, probe_size=1.4, onspherepoints=30):
-        if(chains==None):
+        if(chains is None):
             self.atoms = [i for i in atoms]
         else:
             #Single or multiple chain IDs provided. If there are multiple chain ids, they should be in an array form.

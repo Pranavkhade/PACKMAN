@@ -150,15 +150,15 @@ class Model():
         the_atom = None
         for i in self.__AllResidues:
             the_atom =  self.__AllResidues[i].get_atom(idx)
-            if(the_atom!=None):
+            if(the_atom is not None):
                 break
             
-        if(the_atom==None):
+        if(the_atom is None):
             for i in self.__AllHetMols:
                 the_atom =  self.__AllHetMols[i].get_atom(idx)
-                if(the_atom!=None):
+                if(the_atom is not None):
                     break
-        if(the_atom!=None):
+        if(the_atom is not None):
             return the_atom
         else:
             logging.info('The atom with the given ID is not found in this Model')
@@ -311,11 +311,11 @@ class Model():
         
         atom1, atom2 = bond.get_atoms()
 
-        if( neighbor1 == None ):
+        if( neighbor1 is None ):
             logging.error('neighbour1 not selected. Options available for neighbour1: ' +  ', '.join( [str(i) for i in self.__ModelGraph[atom1.get_id()] if i != atom2.get_id() ] ) )
             return None
 
-        if( neighbor2 == None ):
+        if( neighbor2 is None ):
             logging.error('neighbour2 not selected. Options available for neighbour2: ' + ', '.join( [str(i) for i in self.__ModelGraph[atom2.get_id()] if i != atom1.get_id() ]  ) )
             return None
         
@@ -439,11 +439,11 @@ class Model():
         
         atom1, atom2 = bond.get_atoms()
 
-        if( neighbor1 == None ):
+        if( neighbor1 is None ):
             logging.error('neighbour1 not selected. Options available for neighbour1: ' +  ', '.join( [str(i) for i in self.__ModelGraph[atom1.get_id()] if i != atom2.get_id() ] ) )
             return None
 
-        if( neighbor2 == None ):
+        if( neighbor2 is None ):
             logging.error('neighbour2 not selected. Options available for neighbour2: ' + ', '.join( [str(i) for i in self.__ModelGraph[atom2.get_id()] if i != atom1.get_id() ]  ) )
             return None
         
@@ -593,18 +593,18 @@ class Model():
                                         chain1, chain2 = self[temp_dict['_struct_conn.ptnr1_label_asym_id']], self[temp_dict['_struct_conn.ptnr2_label_asym_id']]
                                                                                 
                                         ptnr1 = chain1.get_residue( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) )
-                                        if(ptnr1==None):
+                                        if(ptnr1 is None):
                                             ptnr1 = chain1.get_hetmol( int(temp_dict['_struct_conn.ptnr1_auth_seq_id']) )
-                                            if(ptnr1==None):
+                                            if(ptnr1 is None):
                                                 ptnr1 = chain1.get_hetmol( temp_dict['_struct_conn.ptnr1_label_comp_id']+temp_dict['_struct_conn.ptnr1_auth_seq_id'] )
 
                                         ptnr2 = chain2.get_residue( int(temp_dict['_struct_conn.ptnr2_auth_seq_id']) )
-                                        if(ptnr2==None):
+                                        if(ptnr2 is None):
                                             ptnr2 = chain2.get_hetmol( int(temp_dict['_struct_conn.ptnr2_auth_seq_id']) )
-                                            if(ptnr2==None):
+                                            if(ptnr2 is None):
                                                 ptnr2 = chain2.get_hetmol( temp_dict['_struct_conn.ptnr2_label_comp_id']+temp_dict['_struct_conn.ptnr2_auth_seq_id'] )
                                         
-                                        if(ptnr1!=None and ptnr2!=None):
+                                        if(ptnr1 is not None and ptnr2 is not None):
                                             atm1 = ptnr1.get_atom(temp_dict['_struct_conn.ptnr1_label_atom_id'])
                                             atm2 = ptnr2.get_atom(temp_dict['_struct_conn.ptnr2_label_atom_id'])
 
@@ -645,7 +645,7 @@ class Model():
                     for j in aa_connectivity[i.get_name()]:
                         try:
                             atom1, atom2 =  i.get_atom(j[0]), i.get_atom(j[1])
-                            if(atom1!=None and atom2!=None and atom1.get_parent().get_parent().get_id() == atom2.get_parent().get_parent().get_id() ):
+                            if(atom1 is not None and atom2 is not None and atom1.get_parent().get_parent().get_id() == atom2.get_parent().get_parent().get_id() ):
                                 counter += 1
                                 if(j[2]=='SING'):
                                     bond = Bond(counter, atom1, atom2, 'covalent-single', source='RCSB/aa-variants-v1.cif')

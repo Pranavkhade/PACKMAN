@@ -60,7 +60,7 @@ class ANM:
         self.pf      = pf
         self.atoms   = [i for i in atoms]
         self.coords  = numpy.array([i.get_location() for i in self.atoms])
-        if self.pf != None and self.pf <= 0:
+        if self.pf is not None and self.pf <= 0:
             raise Exception("pf value cannot be zero or negative")
         if self.gamma <= 0:
             raise Exception("gamma value cannot be zero or negative")
@@ -194,7 +194,7 @@ class ANM:
                     dmat = numpy.array(lobj)
                     distance_mat[i*3:i*3+3, j*3:j*3+3] = dmat
 
-        if self.pf != None:
+        if self.pf is not None:
             hessian = numpy.divide(hessian, distance_mat)
         
         self.hessian=hessian

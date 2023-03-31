@@ -253,7 +253,7 @@ def load_cif(filename):
 
                             #If particular atom is already present, dont add it again; alternate id must be present (_atom_site.label_alt_id)
                             try:
-                                if( AllResidues[FrameNumber-1][str(ResidueNumber)+ChainID].get_atom(AtomName)!= None ):
+                                if( AllResidues[FrameNumber - 1][str(ResidueNumber) + ChainID].get_atom(AtomName) is not None ):
                                     continue
                             except Exception as e:
                                 #Alternate atom exists
@@ -337,7 +337,7 @@ def load_cif(filename):
 
                             #If particular atom is already present, dont add it again; alternate id must be present (_atom_site.label_alt_id)
                             try:
-                                if( AllHetMols[FrameNumber-1][str(HetMolNumber)+ChainID].get_atom(AtomName)!= None ):
+                                if( AllHetMols[FrameNumber - 1][str(HetMolNumber) + ChainID].get_atom(AtomName) is not None ):
                                     continue
                             except Exception as e:
                                 #Alternate atom exists
@@ -512,7 +512,7 @@ def download_structure(pdbid,save_name=None,ftype='cif'):
     else:
         print('Please provide appropriate "ftype" argument. (cif/pdb).')
 
-    if(save_name==None):
+    if(save_name is None):
         try:
             open(pdbid+'.'+ftype,'wb').write(response.read())
         except(IOError):
