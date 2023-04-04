@@ -5,11 +5,11 @@ Entropy Analysis API
 ====================
 This tutorial familiarises users with the Application Programming Interface (API) of the Entropy Analysis. The same functionality is also available in the PACKMAN CLI ( :ref:`tutorials_entropy_cli` ) and GUI (:ref:`tutorials_gui`).
 
-PACKMAN Entropy Analysis Web Server: <link>
+PACKMAN Entropy Analysis Web Server: https://packing-entropy.bb.iastate.edu/
 
 How to cite::
 
-    Paper Under Review.
+    Pranav M. Khade and Robert L. Jernigan. Entropies Derived from the Packing Geometries within a Single Protein Structure. ACS Omega 2022 7 (24), 20719-20730 DOI: 10.1021/acsomega.2c00999
 
 There are two ways the entropy can be calculated. The second way is when the user explicitly wants to leave specific atoms/residues out of the entropy calculation. Chain exclusion can be done via the first method as well. Also, the user has access to the extra get, set, and calculate methods of the Entropy objects using the second way.
 
