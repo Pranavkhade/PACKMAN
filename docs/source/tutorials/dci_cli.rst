@@ -10,7 +10,8 @@ PACKMAN DCI Analysis Web Server:
 
 How to cite::
 
-    Paper Under Review.
+    Ambuj Kumar, Pranav M Khade, Karin S Dorman, Robert L Jernigan, Coarse-graining protein structures into their dynamic communities with DCI, a dynamic community identifier,
+    Bioinformatics, Volume 38, Issue 10, May 2022, Pages 2727–2733, https://doi.org/10.1093/bioinformatics/btac159
 
 
 CLI INSTRUCTIONS

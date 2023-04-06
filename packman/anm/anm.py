@@ -87,7 +87,7 @@ class ANM:
             * Make sure that the ANM().calculate_hessian() is called before calling this function.
         
         Returns:
-            numpy.ndarray: Hessian matrix if successful
+            numpy.ndarray: Hessian matrix
         """
         return self.hessian
     
@@ -98,7 +98,7 @@ class ANM:
             * Make sure that the ANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function.
 
         Returns:
-            numpy.ndarray: Eigenvalues if successful
+            numpy.ndarray: Eigenvalues
         """
         return self.eigen_values
     
@@ -109,7 +109,7 @@ class ANM:
             * Make sure that the ANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function.
 
         Returns:
-            numpy.ndarray: Eigenvectors if successful
+            numpy.ndarray: Eigenvectors
         """
         return self.eigen_vectors
     
@@ -120,7 +120,7 @@ class ANM:
             * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_fluctuations() is called before calling this function.
 
         Returns:
-            numpy.ndarray: Eigenvectors if successful
+            numpy.ndarray: Eigenvectors
         """
         return self.fluctuations
     
@@ -132,7 +132,7 @@ class ANM:
             * Stiffness=1/Compliance
         
         Returns:
-            numpy.ndarray: Stiffness Map if successful
+            numpy.ndarray: Stiffness Map
         """
         return self.stiffness_map
     
@@ -144,7 +144,7 @@ class ANM:
             * Stiffness=1/Compliance
         
         Returns:
-            numpy.ndarray: Compliance Map if successful
+            numpy.ndarray: Compliance Map
         """
         return self.compliance_map
     
@@ -217,7 +217,7 @@ class ANM:
         """Decompose the Hessian Matrix of the ANM model.
         
         Note:
-            Eigen values and Eigen Vectors are calculated. use ANM().get_eigenvalues() and ANM().get_eigenvectors() to obtain them.
+            * Eigen values and Eigen Vectors are calculated. use ANM().get_eigenvalues() and ANM().get_eigenvectors() to obtain them.
         
         Returns:
             bool: True if calculation is successful; False otherwise
@@ -232,8 +232,8 @@ class ANM:
         The fluctualtions/ theoretical b-factors are calculated using this method.
         
         Note:
-            - Fluctuations are calculated. use ANM().get_fluctuations() to obtain the fluctuations.
-            - Endmode needs to be put in the code if and when required.
+            * Fluctuations are calculated. use ANM().get_fluctuations() to obtain the fluctuations.
+            * Endmode needs to be put in the code if and when required.
         
         Returns:
             bool: True if calculation is successful; False otherwise
@@ -252,13 +252,10 @@ class ANM:
     
     def calculate_stiffness_compliance(self) -> bool:
         """Carry out the Stiffness and Compliance analysis of the ANM model.
-
-        Citation:
-        Scaramozzino, D., Khade, P.M., Jernigan, R.L., Lacidogna, G. and Carpinteri, A.
-        (2020), Structural Compliance ‐ A New Metric for Protein Flexibility. Proteins. Accepted Author Manuscript.
-        doi:10.1002/prot.25968
         
         Note:
+            *Citation:
+                Scaramozzino D, Khade PM, Jernigan RL, Lacidogna G, Carpinteri A. Structural compliance: A new metric for protein flexibility. Proteins. 2020 Nov;88(11):1482-1492. doi: 10.1002/prot.25968. Epub 2020 Jul 14. PMID: 32548853; PMCID: PMC7649752.
             * Obtain the following properties by using functions followed by it:
                 Stiffness Map     : ANM().get_stiffness_map()      
                 Compliance Map    : ANM().get_compliance_map()
@@ -307,8 +304,8 @@ class ANM:
             ftype (str, optional):              : Extension of the output file (.cif / .pdb). Defaults to 'cif'.
 
         Note:
-            - Scale and n parameters should be redesigned.
-            - direction is the variable which be allow user to explore only positive or only negative direction of the modes.
+            * Scale and n parameters should be redesigned.
+            * direction is the variable which be allow user to explore only positive or only negative direction of the modes.
 
         Returns:
             bool: True if successful; False otherwise.

@@ -10,7 +10,7 @@ PACKMAN Entropy Analysis Web Server: * Packing Entropy: https://packing-entropy.
 
 How to cite::
 
-    Paper Under Review.
+    Pranav M. Khade and Robert L. Jernigan. Entropies Derived from the Packing Geometries within a Single Protein Structure. ACS Omega 2022 7 (24), 20719-20730 DOI: 10.1021/acsomega.2c00999
 
 
 CLI INSTRUCTIONS

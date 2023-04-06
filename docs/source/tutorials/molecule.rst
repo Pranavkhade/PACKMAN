@@ -6,7 +6,8 @@ Using 'Molecule' to load and manupulate molecular structures. (Basics)
 This module is base for all the algorithms and programs written in the PACKMAN. This tutorial aims to give an idea about the information flow and hierarchy in the objects. Once the object's basic understanding is developed, all the objects' advanced special features can be explored on their object documentation page.
 
 Citation:
-    Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python Toolbox for Structural Bioinformatics, Bioinformatics Advances, 2022;, vbac007, https://doi.org/10.1093/bioadv/vbac007
+    Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python Toolbox for Structural Bioinformatics,
+    Bioinformatics Advances, 2022;, vbac007, https://doi.org/10.1093/bioadv/vbac007
 
 .. image:: ../../_static/gallary/molecule_graph.png
 
