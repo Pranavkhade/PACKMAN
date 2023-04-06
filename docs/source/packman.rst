@@ -12,9 +12,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   packman.anm
-   packman.apps
-   packman.bin
+   packman.ANM
    packman.constants
    packman.entropy
    packman.molecule

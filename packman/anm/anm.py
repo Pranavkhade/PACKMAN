@@ -217,7 +217,7 @@ class ANM:
         """Decompose the Hessian Matrix of the ANM model.
         
         Note:
-            * Eigen values and Eigen Vectors are calculated. use ANM().get_eigenvalues() and ANM().get_eigenvectors() to obtain them.
+            * Eigen values and Eigen Vectors are calculated. use `ANM().get_eigenvalues()` and `ANM().get_eigenvectors()` to obtain them.
         
         Returns:
             bool: True if calculation is successful; False otherwise
@@ -232,7 +232,7 @@ class ANM:
         The fluctualtions/ theoretical b-factors are calculated using this method.
         
         Note:
-            * Fluctuations are calculated. use ANM().get_fluctuations() to obtain the fluctuations.
+            * Once fluctuations are calculated, use `ANM().get_fluctuations()` to obtain the fluctuations.
             * Endmode needs to be put in the code if and when required.
         
         Returns:
@@ -254,7 +254,7 @@ class ANM:
         """Carry out the Stiffness and Compliance analysis of the ANM model.
         
         Note:
-            *Citation:
+            * Citation:
                 Scaramozzino D, Khade PM, Jernigan RL, Lacidogna G, Carpinteri A. Structural compliance: A new metric for protein flexibility. Proteins. 2020 Nov;88(11):1482-1492. doi: 10.1002/prot.25968. Epub 2020 Jul 14. PMID: 32548853; PMCID: PMC7649752.
             * Obtain the following properties by using functions followed by it:
                 Stiffness Map     : ANM().get_stiffness_map()      
