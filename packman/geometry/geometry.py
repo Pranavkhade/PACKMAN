@@ -97,7 +97,7 @@ def AlphaShape( atoms, alpha, get_graph=False, write_objfile=None ):
     AlphaShape   = []
     ProteinGraph = Graph()
 
-    for a, b, c, d in DelaunayTesssellations.vertices:
+    for a, b, c, d in DelaunayTesssellations.simplices:
         Tetrahydron = [atoms[a],atoms[b],atoms[c],atoms[d]]
         Centre, Radius = Circumsphere(Tetrahydron)
         #Alpha Test
