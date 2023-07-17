@@ -90,10 +90,10 @@ class Model():
         self.__properties = {}
 
     def __getitem__(self,ChainID):
-        try:
-            return self.__AllChains[ChainID]
-        except KeyError:
-            logging.warning('Please provide a valid chain ID.')
+        #try:
+        return self.__AllChains[ChainID]
+        #except KeyError:
+        #    logging.warning('Please provide a valid chain ID.')
     
     #Get Functions
     def get_id(self):
