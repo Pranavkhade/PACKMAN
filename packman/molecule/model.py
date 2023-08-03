@@ -80,6 +80,7 @@ class Model():
     def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):                
         self.__id=id
         self.__AllAtoms=AllAtoms
+        self.__AllAtoms_inverse = { self.__AllAtoms[i]:i for i in self.__AllAtoms }
         self.__AllResidues=AllResidues
         self.__AllChains=AllChains
         self.__AllHetAtoms=AllHetAtoms
