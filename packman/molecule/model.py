@@ -80,6 +80,7 @@ class Model():
     def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):                
         self.__id=id
         self.__AllAtoms=AllAtoms
+        self.__AllAtoms_inverse = { self.__AllAtoms[i]:i for i in self.__AllAtoms }
         self.__AllResidues=AllResidues
         self.__AllChains=AllChains
         self.__AllHetAtoms=AllHetAtoms
@@ -487,8 +488,14 @@ class Model():
             else:
                 changed_components.append(i)
 
-        #Smaller component will be rotated to keep computational intensity low
-        to_rotate = list(changed_components[min((len(l), i) for i, l in enumerate(changed_components))[1]])
+        # Whatever component neighbour 1 is in, rotate that. This keeps $\vec{e_a}$ condition satisfied
+        if( self.__AllAtoms_inverse[neighbor1] in changed_components[0] ):
+            to_rotate = list(changed_components[0])
+        elif( self.__AllAtoms_inverse[neighbor1] in changed_components[1] ):
+            to_rotate = list(changed_components[1])
+        else:
+            logging.error('Atom :'+str(neighbor1.get_id())+' is not in the connected to the components')
+            return None
 
         #Setting up rotation matrix
         sn=numpy.sin(rotang)
