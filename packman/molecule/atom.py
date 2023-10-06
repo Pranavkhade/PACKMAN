@@ -201,7 +201,7 @@ class Atom():
         """
         if(type(atom2) == type(self)):
             None
-        elif(type(atom2) ==int):
+        elif(isinstance(atom2, int)):
             Model = self.get_parent().get_parent().get_parent()
             atom2 = Model.get_atom(atom2)
         else:
