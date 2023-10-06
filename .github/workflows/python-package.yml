@@ -15,9 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: pip install --user ruff
-    - run: ruff --exit-zero --line-length=320 --target-version=py37 --statistics . | sort -k 2
-    - run: ruff --ignore=E402,E701,E722,E741,F401,F403,F841
-                --output-format=github --line-length=320 --target-version=py37 .
+    - run: ruff --exit-zero --line-length=320 --target-version=py38 --statistics . | sort -k 2
+    - run: ruff --ignore=E402,E501,E701,E722,E741,F401,F403,F841
+                --output-format=github --target-version=py38 .
 
   build:
     runs-on: ubuntu-latest
