@@ -320,7 +320,7 @@ class Model():
             logging.error('neighbour2 not selected. Options available for neighbour2: ' + ', '.join( [str(i) for i in self.__ModelGraph[atom2.get_id()] if i != atom1.get_id() ]  ) )
             return None
         
-        if(type(neighbor1)==int):
+        if(isinstance(neighbor1, int)):
             neighbor1 = self.__AllAtoms[neighbor1]
         elif(type(neighbor1)==type(atom1)):
             None
@@ -328,7 +328,7 @@ class Model():
             logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
             return None
         
-        if(type(neighbor2)==int):
+        if(isinstance(neighbor2, int)):
             neighbor2 = self.__AllAtoms[neighbor2]
         elif(type(neighbor2)==type(atom2)):
             None
@@ -448,7 +448,7 @@ class Model():
             logging.error('neighbour2 not selected. Options available for neighbour2: ' + ', '.join( [str(i) for i in self.__ModelGraph[atom2.get_id()] if i != atom1.get_id() ]  ) )
             return None
         
-        if(type(neighbor1)==int):
+        if(isinstance(neighbor1, int)):
             neighbor1 = self.__AllAtoms[neighbor1]
         elif(type(neighbor1)==type(atom1)):
             None
@@ -456,7 +456,7 @@ class Model():
             logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
             return None
         
-        if(type(neighbor2)==int):
+        if(isinstance(neighbor2, int)):
             neighbor2 = self.__AllAtoms[neighbor2]
         elif(type(neighbor2)==type(atom2)):
             None
