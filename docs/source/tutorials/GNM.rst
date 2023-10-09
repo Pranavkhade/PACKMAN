@@ -10,6 +10,7 @@ How to cite::
     - For original GNM: Tirion, M.M. (1996). "Large amplitude elastic motions in proteins from a single-parameter, atomic analysis". Phys. Rev. Lett. 77 (9): 1905-1908.
     - For using GNM with this package: Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python Toolbox for Structural Bioinformatics, Bioinformatics Advances, 2022;, vbac007, https://doi.org/10.1093/bioadv/vbac007
     - For 7.8 Angstrom cutoff: Yang, L., Song, G. & Jernigan, R. L. Protein elastic network models and the ranges of cooperativity. Proc Natl Acad Sci U S A 106, 12347-52 (2009).
+    - For PACKMAN molecule API: Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python toolbox for structural bioinformatics, Bioinformatics Advances, Volume 2, Issue 1, 2022, vbac007, https://doi.org/10.1093/bioadv/vbac007
 
 Note: If PACKMAN is not installed, please follow the link: https://github.com/Pranavkhade/PACKMAN
 
