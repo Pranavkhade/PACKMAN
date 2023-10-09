@@ -4,7 +4,11 @@ Calculate Alpha Shape of the Protein
 ====================================
 
 This tutorial is to show how an API user can get the alpha shape of a protein.
+
+Citation::
     
+    Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python toolbox for structural bioinformatics,
+    Bioinformatics Advances, Volume 2, Issue 1, 2022, vbac007, https://doi.org/10.1093/bioadv/vbac007
 
 Step 1
 ------
