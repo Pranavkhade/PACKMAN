@@ -8,7 +8,7 @@ Example::
     from packman.anm import ANM
     help( ANM )
 
-Notes:
+Note:
     * Tutorial: https://jerniganlab.github.io/Software/PACKMAN/Tutorials/compliance
     * For more details about the parameters for compliance, or to site this, read the following paper: https://doi.org/10.1002/prot.25968
 
@@ -25,6 +25,8 @@ Authors:
 
 import numpy
 
+from typing import List
+
 from packman.molecule import Protein, Model, Atom
 
 '''
@@ -36,37 +38,39 @@ from packman.molecule import Protein, Model, Atom
 class ANM:
     """This class contains the functions essential to carry out the Anisotropic Network Model and Compliance analysis.
 
-        Notes:
+        Note:
         * Tutorial: https://jerniganlab.github.io/Software/PACKMAN/Tutorials/compliance
         * For more details about the parameters for compliance, or to site this, read the following paper:
-
-        Todo:
-            * fix init; coords to atoms
-            * Change the pf in such a way that it is not confusing
-            * Add set_ functions
         
         Args:
-            coords ([float])       : Two dimentional array of three dimentional points in the space.
-            gamma (float, optional): Spring Constant Value.                                      Defaults to 1.0.
-            dr (float, optional)   : Distance Cutoff.                                            Defaults to 15.0.
-            power (int, optional)  : Power of distance (mainly useful in non-parametric mode).   Defaults to 0.
-            pf (None, optional)    : Parameter free model. (Check the dr and power params)       Defaults to None.
-        """
-    
-    def __init__(self, atoms, gamma=1.0, dr=15.0, power=0, pf=None):
+                        atoms (List[Atom]): List of Atom objects.
+            gamma (float, optional): Spring Constant Value. Defaults to 1.0.
+            dr (float, optional): Distance Cutoff. Defaults to 15.0.
+            power (int, optional): Power of distance (mainly useful in parameter free mode). Defaults to 0.
+            pf (bool, optional): Parameter-free mode. Defaults to False.
+        Raises:
+            Exception: _description_
+            Exception: _description_
+            Exception: _description_
+    """    
+    def __init__(self, atoms: List[Atom], gamma: float=1.0, dr: float=15.0, power: int=0, pf: bool=False):
         self.gamma   = gamma
         self.dr      = dr
         self.power   = power
         self.pf      = pf
         self.atoms   = [i for i in atoms]
         self.coords  = numpy.array([i.get_location() for i in self.atoms])
-        if self.pf is not None and self.pf <= 0:
-            raise Exception("pf value cannot be zero or negative")
+
+        if self.pf is True and self.power <= 0:
+            raise Exception("Power value cannot be zero or negative")
+        if self.pf is True and self.power == 0:
+            raise Exception("Using power is of no use in this case")
         if self.gamma <= 0:
             raise Exception("gamma value cannot be zero or negative")
         if self.dr <= 0:
             raise Exception("distance cutoff value cannot be zero or negative")
 
+        self.hessian            = None
         self.fluctuations       = None
         self.stiffness_map      = None
         self.compliance_map     = None
@@ -75,21 +79,21 @@ class ANM:
 
 
     '''Get Functions'''
-    def get_hessian(self):
+    def get_hessian(self) -> numpy.ndarray:
         """Get the Hessian Matrix of the ANM model.
 
-        Notes:
-            * Make sure that the ANM().calculate_hessian() is called before calling this function. (will return None otherwise)
+        Note:
+            * * Make sure that the ANM().calculate_hessian() is called before calling this function.
         
         Returns:
-            numpy.ndarray: Hessian matrix if successful; None otherwise
+            numpy.ndarray: Hessian matrix
         """
         return self.hessian
     
-    def get_eigenvalues(self):
+    def get_eigenvalues(self) -> numpy.ndarray:
         """Get the Eigenvalues obtained by decomposing the Hessian Matrix of the ANM model.
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -97,10 +101,10 @@ class ANM:
         """
         return self.eigen_values
     
-    def get_eigenvectors(self):
+    def get_eigenvectors(self) -> numpy.ndarray:
         """Get the Eigenvectors obtained by decomposing the Hessian Matrix of the ANM model.
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -108,10 +112,10 @@ class ANM:
         """
         return self.eigen_vectors
     
-    def get_fluctuations(self):
+    def get_fluctuations(self) -> numpy.ndarray:
         """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -119,10 +123,10 @@ class ANM:
         """
         return self.fluctuations
     
-    def get_stiffness_map(self):
+    def get_stiffness_map(self) -> numpy.ndarray:
         """Get the Stiffness Map obtained from Stiffness and Compliance Analysis
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_stiffness_compliance() is called before calling this function. (will return None otherwise)
             * Stiffness=1/Compliance
         Returns:
@@ -130,10 +134,10 @@ class ANM:
         """
         return self.stiffness_map
     
-    def get_compliance_map(self):
+    def get_compliance_map(self) -> numpy.ndarray:
         """Get the Compliance Map obtained from Stiffness and Compliance Analysis
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_stiffness_compliance() is called before calling this function. (will return None otherwise)
             * Stiffness=1/Compliance
         Returns:
@@ -141,10 +145,10 @@ class ANM:
         """
         return self.compliance_map
     
-    def get_stiffness_profile(self):
+    def get_stiffness_profile(self) -> numpy.ndarray:
         """Get the Stiffness profile obtained from Stiffness and Compliance Analysis
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_stiffness_compliance() is called before calling this function. (will return None otherwise)
             * Stiffness=1/Compliance
         Returns:
@@ -152,10 +156,10 @@ class ANM:
         """
         return self.stiffness_profile
     
-    def get_compliance_profile(self):
+    def get_compliance_profile(self) -> numpy.ndarray:
         """Get the Compliance profile obtained from Stiffness and Compliance Analysis
         
-        Notes:
+        Note:
             * Make sure that the ANM().calculate_hessian(), ANM().calculate_decomposition() and ANM().calculate_stiffness_compliance() is called before calling this function. (will return None otherwise)
             * Stiffness=1/Compliance
         Returns:
@@ -165,12 +169,12 @@ class ANM:
     
 
     '''Calculate Functions'''
-    def calculate_hessian(self):
+    def calculate_hessian(self) -> bool:
         """Build the Hessian Matrix of the ANM model.
 
         This is the most essential step for ANM/ Compliance analysis.
         
-        Notes:
+        Note:
             * Hessian matrix is built; use ANM().get_hessian() to obtain the hessian matrix.
         """
         n_atoms=len(self.coords)
@@ -200,7 +204,7 @@ class ANM:
         self.hessian=hessian
         return True
     
-    def calculate_decomposition(self):
+    def calculate_decomposition(self) -> bool:
         """Decompose the Hessian Matrix of the ANM model.
         
         Note:
@@ -209,7 +213,7 @@ class ANM:
         self.eigen_values,self.eigen_vectors=numpy.linalg.eigh(self.hessian)
         return True
 
-    def calculate_fluctuations(self,endmode=None):
+    def calculate_fluctuations(self, endmode=None) -> bool:
         """Calculate the Fluctuations of the ANM model.
 
         The fluctualtions/ theoretical b-factors are calculated using this method.
@@ -229,7 +233,7 @@ class ANM:
         return True
     
     
-    def calculate_stiffness_compliance(self):
+    def calculate_stiffness_compliance(self) -> bool:
         """Carry out the Stiffness and Compliance analysis of the ANM model.
 
         Citation:
@@ -273,7 +277,7 @@ class ANM:
         self.compliance_profile = [numpy.nanmean(i) for i in compliance_map]
         return True
     
-    def calculate_movie(self, mode_number, scale=1.5, n=20, ftype='cif'):
+    def calculate_movie(self, mode_number, scale=1.5, n=20, ftype='cif') -> bool:
         """Get the movie of the obtained LINEAR modes. The first frame is the original structure and the projection progresses in positive (+) direction, returning to original structure and then in negative direction (-) again returning to the original structure.
 
         Args:
