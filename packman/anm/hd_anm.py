@@ -45,6 +45,7 @@ from .. import molecule, Atom, Model, Protein
 from ..constants import amino_acid_molecular_weight
 from ..constants import atomic_weight
 from ..utilities import load_hinge
+from typing import List
 
 import numpy
 import itertools
@@ -60,7 +61,7 @@ class hdANM:
     """This class contains the functions essential to carry out the Hinge-Domain-Anisotropic Network Model and Compliance analysis.
 
         Notes:
-        * Tutorial: 
+        * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/hdANM.html#tutorials-hdanm
         * For more details about the parameters for compliance, or to site this, read the following paper:
 
         Todo:
@@ -73,14 +74,9 @@ class hdANM:
             dr (float, optional)            : Distance Cutoff.                                            Defaults to 15.0.
             power (int, optional)           : Power of distance (mainly useful in non-parametric mode).   Defaults to 0.
             pf (None, optional)             : Parameter free model?.                                      Defaults to None.
-        
-        Raises:
-            Exception: [description]
-            Exception: [description]
-            Exception: [description]
         """
     
-    def __init__(self, atoms , hng_file , gamma=1.0, dr=15.0, power=0, pf=None):
+    def __init__(self, atoms: List[Atom] , hng_file , gamma: float =1.0, dr: float=15.0, power:float =0, pf: bool=False):
         self.gamma   = gamma
         self.dr      = dr
         self.power   = power
@@ -88,22 +84,20 @@ class hdANM:
         self.atoms   = atoms
         self.HNGinfo = load_hinge(hng_file)
         self.RT_eigen_vectors = None
-
-        #Coords are in the same order as the atoms
         self.coords  = numpy.array([i.get_location() for i in atoms])
-        if self.pf is not None and self.pf <= 0:
-            raise Exception("pf value cannot be zero or negative")
+
+        if self.pf is True and self.power <= 0:
+            raise Exception("Power value cannot be zero or negative")
+        if self.pf is True and self.power == 0:
+            raise Exception("Using power is of no use in this case")
         if self.gamma <= 0:
             raise Exception("gamma value cannot be zero or negative")
         if self.dr <= 0:
             raise Exception("distance cutoff value cannot be zero or negative")
         
-        ##To Verify that the hessian is same as ANM (Part 1/2)
-        #self.calculate_hessian()
-
 
     '''Get Functions'''
-    def get_hessian(self):
+    def get_hessian(self) -> numpy.ndarray:
         """Get the Hessian Matrix of the hd-ANM model.
 
         Notes:
@@ -114,7 +108,7 @@ class hdANM:
         """
         return self.hessian
     
-    def get_eigenvalues(self):
+    def get_eigenvalues(self) -> numpy.ndarray:
         """Get the Eigenvalues obtained by decomposing the Hessian Matrix of the hd-ANM model.
         
         Notes:
@@ -125,7 +119,7 @@ class hdANM:
         """
         return self.eigen_values
     
-    def get_eigenvectors(self):
+    def get_eigenvectors(self) -> numpy.ndarray:
         """Get the Eigenvectors obtained by decomposing the Hessian Matrix of the hd-ANM model.
         
         Notes:
@@ -136,7 +130,7 @@ class hdANM:
         """
         return self.eigen_vectors
     
-    def get_RT_eigen_vectors(self):
+    def get_RT_eigen_vectors(self) -> numpy.ndarray:
         """Get the Reverse Transformed vectors from the hdANM eigenvectors. 
     
         Reverse transformed means that the hdANM eigenvector of dimension: 6D+3H x 6D+3H  (D: Number of domains; H: Number of hinge atoms) are converted to 3N x 6D+3H (N: Number of atoms)
@@ -149,7 +143,7 @@ class hdANM:
         """
         return self.RT_eigen_vectors
     
-    def get_fluctuations(self):
+    def get_fluctuations(self) -> numpy.ndarray:
         """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
         
         Notes:
@@ -160,7 +154,7 @@ class hdANM:
         """
         return self.fluctuations
     
-    def get_hessian_pseudoinverse(self,n_modes="all"):
+    def get_hessian_pseudoinverse(self,n_modes="all") -> numpy.ndarray:
         """Get the Pseudoinverse of the hdANM model.
 
         Returns:
@@ -172,14 +166,14 @@ class hdANM:
             self.calculate_hessian_pseudoinverse(n_modes=n_modes)
             return self.hessian_pseudoinverse
     
-    def get_crosscorrelation_matrix(self,n_modes="all"):
+    def get_crosscorrelation_matrix(self, n_modes="all") -> numpy.ndarray:
         try:
             return self.crosscorrelation_matrix
         except:
             self.calculate_cross_correlation(n_modes=n_modes)
             return self.crosscorrelation_matrix
     
-    def get_hessian_block(self,Index1,Index2):
+    def get_hessian_block(self, Index1, Index2) -> numpy.ndarray:
         """Calculate Hij (Hessian matrix component) using equation . ()
 
         Notes:
@@ -213,52 +207,13 @@ class hdANM:
                     )
             return -diag
 
-        #To Verify that the hessian is same as ANM (Part 2/2)
+        #To Verify that the hessian is same as ANM
         #print(Index1,Index2,dist_ij,'\n',self.get_hessian()[Index1*3:Index1*3+3,Index2*3:Index2*3+3],"\n####\n")
         #return self.get_hessian()[Index1*3:Index1*3+3,Index2*3:Index2*3+3]
 
 
-    '''Calculate Functions'''
-    #Discontinued (But kept for testing)
-    '''
-    def calculate_hessian(self):
-        """Build the Hessian Matrix of the ANM model.
-
-        This is an essential step for hdANM
-        
-        Notes:
-            * Hessian matrix is built; use ANM().get_hessian() to obtain the hessian matrix.
-        """
-        n_atoms=len(self.coords)
-        hessian=numpy.zeros((n_atoms*3, n_atoms*3), float)
-        distance_mat=numpy.ones((n_atoms*3, n_atoms*3), float)
-        for i in range(len(self.coords)):
-            diff = self.coords[i+1:, :] - self.coords[i] 
-            squared_diff = diff**2
-            for j, s_ij in enumerate(squared_diff.sum(1)):
-                if s_ij <= self.dr**2:
-                    diff_coords = diff[j]
-                    j = j + i + 1
-                    derivative = numpy.outer(diff_coords, diff_coords)*(float(-self.gamma)/numpy.sqrt(s_ij)**(2+self.power))
-                    hessian[i*3:i*3+3, j*3:j*3+3] = derivative
-                    hessian[j*3:j*3+3, i*3:i*3+3] = derivative
-                    hessian[i*3:i*3+3, i*3:i*3+3] = hessian[i*3:i*3+3, i*3:i*3+3] - derivative
-                    hessian[j*3:j*3+3, j*3:j*3+3] = hessian[j*3:j*3+3, j*3:j*3+3] - derivative
-                    #abs added to avoid negative numbers
-                    d = numpy.sqrt(s_ij)
-                    lobj = [[d,d,d],[d,d,d], [d,d,d]]
-                    dmat = numpy.array(lobj)
-                    distance_mat[i*3:i*3+3, j*3:j*3+3] = dmat
-
-        if self.pf != None:
-            hessian = numpy.divide(hessian, distance_mat)
-        
-        #Class Change
-        self.hessian=hessian
-        return True
-    '''
-    
-    def calculate_decomposition(self, include_mass=True):
+    '''Calculate Functions'''    
+    def calculate_decomposition(self, include_mass: bool=True) -> bool:
         """Decompose the Hessian Matrix of the hdANM model.
 
         Args:
@@ -283,7 +238,7 @@ class hdANM:
         return True
     
     
-    def calculate_hessian(self,mass_type='unit'):
+    def calculate_hessian(self, mass_type: str='unit') -> bool:
         """Build the Hessian Matrix of the hdANM model.
 
         This is the most essential step for hdANM. It picks up blocks from ANM hessian matrix and puts it in the format described in the paper.
@@ -453,7 +408,7 @@ class hdANM:
         self.domain_hessian, self.domain_mass_matrix, self.domain_info = H_new, M, DomainInfo #DomainInfo is saved to check the sequence in which H_new is formed
         return True
     
-    def calculate_RT_eigen_vectors(self):
+    def calculate_RT_eigen_vectors(self) -> bool:
         """Calculate the reverse transformed vectors from the hdANM eigenvectors. 
     
         Reverse transformed means that the hdANM eigenvector of dimension: 6D+3H x 6D+3H  (D: Number of domains; H: Number of hinge atoms) are converted to 3N x 6D+3H (N: Number of atoms)
@@ -488,7 +443,7 @@ class hdANM:
         self.RT_eigen_vectors = exploded_vectors
         return True
 
-    def calculate_fluctuations(self):
+    def calculate_fluctuations(self) -> bool:
         """Calculate the Fluctuations of the hd-ANM model.
 
         The fluctualtions/ theoretical b-factors are calculated using this method.
@@ -515,7 +470,7 @@ class hdANM:
         self.fluctuations = [numpy.sum(i) for i in mode_bfactors.T]
         return True
     
-    def calculate_hessian_pseudoinverse(self, n_modes="all"):
+    def calculate_hessian_pseudoinverse(self, n_modes: str="all") -> bool:
         """Calculate the hessian pseudoinverse for the hd-ANM modes
 
         Pseudoinverse is calculated using this methd. Please note that first 6 rigid modes are eliminated in this calculation.
@@ -533,7 +488,7 @@ class hdANM:
         else:
             self.hessian_pseudoinverse = numpy.matmul(  numpy.matmul( EVec[6:6+n_modes].transpose() , numpy.diag(1/self.get_eigenvalues()[6:6+n_modes]) )  , EVec[6:6+n_modes]  )
     
-    def calculate_cross_correlation( self, n_modes = "all" ):
+    def calculate_cross_correlation( self, n_modes:str = "all" ) -> bool:
         """Calculate the cross correlation matrix for the hdANM modes.
 
         Crosscorrelation matrix is generated for all modes by default. Please change the n_modes parameter to restrict modes.
@@ -552,7 +507,7 @@ class hdANM:
 
                 self.crosscorrelation_matrix[i][j] = trace_H_inv_ij / numpy.sqrt( trace_H_inv_ii*trace_H_inv_jj )
 
-    def calculate_movie(self, mode_number, scale=1.5, n=20, extrapolation="curvilinear", ftype='cif', ca_to_aa=False):
+    def calculate_movie(self, mode_number: int, scale: float=1.5, n: int=20, extrapolation: str="curvilinear", ftype: str='cif', ca_to_aa: bool=False) -> bool:
         """This function generates the dynamic 3D projection of the normal modes obtained using hd-ANM. The 3D projection can be linearly extrapolated or curvilinearly extrapolated depending on the choices. The first frame is the original structure and the projection progresses in positive (+) direction, returning to original structure and then in negative direction (-) again returning to the original structure.
 
         Args:

@@ -48,10 +48,6 @@ class ANM:
             dr (float, optional): Distance Cutoff. Defaults to 15.0.
             power (int, optional): Power of distance (mainly useful in parameter free mode). Defaults to 0.
             pf (bool, optional): Parameter-free mode. Defaults to False.
-        Raises:
-            Exception: _description_
-            Exception: _description_
-            Exception: _description_
     """    
     def __init__(self, atoms: List[Atom], gamma: float=1.0, dr: float=15.0, power: int=0, pf: bool=False):
         self.gamma   = gamma

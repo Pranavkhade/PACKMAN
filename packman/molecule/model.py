@@ -633,7 +633,10 @@ class Model():
                                             if(bond.get_type().split('-')[0]=='covalent'):
                                                 self.__ModelGraph.add_edge( atm1.get_id(), atm2.get_id() , id = counter )
                                         else:
-                                            logging.warn('Some atom(s) are not identified correctly in the mmCIF file.')
+                                            try:
+                                                logging.debug('Some atom(s) are incorrectly identified and not added in the mmCIF file while adding bond information from the _struct_conn field. Atoms'+str(atm1.get_id())+' '+str(atm2.get_id()) )
+                                            except:
+                                                logging.debug('Some atom(s) are incorrectly identified and not added in the mmCIF file while adding bond information from the _struct_conn field.')
 
                                 except Exception as e:
                                     #Check whats up with string error (very minor)
@@ -672,7 +675,7 @@ class Model():
                             #Bond pair not found
                             None
                 except:
-                    logging.warn('Residue Number|Name|Chain '+str(i.get_id())+'|'+str(i.get_name())+'|'+str(i.get_parent().get_id())+' is not a standard amino acid; sidechain bonds are not calculated.')
+                    logging.debug('Residue Number|Name|Chain '+str(i.get_id())+'|'+str(i.get_name())+'|'+str(i.get_parent().get_id())+' is not a standard amino acid; sidechain bonds are not calculated.')
 
             #Peptide bonds (Assumption: All the reisudes are in the incremental/decremental order)
             for i in range(0,len(resi)-1):
