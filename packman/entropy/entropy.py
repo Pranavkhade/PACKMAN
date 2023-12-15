@@ -10,7 +10,6 @@ Example::
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
-from .. import molecule
 from ..constants import vdw_surface_bondi
 
 import numpy
@@ -19,6 +18,13 @@ import logging
 
 from scipy.spatial import Voronoi, ConvexHull, KDTree
 from scipy.constants import R
+from typing import ForwardRef, TYPE_CHECKING, List
+
+if(TYPE_CHECKING):
+    try:
+        from .. import Atom, Chain
+    except:
+        None
 
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -32,7 +38,7 @@ class PackingEntropy():
         probe_size (float)              : Radius of the probe to generate the surface points (This value should not be less than 1;Read the Publication for more details)
         onspherepoints (int)            : Number of points to be generated around each point for the surface (Read the Publication for more details)
     """
-    def __init__(self, atoms, chains=None, probe_size=1.4, onspherepoints=30):
+    def __init__(self, atoms: 'Atom', chains: (str | None) = None, probe_size: float = 1.4, onspherepoints:int = 30):
         if(chains is None):
             self.atoms = [i for i in atoms]
         else:
@@ -59,7 +65,7 @@ class PackingEntropy():
         self.calculate_entropy()
 
     #Get functions
-    def get_total_packing_fraction(self):
+    def get_total_packing_fraction(self) -> float:
         """The sum of Packing Fraction for the Residues in the provided atoms.
 
         Returns:
@@ -67,14 +73,14 @@ class PackingEntropy():
         """
         return numpy.sum( [i.get_property('PackingFraction') for i in self.residues] )
 
-    def get_total_entropy(self):
+    def get_total_entropy(self) -> float:
         """The sum of Packing Entropies for the Residues in the provided atoms.
         Returns:
             The sum of Residue Entropies (float)
         """
         return numpy.sum( [i.get_entropy('PackingEntropy') for i in self.residues] )
     
-    def get_total_chain_entropy(self,chain):
+    def get_total_chain_entropy(self, chain: str):
         """The sum of Packing Entropies for the Residues in the provided atoms and chain.
         
         Please note that the entropy for the chain you are selecting might not exist if you have not calculated it properly. Please make sure to run calculate_entropy() function properly.
@@ -83,7 +89,7 @@ class PackingEntropy():
         """
         return numpy.sum( [i.get_entropy('PackingEntropy') for i in self.residues if i.get_parent().get_id()==chain] )
         
-    def get_surafacepoints(self):
+    def get_surafacepoints(self) -> List[float]:
         """Get the surface points around the given set of atoms in the protein.
         Returns:
             [[float]]: Array of 3D points around the given set of atoms in the protein.
@@ -91,10 +97,14 @@ class PackingEntropy():
         return self.surface_points
 
     #Calculate Functions
-    def calculate_spherepoints(self,atom):
+    def calculate_spherepoints(self, atom: 'Atom') -> List[float]:
         """Given a single point, this function generates point cloud around the given points.
+        
         Args:
-            atom ([packman.molecule.Atom]) : Atom object around which the sphere of point cloud to be generated.
+            atom (packman.molecule.Atom) : Atom object around which the sphere of point cloud to be generated.
+        
+        Returns:
+            [[float]]: Array of 3D points around a given point
         """
         point = atom.get_location()
         indices = numpy.arange(0, self.onspherepoints, dtype=float) + 0.5
@@ -113,7 +123,7 @@ class PackingEntropy():
                 selected.append(_)
         return selected
 
-    def calculate_surafacepoints(self):
+    def calculate_surafacepoints(self) -> None:
         """Calculate the surface points with the current setup.
         """
         pool = ThreadPool()
@@ -121,7 +131,7 @@ class PackingEntropy():
         surface=[item for sublist in surface for item in sublist]
         self.surface_points = surface
 
-    def calculate_entropy(self):
+    def calculate_entropy(self) -> None:
         """Calculate the Packing Entropy with the current setup.
         """
         logging.info("Packing Entropy calculation started.")
