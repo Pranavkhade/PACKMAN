@@ -20,11 +20,15 @@ Authors:
 """
 import numpy
 
+from typing import TYPE_CHECKING, List
+
 from scipy.spatial import Delaunay
 
 from networkx import Graph
 
-def Circumsphere(Tetrahydron):
+from .. import Atom
+
+def Circumsphere(Tetrahydron: List[Atom]) -> (float, float):
     """Get the Circumsphere of the set of four points.
     
     Given any four three dimentional points, this function calculates the features of the circumsphere having the given four points on it's surface.

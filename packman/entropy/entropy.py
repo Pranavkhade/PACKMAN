@@ -38,7 +38,7 @@ class PackingEntropy():
         probe_size (float)              : Radius of the probe to generate the surface points (This value should not be less than 1;Read the Publication for more details)
         onspherepoints (int)            : Number of points to be generated around each point for the surface (Read the Publication for more details)
     """
-    def __init__(self, atoms: 'Atom', chains: (str | None) = None, probe_size: float = 1.4, onspherepoints:int = 30):
+    def __init__(self, atoms: 'Atom', chains: str | None = None, probe_size: float = 1.4, onspherepoints:int = 30):
         if(chains is None):
             self.atoms = [i for i in atoms]
         else:
