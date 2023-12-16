@@ -14,12 +14,6 @@ Example::
 
 Note:
     * Iterating over chain only fetches the residues not the hetero atoms
-    * The object fetches the atoms and residues which are not in order as they appear in the PDB. Find a way to fix this
-    
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
 
 Authors:
     * Pranav Khade (https://github.com/Pranavkhade)
@@ -28,7 +22,10 @@ Authors:
 import numpy
 import logging
 
+from typing import TYPE_CHECKING, List, Union, Iterable
 
+if(TYPE_CHECKING):
+    from .. import Atom, Residue, HetMol, Model, Hinge, Bond
 
 class Chain():
     """This class contains the information about the 'Chain' object (packman.molecule.Chain).
@@ -39,68 +36,65 @@ class Chain():
 
     Note:
         * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
-        * Add get_atoms()
     
     Args:
-        id (str): Chain ID from the PDB file as it is. Each Chain in a PDB file Model/Frame has unique ID. (essential)
-        
+        id (str): Chain ID from the PDB file as it is. Each Chain in a PDB file Model/Frame has unique ID. (essential)      
     """
-    
-    def __init__(self,id):
-        self.__id = id
-        self.__Residues = {}
-        self.__HetMols = {}
-        self.__parent = None
+    def __init__(self, id: str):
+        self.__id         = id
+        self.__Residues   = {}
+        self.__HetMols    = {}
+        self.__parent     = None
         #More Features
-        self.__Hinges = []
+        self.__Hinges     = []
 
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
     
-    def __setitem__(self,Number,Entity,Type):
+    def __setitem__(self, Number: int, Entity: Union['Residue', 'HetMol'], Type: str):
         if(Type=='Residue'):
             try:
-                self.__Residues[Number]=Entity
+                self.__Residues[Number] = Entity
             except:
-                self.__Residues[Number]=Entity
+                self.__Residues[Number] = Entity
         elif(Type=='HetMol'):
             try:
-                self.__HetMols[Number]=Entity
+                self.__HetMols[Number] = Entity
             except:
-                self.__HetMols[Number]=Entity
+                self.__HetMols[Number] = Entity
 
-    def __getitem__(self,Number,Type=None):
+    def __getitem__(self, Number: int):
         try:
             return self.__Residues[Number]
         except:
             return self.__HetMols[Number]
     
     #Get Functions
-    def get_id(self):
-        """Get the ID of the 'Residue'
+    def get_id(self) -> str:
+        """Get the ID of the 'Chain'
 
         Returns:
             str if successful, None otherwise.
         """
         return self.__id
     
-    def get_parent(self):
+    def get_parent(self) -> 'Model':
         """Get the 'Model' the given 'Chain' belongs to.
 
         Returns:
-            packman.molecule.Model if successful, None otherwise.
+            ref:`packman.molecule.Model` if successful, None otherwise.
         """
         return self.__parent
     
-    def get_hinges(self):
+    def get_hinges(self) -> List['Hinge']:
         """Get the hinges in the chain as a dictionary of 'Hinge' objects.
 
         Returns:
-            packman.molecule.annotations.Hinge if successful, None otherwise.
+            List of ref:`packman.molecule.annotations.Hinge` if successful, None otherwise.
         """
         return self.__Hinges
     
-    def get_entropy(self,entropy_type):
+    def get_entropy(self, entropy_type: str):
         """Get the Packing Entropy of the given 'Chain'.
 
         Please note that if the Entropy is calculated using specific atoms, this option might not give results for the amino acids that are not included because of the specific selection. Use the get_total_chain_entropy() function. Please see the documentation for more details.
@@ -109,7 +103,7 @@ class Chain():
             type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
 
         Note:
-            - More type of Entropies might be added in the future.
+            * More type of Entropies might be added in the future.
         """
         EntropyTypes = ['PackingEntropy']
         try:
@@ -120,7 +114,7 @@ class Chain():
             else:
                 logging.warning('The Entropy type provided is invalid. Please check the documentation for the details.')
 
-    def get_property(self,property_name):
+    def get_property(self, property_name):
         """Get the Property of the given 'Chain'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
@@ -130,14 +124,14 @@ class Chain():
             property_name (object): The 'Key' or a name the user wants to assign to to the property
         
         Note:
-            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+            * Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
         """
         try:
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
     
-    def get_bonds(self):
+    def get_bonds(self) -> Iterable['Bond']:
         """Get the Bonds in the given 'Chain'
 
         Please check out calculate_bonds() for more information on the bond calculations.
@@ -148,31 +142,31 @@ class Chain():
             logging.warn('Bonds are not calculated yet. Use calculate_bond()')
     
     #Set Functions
-    def set_id(self,new_id):
+    def set_id(self, new_id: str):
         """Set the ID of the given 'Chain'
 
         Args:
             new_id (str): The ID User wishes to assign to the given 'Chain'
         """
-        self.__id=new_id
+        self.__id = new_id
     
-    def set_parent(self,parent):
-        """Set the Parent of the given 'Residue'
+    def set_parent(self, parent: 'Model'):
+        """Set the Parent of the given 'Chain'
 
         Args:
-            new_parent (packman.molecule.Chain): The parent 'Chain' User wishes to assign to the given 'Residue'
+            new_parent (ref:`packman.molecule.Model`): The parent 'Model' User wishes to assign to the given 'Chain'
         """
-        self.__parent=parent
+        self.__parent = parent
     
-    def set_hinges(self,new_hinges):
+    def set_hinges(self, new_hinges: List['Hinge']):
         """Set/Add hinge to the 'Chain' object
 
         Args:
-            new_hinges (packman.molecule.annotations.Hinge): The 'Hinge' User wishes to assign/add to the given 'Chain'
+            new_hinges (ref:`packman.molecule.annotations.Hinge`): The 'Hinge' User wishes to assign/add to the given 'Chain'
         """
-        self.__Hinges=self.__Hinges+new_hinges
+        self.__Hinges = self.__Hinges + new_hinges
 
-    def set_property(self,property_name,value):
+    def set_property(self, property_name, value):
         """Set the Property of the given 'Chain'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
@@ -191,37 +185,38 @@ class Chain():
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
     #Calculation Functions
-    def get_atoms(self):
-        """Get the generator of corresponding 'atom' objects of the residues of the 'Chain'
+    def get_atoms(self) -> List[List['Atom']]:
+        """Get the generator of corresponding 'Atom' objects of the residues of the 'Chain'
 
         Returns:
-            generator of 'atom' objects if successful, None otherwise.
+            generator of ref:`packman.molecule.Atom` objects if successful, None otherwise.
         """
         for i in sorted(self.__Residues.keys()):
             for j in self.__Residues[i].get_atoms():
                 yield j
     
-    def get_hetatoms(self):
-        """Get the generator of corresponding 'atom' objects of the hetmols of the 'Chain'
+    def get_hetatoms(self) -> List[List['Atom']]:
+        """Get the generator of corresponding 'Atom' objects of the hetmols of the 'Chain'
 
         Returns:
-            generator of 'atom' objects if successful, None otherwise.
+            generator of ref:`packman.molecule.Atom` objects if successful, None otherwise.
         """
         for i in sorted(self.__HetMols.keys()):
             for j in self.__HetMols[i].get_atoms():
                 yield j
     
-    def get_atom(self, idx):
+    def get_atom(self, idx: int) -> Union['Atom', None]:
         """Get the atom of the given ID.
 
-        Note: - This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
-              - If the PDB file is constructed manually/ has multiple atoms of the same ID, the first instance of the atom with that id is returned. Please avoid saving two atoms with same ID in a same structure file in a given frame/model.
+        Note: 
+            * This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
+            * If the PDB file is constructed manually/ has multiple atoms of the same ID, the first instance of the atom with that id is returned. Please avoid saving two atoms with same ID in a same structure file in a given frame/model.
 
         Args:
             idx (int): Get atom by the id
         
         Returns:
-            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+            atom (ref:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
         """
         the_atom = None
         for i in self.__Residues:
@@ -240,11 +235,12 @@ class Chain():
             logging.info('The atom with the given ID is not found in the Residues/HetMols')
             return None
     
-    def get_residue(self,idx):
+    def get_residue(self, idx: int) -> Union['Residue', None]:
         """Get the residue of the given ID.
 
-        Note: - This function is different from :py:func:`packman.molecule.chain.get_residues`
-              - If the PDB file is constructed manually/ has multiple residues of the same ID, the first instance of the residue with that id is returned. Please avoid saving two residues with same ID in a same structure file in a given frame/model.
+        Note:
+            * This function is different from :py:func:`packman.molecule.chain.get_residues`
+            * If the PDB file is constructed manually/ has multiple residues of the same ID, the first instance of the residue with that id is returned. Please avoid saving two residues with same ID in a same structure file in a given frame/model.
 
         Args:
             idx (int): Get residue by the id
@@ -257,7 +253,7 @@ class Chain():
                 return i
                 break
 
-    def get_hetmol(self,idx):
+    def get_hetmol(self, idx: int) -> Union['HetMol', None]:
         """Get the hetmol of the given ID.
 
         Note: - This function is different from :py:func:`packman.molecule.chain.get_hetmols`
@@ -267,63 +263,63 @@ class Chain():
             idx (int): Get hetmol by the id
         
         Returns:
-            residue (:py:class:`packman.molecule.HetMol`): HetMol of the given ID if successful; None otherwise.
+            HetMol (:py:class:`packman.molecule.HetMol`): HetMol of the given ID if successful; None otherwise.
         """
         for i in self.get_hetmols():
             if(i.get_id() == idx):
                 return i
                 break
     
-    def get_residues(self):
+    def get_residues(self) -> Iterable['Residue']:
         """Get the generator of corresponding 'Residue' objects of the 'Chain'
 
         Returns:
-            generator of 'Residue' objects if successful, None otherwise.
+            generator of ref:`packman.molecule.Residue` objects if successful, None otherwise.
         """
-        for i in sorted(self.__Residues.keys()):yield self.__Residues[i]
+        for i in sorted(self.__Residues.keys()): yield self.__Residues[i]
     
-    def get_calpha(self):
+    def get_calpha(self) -> Iterable['Atom']:
         """Get the C-Alpha atoms of the 'Chain' as an 'Atom' object.
 
         Returns:
-            generator of packman.molecule.Atom objects if successful, None otherwise.
+            generator of ref:`packman.molecule.Atom` objects if successful, None otherwise.
         """
-        for i in self.get_residues():yield i.get_calpha()
+        for i in self.get_residues(): yield i.get_calpha()
     
-    def get_hetmols(self):
+    def get_hetmols(self) -> Iterable['HetMol']:
         """Get the generator of corresponding 'HetMol' objects of the 'Chain'
 
         Returns:
-            generator of 'HetAtom' objects if successful, None otherwise.
+            generator of ref:`packman.molecule.HetAtom` objects if successful, None otherwise.
         """
-        for i in sorted(self.__HetMols.keys()):yield self.__HetMols[i]
+        for i in sorted(self.__HetMols.keys()): yield self.__HetMols[i]
     
-    def get_backbone(self):
+    def get_backbone(self) -> List[List['Atom']]:
         """Get the Backbone atoms of the given 'Chain' as a list of 'Atom' object
 
         Note:
             * Backbone Atoms: CA, O, N, C
 
         Returns:
-            list of packman.molecule.Atom if successful, None otherwise.
+            list of ref:`packman.molecule.Atom` if successful, None otherwise.
         """
         return [i.get_backbone() for i in self.get_residues()]
     
-    def get_sequence(self):
+    def get_sequence(self) -> str:
         """Get the Amino acid sequence of the chain. (Protein chains only)
         
         Returns:
-            FASTA format string of the chain sequence.
+            FASTA format (str) of the chain sequence.
         """
         try:
             return '>'+str(self.get_parent().get_parent().get_id())+'_'+str(self.get_parent().get_id())+'_'+str(self.get_id())+'\n'+''.join([resi.get_changed_alphabet() if len(resi.get_name())>1 else resi.get_name() for resi in self.get_residues()])
         except:
             logging.debug('Error in retriving chain sequence.')
     
-    def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
+    def calculate_entropy(self, entropy_type: str, chains: Union[List[str], str, None]=None, probe_size: float=1.4, onspherepoints: int=30):
         """Calculate the entropy for the each amino acid will be returned.
     
-        The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
+        The 'Chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
 
         Args:
             entropy_type (str)              : Type of entropy to be calculated (Options: PackingEntropy)
@@ -331,4 +327,4 @@ class Chain():
             probe_size (float)              : Radius of the probe to generate the surface points (This value should not be less than 1;Read the Publication for more details)
             onspherepoints (int)            : Number of points to be generated around each point for the surface (Read the Publication for more details)
         """
-        self.get_parent().calculate_entropy(entropy_type,chains=chains, probe_size=probe_size, onspherepoints=onspherepoints)
+        self.get_parent().calculate_entropy(entropy_type, chains=chains, probe_size=probe_size, onspherepoints=onspherepoints)
