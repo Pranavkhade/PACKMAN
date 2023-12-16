@@ -32,6 +32,7 @@ class PackingEntropy():
     """This class contains all the methods required to obtain a protein complex's entropy.
     Given a group of atoms in the :mod:'packman.molecule.Atom' objects, the entropy for the each amino acid will be returned.
     The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
+    
     Args:
         atoms ([packman.molecule.Atom]) : The group of atoms user wisher to calculate Packing Entropy with.
         chains ([str]/str)              : Chain IDs for the Entropy calculation (None means all the chains are included; single string means only one chain ID; multiple chains should be an array of strings).

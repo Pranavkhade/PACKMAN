@@ -62,7 +62,7 @@ def AlphaShape( atoms: Iterable[Atom], alpha: float, get_graph: bool=True ) -> U
 
     Given set of atoms as 'Atom' (packman.molecule.Atom) object(s) and the alpha value, this class will calculate and return the alpha shape tessellations. It will also write the .obj file if the filename is provided as an input.
 
-    Notes:
+    Note:
         * Tip: If you do not want to use the function multiple times to save computation, calculate it once with alpha = float('Inf') and then use the tessellations to calculate radius and save it as a dictionary to retrieve. Tessellations with any cutoff.
         * For more information on the alpha shape, read the following paper:
             EdelsbrunnerandE. P. M ̈ucke.Three-dimensional alpha shapes.
@@ -80,7 +80,7 @@ def AlphaShape( atoms: Iterable[Atom], alpha: float, get_graph: bool=True ) -> U
     def calculate_alphafitness(alpha: float, circumradius: float) -> bool:
         """Alpha Test as per the paper.
         
-        Notes:
+        Note:
             * Resides inside 'get_alphashape' function.
 
         Args:

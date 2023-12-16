@@ -28,12 +28,12 @@ Example::
     from packman.anm import hdANM
     help( hdANM )
 
-Notes:
+Note:
     * Tutorial: https://py-packman.readthedocs.io/en/latest/tutorials/hdANM.html#tutorials-hdanm
 
 Todo:
     * Finish optimizing the performance.
-    * Add publication details in the Notes
+    * Add publication details in the Note
     * Make sure that parameter to the ANM is changed from [float] to packman.molecule.atom
 
 Authors:
@@ -60,7 +60,7 @@ from scipy.linalg import eig as scipy_eig
 class hdANM:
     """This class contains the functions essential to carry out the Hinge-Domain-Anisotropic Network Model and Compliance analysis.
 
-        Notes:
+        Note:
         * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/hdANM.html#tutorials-hdanm
         * For more details about the parameters for compliance, or to site this, read the following paper:
 
@@ -100,7 +100,7 @@ class hdANM:
     def get_hessian(self) -> numpy.ndarray:
         """Get the Hessian Matrix of the hd-ANM model.
 
-        Notes:
+        Note:
             * Make sure that the hdANM().calculate_hessian() is called before calling this function. (will return None otherwise)
         
         Returns:
@@ -111,7 +111,7 @@ class hdANM:
     def get_eigenvalues(self) -> numpy.ndarray:
         """Get the Eigenvalues obtained by decomposing the Hessian Matrix of the hd-ANM model.
         
-        Notes:
+        Note:
             * Make sure that the hdANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -122,7 +122,7 @@ class hdANM:
     def get_eigenvectors(self) -> numpy.ndarray:
         """Get the Eigenvectors obtained by decomposing the Hessian Matrix of the hd-ANM model.
         
-        Notes:
+        Note:
             * Make sure that the hdANM().calculate_hessian() and hdANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -146,7 +146,7 @@ class hdANM:
     def get_fluctuations(self) -> numpy.ndarray:
         """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
         
-        Notes:
+        Note:
             * Make sure that the hdANM().calculate_hessian(), hdANM().calculate_decomposition() and hdANM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -176,7 +176,7 @@ class hdANM:
     def get_hessian_block(self, Index1, Index2) -> numpy.ndarray:
         """Calculate Hij (Hessian matrix component) using equation . ()
 
-        Notes:
+        Note:
             
         Returns:
             numpy.ndarray: Hij if successful; None otherwise
@@ -246,7 +246,7 @@ class hdANM:
         Args:
             mass_type (unit/atom/residue): Whether to use unit (1), atomic weights or residue mass for the mass matrix.
         
-        Notes:
+        Note:
             * Possible argument removal for the decomposition function
             * use hdANM().domain_hessian, hdANM().domain_mass_matrix and hdANM().domain_info to access output of this function
             * Mass of the Amino Acid Residues/Atoms can be found in /packman/constants/Constants.py

@@ -8,9 +8,6 @@ How to use::
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
-import numpy
-
-import traceback
 import logging
 
 from .. import molecule
@@ -19,7 +16,6 @@ from ..apps import hinge_cli, hdanm_cli, entropy_cli, dci_cli
 import operator
 import argparse
 import os
-import sys
 
 '''
 ##################################################################################################

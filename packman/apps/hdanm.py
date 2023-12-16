@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+"""The 'hdANM' object host file.
+This is file information, not the class information. This information is only for the API developers.
+Please read the 'DCI' object documentation for details.
+
+Example::
+    from packman.apps import hdanm_cli
+    help( hdanm_cli )
+
+Note:
+    * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/hdANM_cli.html#tutorials-hdanm-cli
+    * For more details about the parameters for compliance, or to site this, read the following paper: 
+
+Authors:
+    * Ambuj Kumar  (ambuj@iastate.edu)
+    * Pranav Khade (https://github.com/Pranavkhade)
+"""
 import numpy
 import tarfile
 import tempfile
