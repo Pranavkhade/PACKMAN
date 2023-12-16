@@ -20,7 +20,7 @@ Todo:
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
-from typing import List
+from typing import List, Union
 from . import Atom, Residue
 
 '''
@@ -52,7 +52,7 @@ class Hinge():
         self.__p=p
 
     #Get functions
-    def get_id(self) -> (int | None):
+    def get_id(self) -> Union[int, None]:
         """Get the ID of the 'Hinge'
 
         Returns:
@@ -60,7 +60,7 @@ class Hinge():
         """
         return self.__id
     
-    def get_alpha_value(self) -> (int | None):
+    def get_alpha_value(self) -> Union[int, None]:
         """Get the hinge prediction algorithm parameter (Alpha Value) of the 'Hinge'.
 
         Returns:
