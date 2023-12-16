@@ -19,7 +19,7 @@ Todo:
     * Finish optimizing the performance.
 
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
 
 import numpy

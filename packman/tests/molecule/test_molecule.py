@@ -1,5 +1,6 @@
 from ... import molecule
 import unittest
+import numpy
 
 import logging
 from os import remove as rm
@@ -75,21 +76,22 @@ class TestMolecule(unittest.TestCase):
     
     def test_Atom(self):
         #Basic
-        Residues = [ i for i in self.mol[0]['A'].get_residues() ]
-        self.assertIsInstance( Residues[0], molecule.Residue )
-        self.assertIsInstance( Residues[0].get_parent(), molecule.Chain )
-        self.assertIsNotNone( Residues[0].get_id() )
+        Atoms = [ i for i in self.mol[0]['A'].get_atoms() ]
+        self.assertIsInstance( Atoms[0], molecule.Atom )
+        self.assertIsInstance( Atoms[0].get_parent(), molecule.Residue )
+        self.assertIsNotNone( Atoms[0].get_id() )
 
         #Get Methods
-        self.assertNotEqual( len( [i for i in Residues[0].get_atoms()] )   , 0 )
-        self.assertNotEqual( len( [i for i in Residues[0].get_backbone()] ), 0 )
+        self.assertIsInstance( Atoms[0].get_location(), numpy.ndarray )
 
-        self.assertIsNotNone( Residues[0].get_calpha() )
-        self.assertIsNotNone( Residues[0].get_tip() )
-        self.assertIsNotNone( Residues[0].get_centerofgravity() )
-    
+
     def test_Bond(self):
-        self.assertEqual( len([i.get_id() for i in self.mol[0].get_bonds()]) , 1542 )
+        Bonds = [i for i in self.mol[0].get_bonds()]
+        self.assertEqual( len(Bonds), 1542 )
+        self.assertIsInstance( Bonds[0].get_id(), int)
+        
+        self.assertIsInstance(Bonds[0].get_atoms()[0], molecule.Atom)
+        self.assertIsInstance(Bonds[0].get_atoms()[1], molecule.Atom)
     
     def tearDown(self):
         logging.info('Molecule Test Done.')
