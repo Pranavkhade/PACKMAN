@@ -20,7 +20,12 @@ import numpy
 
 import logging
 
-from typing import List, Self, TYPE_CHECKING, Union
+from typing import List, TYPE_CHECKING, Union
+
+try:
+    from typing import Self
+except:
+    from typing_extensions import Self
 
 if(TYPE_CHECKING):
     from . import Residue, Bond, HetMol
