@@ -13,12 +13,7 @@ Example::
     help( Model )
 
 Note:
-    * The models are nothing but frames of the PDB file.
-    
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
+    * The models are frames of the PDB file.
 
 Authors:
     * Pranav Khade (https://github.com/Pranavkhade)
@@ -53,8 +48,13 @@ from .bond import Bond
 import numpy
 import logging
 
-#Think how the graph can be improved
 from networkx import Graph, bridges, draw, connected_components
+
+from typing import TYPE_CHECKING, Union, List, Iterable, Dict
+
+if(TYPE_CHECKING):
+    from .. import Atom, Residue, HetMol, Chain, Protein
+
 
 
 class Model():
@@ -68,36 +68,33 @@ class Model():
             * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
         
         Args:
-            id (int)                                : Model ID from the PDB file ordered from first to the last. Each Model in a PDB file has unique ID. (essential)
-            AllAtoms ({packman.molecule.Atom})      : Dictionary of all the 'Atom' in the given model.
-            AllResidues ({packman.molecule.Residue}): Dictionary of all the 'Residue' in the given model.
-            AllChains ({packman.molecule.Chain})    : Dictionary of all the 'Chain' in the given model.
-            AllHetAtoms ({packman.molecule.HetAtom}): Dictionary of all the 'HetAtom' in the given model.
-            AllHetMols ({packman.molecule.HetMol})  : Dictionary of all the 'HetMol' in the given model.
+            id (int)                                      : Model ID from the PDB file ordered from first to the last. Each Model in a PDB file has unique ID. (essential)
+            AllAtoms ({ref:`packman.molecule.Atom`})      : Dictionary of all the 'Atom' in the given model.
+            AllResidues ({ref:`packman.molecule.Residue`}): Dictionary of all the 'Residue' in the given model.
+            AllChains ({ref:`packman.molecule.Chain`})    : Dictionary of all the 'Chain' in the given model.
+            AllHetAtoms ({ref:`packman.molecule.HetAtom`}): Dictionary of all the 'HetAtom' in the given model.
+            AllHetMols ({ref:`packman.molecule.HetMol`})  : Dictionary of all the 'HetMol' in the given model.
 
         """
         
-    def __init__(self,id,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols):                
-        self.__id=id
-        self.__AllAtoms=AllAtoms
+    def __init__(self, id: int, AllAtoms: Dict[int, 'Atom'], AllResidues: Dict[str, 'Residue'], AllChains: Dict[str, 'Chain'], AllHetAtoms: Dict[int, 'Atom'], AllHetMols: Dict[str, 'HetMol']):                
+        self.__id               = id
+        self.__AllAtoms         = AllAtoms
         self.__AllAtoms_inverse = { self.__AllAtoms[i]:i for i in self.__AllAtoms }
-        self.__AllResidues=AllResidues
-        self.__AllChains=AllChains
-        self.__AllHetAtoms=AllHetAtoms
-        self.__AllHetMols=AllHetMols
-        self.__parent = None
+        self.__AllResidues      = AllResidues
+        self.__AllChains        = AllChains
+        self.__AllHetAtoms      = AllHetAtoms
+        self.__AllHetMols       = AllHetMols
+        self.__parent           = None
         
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
 
-    def __getitem__(self,ChainID):
-        #try:
+    def __getitem__(self, ChainID: str) -> 'Chain':
         return self.__AllChains[ChainID]
-        #except KeyError:
-        #    logging.warning('Please provide a valid chain ID.')
     
     #Get Functions
-    def get_id(self):
+    def get_id(self) -> int:
         """Get the ID of the 'Model'
 
         Returns:
@@ -105,21 +102,20 @@ class Model():
         """
         return self.__id
 
-    def get_chains(self):
+    def get_chains(self) -> Iterable['Chain']:
         """Get the list of corresponding 'Chain' objects of the 'Model'
 
         Returns:
-            [packman.molecule.Chain] if successful, None otherwise.
+            Generator of ref:`packman.molecule.Chain` if successful, None otherwise.
         """
-        for i in sorted(self.__AllChains.keys()):yield self.__AllChains[i]
+        for i in sorted(self.__AllChains.keys()): yield self.__AllChains[i]
 
-    def get_residues(self):
+    def get_residues(self) -> List['Chain']:
         """Get the generator of corresponding 'Residue' objects of the 'Model'
 
         Returns:
             array of 'Residue' objects if successful, None otherwise.
         """
-        #return [j for i in self.__AllChains.keys() for j in self.__AllChains[i].get_residues()]
         residues = []
         for i in self.__AllChains.keys():
             try:
@@ -128,15 +124,15 @@ class Model():
                 logging.warning("Chain "+str(i)+" either doesn't have residues or an error occurred; Model.get_residues() may have loaded other chains.")
         return residues
     
-    def get_atoms(self):
+    def get_atoms(self) -> Iterable['Atom']:
         """Get the generator of corresponding 'Atom' objects of the 'Model'
 
         Returns:
             generator of 'Atom' objects if successful, None otherwise.
         """
-        for i in sorted(self.__AllAtoms.keys()):yield self.__AllAtoms[i]
+        for i in sorted(self.__AllAtoms.keys()): yield self.__AllAtoms[i]
     
-    def get_atom(self, idx):
+    def get_atom(self, idx: int) -> 'Atom':
         """Get the atom of the given ID.
 
         Note: - This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
@@ -165,7 +161,7 @@ class Model():
             logging.info('The atom with the given ID is not found in this Model')
             return None
     
-    def get_chain(self,ChainID):
+    def get_chain(self, ChainID: str) -> 'Chain':
         """Get the corresponding 'Chain' object
 
         Returns:
@@ -173,46 +169,41 @@ class Model():
         """
         return self.__AllChains[ChainID]
     
-    def get_atom_byid(self,query_atom_id):
-        """Get the 'Atom' with corresponding 'Atom' ID
-
-        Returns:
-            'packman.molecule.Atom' object if successful, None otherwise.
-        """
-        return self.__AllAtoms[query_atom_id]
-    
-    def get_hetmols(self):
+    def get_hetmols(self) -> Iterable['HetMol']:
         """Get the generator of corresponding 'HetMol' objects of the 'Model'
 
         Returns:
-            generator of 'packman.molecule.HetMol' objects if successful, None otherwise.
+            generator of ref:`packman.molecule.HetMol` objects if successful, None otherwise.
         """
-        for i in sorted(self.__AllHetMols.keys()):yield self.__AllHetMols[i]
+        for i in sorted(self.__AllHetMols.keys()): yield self.__AllHetMols[i]
      
-    def get_hetatoms(self):
+    def get_hetatoms(self) -> Iterable['Atom']:
         """Get the generator of corresponding 'HetAtom' objects of the 'Model'
 
         Returns:
             generator of 'packman.molecule.HetAtom' objects if successful, None otherwise.
         """
-        for i in sorted(self.__AllHetAtoms.keys()):yield self.__AllHetAtoms[i]
+        for i in sorted(self.__AllHetAtoms.keys()): yield self.__AllHetAtoms[i]
     
-    def get_parent(self):
+    def get_parent(self) -> 'Protein':
         """Get the 'Protein' parent of the 'Model' object.
 
         Returns:
-            'packman.molecule.Protein' object if successful, None otherwise.
+            ref:`packman.molecule.Protein` object if successful, None otherwise.
         """
         return self.__parent
     
-    def get_entropy(self,entropy_type):
+    def get_entropy(self, entropy_type: str) -> float:
         """Get the Packing Entropy of the given 'Chain'.
 
         Args:
             type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
 
         Note:
-            - More type of Entropies might be added in the future.
+            * More type of Entropies might be added in the future.
+        
+        Returns:
+            Total Entropy (float) of the complex if successful, None otherwise.
         """
         EntropyTypes = ['PackingEntropy']
         try:
@@ -223,8 +214,8 @@ class Model():
             else:
                 logging.warning('The Entropy type provided is invalid. Please check the documentation for the details.')
 
-    def get_property(self,property_name):
-        """Get the Property of the given 'Chain'.
+    def get_property(self, property_name):
+        """Get the Property of the given 'Model'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
         Properties are like pinboards. You can pin anything to the object with a key as a pin.
@@ -233,40 +224,40 @@ class Model():
             property_name (object): The 'Key' or a name the user wants to assign to to the property
         
         Note:
-            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+            - Users can add custom annotations; for example: If particular model is disordered, it can be annotated with this feature.
         """
         try:
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
     
-    def get_bonds(self):
+    def get_bonds(self) -> Iterable['Bond']:
         """Return all the bonds in the given 'Model'.
 
         Returns:
-            generator of packman.molecule.Bond objects if successful, None otherwise.
+            generator of ref:`packman.molecule.Bond` objects if successful, None otherwise.
         """
         try:
             for i in self.__AllBonds: yield self.__AllBonds[i]
         except:
             logging.warning('Failed to return the bonds.')
             
-    def get_bond(self,idx):
-        """Return the specific bond with specific ID.
+    def get_bond(self, idx: int) -> 'Bond':
+        """Return the specific bond with ID.
 
         Args:
             idx (int): Get the 'Bond' by the id
         
         Returns:
-            packman.molecule.Bond object if successful, None otherwise.
+            ref:`packman.molecule.Bond` object if successful, None otherwise.
         """
         try:
-            return self.__AllBonds[idx]
+            return self.__AllBonds[ idx ]
         except:
             logging.warning('Failed to return the bond. Please check the ID.')
 
     #Compute Functions
-    def get_calpha(self):
+    def get_calpha(self) -> List['Atom']:
         """Get the C-Alpha atom of the 'Model' as an 'Atom' object.
 
         Returns:
@@ -274,7 +265,7 @@ class Model():
         """
         return [i.get_calpha() for i in self.get_residues()]
     
-    def get_backbone(self):
+    def get_backbone(self) -> List[List['Atom']]:
         """Get the Backbone atoms of the given 'Model' as a list of 'Atom' object
 
         Note:
@@ -285,7 +276,7 @@ class Model():
         """
         return [i.get_backbone() for i in self.get_residues()]
     
-    def get_torsion(self, bond, neighbor1=None, neighbor2=None, radians=True):
+    def get_torsion(self, bond: 'Bond', neighbor1: Union[int, 'Atom'], neighbor2: Union[int, 'Atom'], radians: bool=True) -> float:
         """Calculate the torsion angle of the given covalent bond with the corresponding selected neighbors.
 
         Note:
@@ -295,7 +286,7 @@ class Model():
             bond      (packman.molecule.Bond)     : The bond user wishes to calculate torsion angle to.
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
-            radians   (True/False)                : Return value of the angle in radians (returns value in degrees if False; Default : True)
+            radians   (bool)                : Return value of the angle in radians (returns value in degrees if False; Default : True)
         
         Returns:
             The torsion angle in radians/degrees if sucessful, None otherwise.
@@ -303,7 +294,7 @@ class Model():
         assert type(bond) == Bond, 'The bond varible should be a packman.molecule.Bond object'
 
         try:
-            if(self.__AllBonds=={}):
+            if(self.__AllBonds == {}):
                 logging.warning('Please check if the Model.calculate_bonds() was executed successfully.')
                 return None
         except:
@@ -322,7 +313,7 @@ class Model():
         
         if(isinstance(neighbor1, int)):
             neighbor1 = self.__AllAtoms[neighbor1]
-        elif(type(neighbor1)==type(atom1)):
+        elif(type(neighbor1) == type(atom1)):
             None
         else:
             logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
@@ -330,7 +321,7 @@ class Model():
         
         if(isinstance(neighbor2, int)):
             neighbor2 = self.__AllAtoms[neighbor2]
-        elif(type(neighbor2)==type(atom2)):
+        elif(type(neighbor2) == type(atom2)):
             None
         else:
             logging.error('neighbour2 should either be an integer or a packman.molecule.Atom object.')
@@ -352,7 +343,7 @@ class Model():
         else:
             return numpy.rad2deg(radang)
     
-    def get_sequence(self):
+    def get_sequence(self) -> str:
         """Get the Amino acid sequence of the chain. (Protein chains only)
         
         Returns:
@@ -361,23 +352,23 @@ class Model():
         return '\n'.join( [chain.get_sequence() for chain in self.get_chains() if chain.get_sequence()!=''] )
     
         #Set Functions
-    def set_id(self,new_id):
+    def set_id(self, new_id: int):
         """Set the ID of the given 'Model'
 
         Args:
             new_id (int): The ID User wishes to assign to the given 'Model'
         """
-        self.__id=new_id
+        self.__id = new_id
     
-    def set_parent(self, new_parent):
+    def set_parent(self, new_parent: 'Protein'):
         """Set the 'Protein' object as a parent to the 'Model' object.
 
         Args:
-            new_parent (packman.molecule.Protein): The 'Protein' object as a parent to the given 'Model'
+            new_parent (ref:`packman.molecule.Protein`): The 'Protein' object as a parent to the given 'Model'
         """
         self.__parent = new_parent
     
-    def set_property(self,property_name,value):
+    def set_property(self, property_name, value):
         """Set the Property of the given 'Model'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
@@ -396,7 +387,7 @@ class Model():
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
     #Calculate Functions
-    def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
+    def calculate_entropy(self, entropy_type: str,chains: Union[List[str], str, None]=None, probe_size: float=1.4, onspherepoints: int=30):
         """Calculate the entropy for the each amino acid will be returned.
     
         The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
@@ -412,7 +403,7 @@ class Model():
         else:
             logging.warning("Please provide the valid type for the Entropy Calculation.")
         
-    def set_torsion(self, bond, theta, neighbor1=None, neighbor2=None, radians=True):
+    def set_torsion(self, bond: 'Bond', theta: float, neighbor1: Union[int, 'Atom'], neighbor2: Union[int, 'Atom'], radians: bool=True) -> Union[bool, None]:
         """Set the torsion for the given covalent bond with the corresponding selected neighbors.
 
         Note:
@@ -420,13 +411,13 @@ class Model():
 
         Args:
             bond      (packman.molecule.Bond)     : The bond user wishes to rotate.
-            theta     (int)                       : Set the torsional angle (see the 'radians' parameter description)
+            theta     (float)                     : Set the torsional angle (see the 'radians' parameter description)
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
-            radians   (True/False)                : Parameter 'theta' will be assuned to be in Radians if True, Degrees will be assumed when False. ( Default : True)
+            radians   (bool)                      : Parameter 'theta' will be assuned to be in Radians if True, Degrees will be assumed when False. ( Default : True)
         
         Returns:
-            True if successfulm None otherwise
+            True if successful; None otherwise
         """
         assert type(bond) == Bond, 'The bond varible should be a packman.molecule.Bond object'
 
@@ -705,7 +696,7 @@ class Model():
 
 
     #Check Function
-    def check_clashes(self,distance=0.77):
+    def check_clashes(self, distance: float=0.77) -> int:
         """Check if any atoms are too close to each other. This is important since too close atoms in the elastic network models can be very bad for the results.
 
         Notes:

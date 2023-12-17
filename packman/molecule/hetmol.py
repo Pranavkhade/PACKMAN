@@ -211,14 +211,14 @@ class HetMol():
         Returns:
             Cartesian Coordinates as numpy.array of the centre of the gravity.
         """
-        atoms=self.get_atoms()
-        AtomicMass=1
-        XYZ_M=[0,0,0]
-        MassofAA=0
+        atoms = self.get_atoms()
+        AtomicMass = 1
+        XYZ_M = [0,0,0]
+        MassofAA = 0
         for i in atoms:
-            XYZ_M[0]+=i.Coordinates[0]*AtomicMass
-            XYZ_M[1]+=i.Coordinates[1]*AtomicMass
-            XYZ_M[2]+=i.Coordinates[2]*AtomicMass
-            MassofAA=MassofAA+AtomicMass
+            XYZ_M[0] += i.Coordinates[0] * AtomicMass
+            XYZ_M[1] += i.Coordinates[1] * AtomicMass
+            XYZ_M[2] += i.Coordinates[2] * AtomicMass
+            MassofAA = MassofAA + AtomicMass
         
-        return numpy.array([i/MassofAA for i in XYZ_M])
+        return numpy.array(  [ i/MassofAA for i in XYZ_M ]  )
