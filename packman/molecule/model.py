@@ -48,7 +48,7 @@ from .bond import Bond
 import numpy
 import logging
 
-from networkx import Graph, bridges, draw, connected_components
+from networkx import Graph, connected_components
 
 from typing import TYPE_CHECKING, Union, List, Iterable, Dict
 
@@ -56,15 +56,15 @@ if(TYPE_CHECKING):
     from .. import Atom, Residue, HetMol, Chain, Protein
 
 
-
 class Model():
-    """This class contains the information about the 'Chain' object (packman.molecule.Chain).
+    """This class contains the information about the 'Model' object (packman.molecule.Model).
 
-        This class contains all the information available about the Chain and stores the corresponding 'Residue' and 'Hetmol' objects in itself. The Chain class is the third lowest in the hierarchy of the 'molecule' API classes.
+        This class contains all the information available about the Model and stores the corresponding 'Chain' objects. The Model class is the second lowest in the hierarchy of the 'molecule' API classes.
         the order of hierarchy being: Protein> Model> Chain> Residue> Atom. This class is also the component of the 'molecule' module API.
         Please read the Tutorials and Documentation for more details.
 
         Notes:
+            * Important: get_hetmols and get_residues must be used based on your interest in protein/ non-protein components.
             * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
         
         Args:
@@ -133,9 +133,9 @@ class Model():
         for i in sorted(self.__AllAtoms.keys()): yield self.__AllAtoms[i]
     
     def get_atom(self, idx: int) -> 'Atom':
-        """Get the atom of the given ID.
+        """Get the atom of the given ID in the current model.
 
-        Note: - This function is different from :py:func:`packman.molecule.chain.get_atoms` and also :py:func:`packman.molecule.residue.get_atom`
+        Note: - This function is different from :py:func:`packman.molecule.Chain.get_atoms` and also :py:func:`packman.molecule.Chain.get_atom`
               - If the PDB file is constructed manually/ has multiple atoms of the same ID, the first instance of the atom with that id is returned. Please avoid saving two atoms with same ID in a same structure file in a given frame/model.
 
         Args:
@@ -162,7 +162,7 @@ class Model():
             return None
     
     def get_chain(self, ChainID: str) -> 'Chain':
-        """Get the corresponding 'Chain' object
+        """Get the corresponding 'Chain' object of the current Model.
 
         Returns:
             'Chain' object if successful, None otherwise.
@@ -194,7 +194,7 @@ class Model():
         return self.__parent
     
     def get_entropy(self, entropy_type: str) -> float:
-        """Get the Packing Entropy of the given 'Chain'.
+        """Get the Packing Entropy of the given 'Chain' for the Current Model.
 
         Args:
             type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
@@ -243,7 +243,7 @@ class Model():
             logging.warning('Failed to return the bonds.')
             
     def get_bond(self, idx: int) -> 'Bond':
-        """Return the specific bond with ID.
+        """Return the specific bond with ID in the current Model.
 
         Args:
             idx (int): Get the 'Bond' by the id
@@ -258,7 +258,7 @@ class Model():
 
     #Compute Functions
     def get_calpha(self) -> List['Atom']:
-        """Get the C-Alpha atom of the 'Model' as an 'Atom' object.
+        """Get the C-Alpha atom of the 'Model' as an 'Atom' object from the current Model.
 
         Returns:
             list of packman.molecule.Atom if successful, None otherwise.
@@ -277,7 +277,7 @@ class Model():
         return [i.get_backbone() for i in self.get_residues()]
     
     def get_torsion(self, bond: 'Bond', neighbor1: Union[int, 'Atom'], neighbor2: Union[int, 'Atom'], radians: bool=True) -> float:
-        """Calculate the torsion angle of the given covalent bond with the corresponding selected neighbors.
+        """Calculate the torsion angle of the given covalent bond with the corresponding selected neighbors in the current Model.
 
         Note:
             At least four atoms are needed to form two planes that can measure the torsional angles; therefore, along with the two bond atoms, the user needs to provide the additional two atoms that are ideally non-mutual neighbors of the atoms in the bond.
@@ -344,7 +344,7 @@ class Model():
             return numpy.rad2deg(radang)
     
     def get_sequence(self) -> str:
-        """Get the Amino acid sequence of the chain. (Protein chains only)
+        """Get the Amino acid sequence of the chain. (Protein chains only) of the current Model.
         
         Returns:
             FASTA format string of the chain sequence.
@@ -388,7 +388,7 @@ class Model():
 
     #Calculate Functions
     def calculate_entropy(self, entropy_type: str,chains: Union[List[str], str, None]=None, probe_size: float=1.4, onspherepoints: int=30):
-        """Calculate the entropy for the each amino acid will be returned.
+        """Calculate the entropy for the each amino acid.
     
         The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.
 
@@ -702,7 +702,6 @@ class Model():
         Notes:
             * This function will be moved to the molecule manipulation package later
 
-        
         Args:
             distance (float): The distance cutoff user wishes to defined as a clash radius (default:0.77; max bond length)
         
