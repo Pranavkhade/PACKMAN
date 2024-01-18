@@ -6,10 +6,10 @@
 import logging
 import numpy
 
-from typing import TYPE_CHECKING, List, Tuple, Dict
+from typing import TYPE_CHECKING, List, Tuple, Dict, IO
 
 if(TYPE_CHECKING):
-    from ..molecule import Chain
+    from ..molecule import Chain, Atom
 
 def superimporse(reference: 'Chain', target: 'Chain', use: str='calpha', ids: List[int]=[], change_target: bool=True) -> Tuple[numpy.matrix, numpy.ndarray]:
     """This function is used to superimpose the Target Chain(coordinates will be changed) on the Reference Chain(coordinates will change).
@@ -172,21 +172,24 @@ def load_hinge(filename: str) -> Dict[str, List[float]]:
 ##################################################################################################
 '''
 
-def WriteOBJ(atoms, faces, fh):
+def WriteOBJ(atoms: List['Atom'], faces: List['Atom'], fh: IO):
     """Write the .obj file to visualize the obtain alpha shape tesselations.
+
+    Note:
+        * One chain at a time.
     
     Args:
         atoms (packman.molecule.Atom): Atoms (Just for the node records)
-        faces ([float])              : SelectedTesselations (See the packman.apps.predict_hinge)
+        faces ([Atom])              : SelectedTesselations (See the packman.apps.predict_hinge)
         fh (file)                    : Output file with .obj extension
-    
     """
+    atoms = [i for i in atoms]
     NewIDs = {i.get_id():numi+1 for numi,i in enumerate(atoms)}
     fh.write('mtllib master.mtl\ng\n'.encode())
     fh.write('usemtl atoms\n'.encode())
     for i in atoms:
         x, y, z = i.get_location()
-        fh.write("v %f %f %f\n".encode()%(x,y,z))
+        fh.write("v %f %f %f\n".encode()%(x, y, z))
     
     line='usemtl bonds\nl'
     for i in atoms:
@@ -196,8 +199,8 @@ def WriteOBJ(atoms, faces, fh):
     
     fh.write('usemtl faces\n'.encode())
     for i in faces:
-        faces = [NewIDs[j.get_id()] for j in i]
-        fh.write("f %i %i %i %i\n".encode()%(faces[0],faces[1],faces[2],faces[3]))
+        local_faces = [NewIDs[j.get_id()] for j in i]
+        fh.write("f %i %i %i %i\n".encode()%(local_faces[0], local_faces[1], local_faces[2], local_faces[3]))
         #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
     return True
 

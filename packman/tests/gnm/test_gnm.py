@@ -5,7 +5,7 @@ import unittest
 import logging
 from os import remove as rm
 
-class TestMolecule(unittest.TestCase):
+class Test_GNM(unittest.TestCase):
 
     def setUp(self):
         self.mol = molecule.load_structure('packman/tests/data/4hla.cif',ftype='cif')
