@@ -104,7 +104,7 @@ class Protein():
 
 
     #Wite Functions
-    def write_pdb(self, filename: str) -> Union[True, None]:
+    def write_pdb(self, filename: str) -> Union[bool, None]:
         """Write a PDB (.pdb) file from the Protein object.
         
         Args:
@@ -128,7 +128,7 @@ class Protein():
         fh.close()
         return True
     
-    def write_cif(self, filename: str) -> Union[True, None]:
+    def write_cif(self, filename: str) -> Union[bool, None]:
         """Write a PDBx/mmCIF (.cif) file from the Protein object.
         
         Args:
