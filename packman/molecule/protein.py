@@ -173,7 +173,7 @@ class Protein():
 
         return True
     
-    def write_structure(self, filename: str, ftype: str='cif') -> Union[True, None]:
+    def write_structure(self, filename: str, ftype: str='cif') -> Union[bool, None]:
         """Write the 'Protein' object to the file.
         
         CIF file format is default because it has more advantages over PDB format and PDB format is 'frozen'. Please read following for more information::
