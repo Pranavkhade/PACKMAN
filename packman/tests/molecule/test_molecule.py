@@ -39,12 +39,13 @@ class Test_Molecule(unittest.TestCase):
         self.assertIsNotNone( self.mol[0].get_id() )
 
         #Get Methods
-        self.assertNotEqual( len( [i for i in self.mol[0].get_chains()] )  , 0 )
-        self.assertNotEqual( len( [i for i in self.mol[0].get_residues()] ), 0 )
-        self.assertNotEqual( len( [i for i in self.mol[0].get_atoms()] )   , 0 )
-        self.assertNotEqual( len( [i for i in self.mol[0].get_calpha()] )  , 0 )
-        self.assertNotEqual( len( [i for i in self.mol[0].get_backbone()] ), 0 )
-        self.assertNotEqual( len( [i for i in self.mol[0].get_sequence()] ), 0 )
+        self.assertEqual( len( [i for i in self.mol[0].get_chains()] )  , 2 )
+        self.assertEqual( len( [i for i in self.mol[0].get_residues()] ), 198 )
+        self.assertEqual( len( [i for i in self.mol[0].get_atoms()] )   , 1516 )
+        self.assertEqual( len( [i for i in self.mol[0].get_calpha()] )  , 198 )
+        self.assertEqual( len([j for i in self.mol[0].get_backbone() for j in i]), 792 )
+        expected_seq = '>packman/tests/data/4hla.cif_1_A\nPQITLWQRPLVTIKIGGQLKEALLDTGADDTVLEEMSLPGRWKPKMIGGIGGFIKVRQYDQILIEICGHKAIGTVLVGPTPVNIIGRNLLTQIGCTLNF\n>packman/tests/data/4hla.cif_1_B\nPQITLWQRPLVTIKIGGQLKEALLDTGADDTVLEEMSLPGRWKPKMIGGIGGFIKVRQYDQILIEICGHKAIGTVLVGPTPVNIIGRNLLTQIGCTLNF\n'
+        self.assertNotEqual( self.mol[0].get_sequence(), expected_seq )
     
     def test_Chain(self):
         #Basic
