@@ -70,6 +70,10 @@ class HetMol():
         
         self.__Atoms_Names[Atom.get_name()] = Atom
     
+    def __repr__(self) -> str:
+        return '<HetMol '+str(self.__id)+' from Chain: '+str(self.__parent.get_id())+' Model: '+str(self.__parent.get_parent().get_id())+'>'
+    
+    
     #Get Functions
     def get_id(self) -> int:
         """Get the ID of the 'HetMol'

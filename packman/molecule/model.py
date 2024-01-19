@@ -64,6 +64,7 @@ class Model():
         Please read the Tutorials and Documentation for more details.
 
         Notes:
+            * Model index starts from 0 while retriving but identifiers (ids) start from 1.
             * Important: get_hetmols and get_residues must be used based on your interest in protein/ non-protein components.
             * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
         
@@ -92,6 +93,9 @@ class Model():
 
     def __getitem__(self, ChainID: str) -> 'Chain':
         return self.__AllChains[ChainID]
+    
+    def __repr__(self) -> str:
+        return '<Model '+str(self.__id)+' Index: '+str(self.__id-1)+'>'
     
     #Get Functions
     def get_id(self) -> int:

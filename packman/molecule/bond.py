@@ -53,6 +53,9 @@ class Bond():
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
     
+    def __repr__(self) -> str:
+        return '<Bond ('+str(self.__type)+') '+str(self.__id)+' between Atom '+str(self.__atom1.get_id())+' and '+str(self.__atom2.get_id())+'>'
+    
     #Get Functions
     def get_id(self) -> int:
         """Get the ID of the 'Bond'

@@ -68,6 +68,12 @@ class Atom():
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
         self.__Bonds = []
+    
+    def __repr__(self) -> str:
+        if(self.__parent.__class__.__name__=='Residue'):
+            return '<Atom '+str(self.__id)+' from Residue: '+str(self.__parent.get_id())+' Chain: '+str(self.__parent.get_parent().get_id())+' Model: '+str(self.__parent.get_parent().get_parent().get_id())+'>'
+        elif(self.__parent.__class__.__name__=='HetMol'):
+            return '<Atom '+str(self.__id)+' from HetMol: '+str(self.__parent.get_id())+' Chain: '+str(self.__parent.get_parent().get_id())+' Model: '+str(self.__parent.get_parent().get_parent().get_id())+'>'
 
     #Get Functions
     def get_id(self) -> int:

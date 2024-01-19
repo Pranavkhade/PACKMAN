@@ -50,6 +50,9 @@ class Hinge():
         self.__elements=elements
         self.__stats=stats
         self.__p=p
+    
+    def __repr__(self) -> str:
+        return '<Hinge ID:'+str(self.__id)+'>'
 
     #Get functions
     def get_id(self) -> Union[int, None]:

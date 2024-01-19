@@ -69,6 +69,9 @@ class Chain():
         except:
             return self.__HetMols[Number]
     
+    def __repr__(self) -> str:
+        return '<Chain '+str(self.__id)+' from Model: '+str(self.__parent.get_id())+'>'
+    
     #Get Functions
     def get_id(self) -> str:
         """Get the ID of the 'Chain'

@@ -73,6 +73,9 @@ class Residue():
             self.__Atoms[id] = Atom
         self.__Atoms_Names[Atom.get_name()] = Atom
     
+    def __repr__(self) -> str:
+        return '<Residue '+str(self.__id)+' from Chain: '+str(self.__parent.get_id())+' Model: '+str(self.__parent.get_parent().get_id())+'>'
+    
     #Get Functions
     def get_id(self) -> int:
         """Get the ID of the 'Residue'

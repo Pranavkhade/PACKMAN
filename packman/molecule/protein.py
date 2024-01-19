@@ -45,10 +45,13 @@ class Protein():
         self.__Models = Models
         self.__Data = None
     
-    #Get Functions
     def __getitem__(self, ModelNumber: int) -> 'Model':
         return self.__Models[ModelNumber]
     
+    def __repr__(self) -> str:
+        return '<Protein from '+str(self.__id)+'>'
+
+    #Get Functions
     def get_id(self) -> int:
         """Get the ID for the Protein object.
 
