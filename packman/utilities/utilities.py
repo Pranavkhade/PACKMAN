@@ -1,12 +1,17 @@
+# -*- coding: utf-8 -*-
+# Author: Pranav Khade
 """This class contains all the utilities that are neccessary for carriying out structural superimposition, sequence matching etc.
-
-
 """
 
 import logging
 import numpy
 
-def superimporse(reference,target,use='calpha',ids=[],change_target=True):
+from typing import TYPE_CHECKING, List, Tuple, Dict, IO
+
+if(TYPE_CHECKING):
+    from ..molecule import Chain, Atom
+
+def superimporse(reference: 'Chain', target: 'Chain', use: str='calpha', ids: List[int]=[], change_target: bool=True) -> Tuple[numpy.matrix, numpy.ndarray]:
     """This function is used to superimpose the Target Chain(coordinates will be changed) on the Reference Chain(coordinates will change).
 
     The superimposition currently is done on the basis of matching Residue ID. If both the proteins have unequal amount of residues,
@@ -22,50 +27,53 @@ def superimporse(reference,target,use='calpha',ids=[],change_target=True):
         target (packman.molecule.Chain): Chain whose coordinates will be changed according to the reference chain.  
         use (str): Which atoms to be used for superimposition (Options: calpha, backbone)
         ids (list): Use only particular residues to align (Provide IDs) eg... ids=[1,2,5,77] will use only 1,2,5 and 77th residues to align two chains
-        change_target (bool): Change the coordinates of the target chain based on the reference
+        change_target (bool): Change the coordinates of the target chain based on the reference.
 
     Returns:
         R (numpy.matrix): Rotation matrix for Target Chain w.r.t Reference Chain.
         t (numpy.array): Translation vector for Target Chain w.r.t Reference Chain.
     """
 
-    if(use=='calpha'):
-        atoms1=[i for i in reference.get_calpha() ]
-        atoms2=[i for i in target.get_calpha() ]
-    if(use=='backbone'):
-        atoms1=[j for i in reference.get_backbone() for j in i]
-        atoms2=[j for i in target.get_backbone() for j in i ]    
+    if(use == 'calpha'):
+        atoms1 = [i for i in reference.get_calpha() ]
+        atoms2 = [i for i in target.get_calpha() ]
+    elif(use == 'backbone'):
+        atoms1 = [j for i in reference.get_backbone() for j in i]
+        atoms2 = [j for i in target.get_backbone() for j in i ]
+    else:
+        logging.warning("Please provide a valid option for the 'use' argument.")
+        return
 
     #Finding common residues to align
-    res1=[i.get_parent().get_id() for i in atoms1]
-    res2=[i.get_parent().get_id() for i in atoms2]
+    res1 = [i.get_parent().get_id() for i in atoms1]
+    res2 = [i.get_parent().get_id() for i in atoms2]
 
     if(ids==[]):
-        common_residues=list(set(res1).intersection(res2))
+        common_residues = list(set(res1).intersection(res2))
     else:
-        common_residues=list( set(res1).intersection(res2).intersection(ids) )
+        common_residues = list( set(res1).intersection(res2).intersection(ids) )
 
-    atoms1=[i for i in atoms1 if i.get_parent().get_id() in common_residues]
-    atoms2=[i for i in atoms2 if i.get_parent().get_id() in common_residues]
+    atoms1 = [i for i in atoms1 if i.get_parent().get_id() in common_residues]
+    atoms2 = [i for i in atoms2 if i.get_parent().get_id() in common_residues]
 
-    atoms1_location=[i.get_location() for i in atoms1]
-    atoms2_location=[i.get_location() for i in atoms2]
+    atoms1_location = [i.get_location() for i in atoms1]
+    atoms2_location = [i.get_location() for i in atoms2]
 
     #Subtract Mean
-    Centroid1=numpy.mean(atoms1_location,axis=0)
-    Centroid2=numpy.mean(atoms2_location,axis=0)
-    Am= numpy.subtract(atoms1_location,Centroid1)
-    Bm= numpy.subtract(atoms2_location,Centroid2)
+    Centroid1 = numpy.mean(atoms1_location, axis=0)
+    Centroid2 = numpy.mean(atoms2_location, axis=0)
+    Am = numpy.subtract(atoms1_location, Centroid1)
+    Bm = numpy.subtract(atoms2_location, Centroid2)
 
     #Dot is matrix multiplication for array
-    H= numpy.mat(Bm.T) * numpy.mat(Am)
+    H = numpy.mat(Bm.T) * numpy.mat(Am)
 
     #Find Rotation
     U, S, Vt = numpy.linalg.svd(H)
     R = Vt.T * U.T
 
     #Special Reflection Case
-    if numpy.linalg.det(R) < 0:
+    if(numpy.linalg.det(R) < 0):
         Vt[2,:] *= -1
         R = Vt.T * U.T
     
@@ -74,39 +82,52 @@ def superimporse(reference,target,use='calpha',ids=[],change_target=True):
     #Change the location of the target
     if(change_target):
         for i in target.get_atoms():
-            new_location=numpy.dot(R , i.get_location()) + t
+            new_location = numpy.dot(R , i.get_location()) + t
             i.set_location( numpy.array(new_location.tolist()[0]) )
     else:
         None
     
     return R, t
 
-def RMSD(group1,group2,use='calpha',ids=[]):
-    """
+def RMSD(reference: 'Chain', target: 'Chain', use: str='calpha', ids: List[int]=[]) -> float:
+    """This function is used to calculate RMSD of the two target chains
+
+    Args:
+        reference (packman.molecule.Chain): Chain whose coordinates will remain same and will be used as a reference.
+        target (packman.molecule.Chain): Chain whose coordinates will be changed according to the reference chain.  
+        use (str): Which atoms to be used for superimposition (Options: calpha, backbone)
+        ids (list): Use only particular residues to align (Provide IDs) eg... ids=[1,2,5,77] will use only 1,2,5 and 77th residues to align two chains
+        change_target (bool): Change the coordinates of the target chain based on the reference.
+
+    Returns:
+        RMSD (float): Root mean square distance for Target Chain w.r.t Reference Chain.
     """
     if(use=='calpha'):
-        atoms1=[i for i in group1.get_calpha() ]
-        atoms2=[i for i in group2.get_calpha() ]
-    if(use=='backbone'):
-        atoms1=[j for i in group1.get_backbone() for j in i]
-        atoms2=[j for i in group2.get_backbone() for j in i ]    
+        atoms1 = [i for i in reference.get_calpha() ]
+        atoms2 = [i for i in target.get_calpha() ]
+    elif(use=='backbone'):
+        atoms1 = [j for i in reference.get_backbone() for j in i]
+        atoms2 = [j for i in target.get_backbone() for j in i ]
+    else:
+        logging.warning("Please provide a valid option for the 'use' argument.")
+        return
 
     #Finding common residues to align
-    res1=[i.get_parent().get_id() for i in atoms1]
-    res2=[i.get_parent().get_id() for i in atoms2]
+    res1 = [i.get_parent().get_id() for i in atoms1]
+    res2 = [i.get_parent().get_id() for i in atoms2]
 
-    if(ids==[]):
-        common_residues=list(set(res1).intersection(res2))
+    if(ids == []):
+        common_residues = list(set(res1).intersection(res2))
     else:
-        common_residues=list( set(res1).intersection(res2).intersection(ids) )
+        common_residues = list( set(res1).intersection(res2).intersection(ids) )
 
-    atoms1=[i for i in atoms1 if i.get_parent().get_id() in common_residues]
-    atoms2=[i for i in atoms2 if i.get_parent().get_id() in common_residues]
+    atoms1 = [i for i in atoms1 if i.get_parent().get_id() in common_residues]
+    atoms2 = [i for i in atoms2 if i.get_parent().get_id() in common_residues]
 
-    atoms1_location=[i.get_location() for i in atoms1]
-    atoms2_location=[i.get_location() for i in atoms2]
+    atoms1_location = [i.get_location() for i in atoms1]
+    atoms2_location = [i.get_location() for i in atoms2]
 
-    R,t = superimporse(group1,group2,use,ids,change_target=False)
+    R,t = superimporse(reference, target, use, ids, change_target=False)
 
     for i in range(0,len(atoms2_location)):
         atoms2_location[i] = numpy.dot(R , atoms2_location[i]) + t
@@ -114,7 +135,7 @@ def RMSD(group1,group2,use='calpha',ids=[]):
     
     return numpy.mean( [numpy.abs( numpy.linalg.norm(atoms1_location[i]-atoms2_location[i]) ) for i in range(0,len(atoms1_location))] )
 
-def load_hinge(filename):
+def load_hinge(filename: str) -> Dict[str, List[float]]:
     """Load the hinge information neccessary for the hd-ANM and other methods.
 
     About .hng File:
@@ -134,15 +155,15 @@ def load_hinge(filename):
 
 
     Args:
-        filename (string) : filepath and name of the .hng file
+        filename (str) : filepath and name of the .hng file
     
     Returns:
         HNGinfo (dictionary) : residue based hinge and domain information.
     """
     HNGinfo={}
     for i in open(filename):
-        line=i.strip().split('\t')
-        HNGinfo[ line[0]+'_'+line[1] ]=[float(j) for j in line[2].split(':')]
+        line = i.strip().split('\t')
+        HNGinfo[ line[0]+'_'+line[1] ] = [float(j) for j in line[2].split(':')]
     return HNGinfo
 
 '''
@@ -151,36 +172,39 @@ def load_hinge(filename):
 ##################################################################################################
 '''
 
-def WriteOBJ(atoms,faces, fh):
+def WriteOBJ(atoms: List['Atom'], faces: List['Atom'], fh: IO):
     """Write the .obj file to visualize the obtain alpha shape tesselations.
+
+    Note:
+        * One chain at a time.
     
     Args:
         atoms (packman.molecule.Atom): Atoms (Just for the node records)
-        faces ([float])              : SelectedTesselations (See the packman.apps.predict_hinge)
+        faces ([Atom])              : SelectedTesselations (See the packman.apps.predict_hinge)
         fh (file)                    : Output file with .obj extension
-    
     """
-    NewIDs={i.get_id():numi+1 for numi,i in enumerate(atoms)}
+    atoms = [i for i in atoms]
+    NewIDs = {i.get_id():numi+1 for numi,i in enumerate(atoms)}
     fh.write('mtllib master.mtl\ng\n'.encode())
     fh.write('usemtl atoms\n'.encode())
     for i in atoms:
-        x,y,z=i.get_location()
-        fh.write("v %f %f %f\n".encode()%(x,y,z))
+        x, y, z = i.get_location()
+        fh.write("v %f %f %f\n".encode()%(x, y, z))
     
     line='usemtl bonds\nl'
     for i in atoms:
-        line=line+" "+str(NewIDs[i.get_id()])
-    line=line+'\n'
+        line = line+" " + str(NewIDs[i.get_id()])
+    line = line+'\n'
     fh.write(line.encode())
     
     fh.write('usemtl faces\n'.encode())
     for i in faces:
-        faces=[NewIDs[j.get_id()] for j in i]
-        fh.write("f %i %i %i %i\n".encode()%(faces[0],faces[1],faces[2],faces[3]))
+        local_faces = [NewIDs[j.get_id()] for j in i]
+        fh.write("f %i %i %i %i\n".encode()%(local_faces[0], local_faces[1], local_faces[2], local_faces[3]))
         #fh.write("l %i %i %i %i\n"%(faces[0],faces[1],faces[2],faces[3]))
     return True
 
-def change_alphabet(AA):
+def change_alphabet(AA) -> str:
     """Converts three letter amino acid code to one letter and vise-versa
 
     Args:
@@ -201,7 +225,7 @@ def change_alphabet(AA):
             return one_to_three_lookup[AA]
         except:
             logging.warning('Amino acid code provided did not match any of three or one letter code; returning unknown amino acid code.')
-            if(len(AA)==3):
+            if(len(AA) == 3):
                 return 'X'
-            if(len(AA)==1):
+            if(len(AA) == 1):
                 return 'UNK'

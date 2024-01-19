@@ -19,7 +19,7 @@ Todo:
     * Finish optimizing the performance.
 
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
 
 import numpy
@@ -27,12 +27,16 @@ import logging
 
 from ..utilities import change_alphabet
 
+from typing import TYPE_CHECKING, Union, List, Iterable
+
+if(TYPE_CHECKING):
+    from .. import Chain, Residue, Atom
 
 class Residue():
-    """This class contains the information about the 'Residue' object (packman.molecule.Residue).
+    """This class contains the information about the 'Residue' object (ref:`packman.molecule.Residue`).
 
     This class contains all the information available about the Residue and stores the corresponding 'Atom' objects in itself. The Residue class is the second lowest in the hierarchy of the 'molecule' API classes.
-    the order of hierarchy being: Protein> Model> Chain> Residue> Atom. This class is also the component of the 'molecule' module API.
+    the order of hierarchy being: Protein> Model> Chain/ HetMol> Residue> Atom. This class is also the component of the 'molecule' module API.
     Please read the Tutorials and Documentation for more details.
 
     Note:
@@ -44,7 +48,7 @@ class Residue():
         parent (packman.molecule.Chain): The Chain Object (parent) this Residue belongs to.
 
     """
-    def __init__(self,id,name,parent):
+    def __init__(self, id: int, name: str, parent: 'Chain'):
         self.__id = id
         self.__name = name
         self.__parent = parent
@@ -55,21 +59,25 @@ class Residue():
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
     
-    def __setitem__(self,id,Atom):
+    def __setitem__(self, id: int, Atom: 'Atom'):
         """Simply assign new atom to the 'Residue'
 
         Args:
-            new_id: The ID User wishes to assign to the given 'Atom'
+            id   : The ID User wishes to assign to the given 'Atom'
+            Atom : The new atom user wishes to assign to the Residue object.
         """
         try:
-            self.__Atoms[id]=Atom
+            self.__Atoms[id] = Atom
         except:
-            self.__Atoms={}
-            self.__Atoms[id]=Atom
+            self.__Atoms = {}
+            self.__Atoms[id] = Atom
         self.__Atoms_Names[Atom.get_name()] = Atom
     
+    def __repr__(self) -> str:
+        return '<Residue '+str(self.__id)+' from Chain: '+str(self.__parent.get_id())+' Model: '+str(self.__parent.get_parent().get_id())+'>'
+    
     #Get Functions
-    def get_id(self):
+    def get_id(self) -> int:
         """Get the ID of the 'Residue'
 
         Returns:
@@ -77,7 +85,7 @@ class Residue():
         """
         return self.__id
     
-    def get_name(self):
+    def get_name(self) -> str:
         """Get the Name of the 'Residue'
 
         Returns:
@@ -85,7 +93,7 @@ class Residue():
         """
         return self.__name
 
-    def get_parent(self):
+    def get_parent(self) -> 'Chain':
         """Get the Parent of the 'Residue'
 
         Returns:
@@ -93,14 +101,14 @@ class Residue():
         """
         return self.__parent
     
-    def get_atom(self,key):
+    def get_atom(self, key: Union[int, str]) -> Union['Atom', None]:
         """Get the specific Atom by id/name. Please note that this is different than get_atoms()
 
         Args:
             key (int/str): Get atom by the id/name
         
         Returns:
-            atom (:py:class:`packman.molecule.Atom`): Atom of the given ID if successful; None otherwise.
+            atom (:ref:`packman.molecule.Atom`): Atom of the given ID/ Name if successful; None otherwise.
         """
         try:
             return self.__Atoms[key]
@@ -110,15 +118,15 @@ class Residue():
             except:
                 return None
 
-    def get_atoms(self):
+    def get_atoms(self) -> Iterable['Atom']:
         """Get the generator of corresponding 'Atom' objects of the 'Residue'
 
         Returns:
             generator of 'Atom' objects if successful, None otherwise.
         """
-        for i in sorted(self.__Atoms.keys()):yield self.__Atoms[i]
+        for i in sorted(self.__Atoms.keys()): yield self.__Atoms[i]
     
-    def get_domain_id(self):
+    def get_domain_id(self) -> Union[str, None]:
         """Get the Domain Identifier of the given 'Residue'. Hinge Prediction is Necessary for this option.
 
         Note:
@@ -131,16 +139,16 @@ class Residue():
         """
         return self.__domain_id
     
-    def get_entropy(self, entropy_type):
+    def get_entropy(self, entropy_type: str) -> float:
         """Get the Packing Entropy of the given 'Residue'.
 
         Please note that if the Entropy is calculated using specific atoms, this option might not give results for the amino acids that are not included because of the specific selection. Please see the documentation for more details.
 
         Args:
-            type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
+            entropy_type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
 
         Note:
-            - More type of Entropies might be added in the future.
+            * More type of Entropies might be added in the future.
         """
         EntropyTypes = ['PackingEntropy']
         try:
@@ -151,7 +159,7 @@ class Residue():
             else:
                 logging.warning('The Entropy type provided is invalid. Please check the documentation for the details.')
 
-    def get_property(self,property_name):
+    def get_property(self, property_name):
         """Get the Property of the given 'Residue'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
@@ -161,14 +169,14 @@ class Residue():
             property_name (object): The 'Key' or a name the user wants to assign to to the property
         
         Note:
-            - Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
+            * Users can add custom annotations; for example: If particular amino acid becomes disordered, it can be annotated with this feature.
         """
         try:
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
     
-    def get_changed_alphabet(self):
+    def get_changed_alphabet(self) -> str:
         """Converts three letter amino acid code to one letter and vise-versa
 
         Returns:
@@ -177,31 +185,31 @@ class Residue():
         return change_alphabet(self.get_name())
 
     #Set Functions
-    def set_id(self,new_id):
+    def set_id(self, new_id: int):
         """Set the ID of the given 'Residue'
 
         Args:
             new_id (int): The ID User wishes to assign to the given 'Residue'
         """
-        self.__id=new_id
+        self.__id = new_id
     
-    def set_name(self,new_name):
+    def set_name(self, new_name: str):
         """Set the Name of the given 'Residue'
 
         Args:
             new_name (str): The Name User wishes to assign to the given 'Residue'
         """
-        self.__name=new_name
+        self.__name = new_name
     
-    def set_parent(self,new_parent):
+    def set_parent(self, new_parent: 'Chain'):
         """Set the Parent of the given 'Residue'
 
         Args:
-            new_parent (packman.molecule.Chain): The parent 'Chain' User wishes to assign to the given 'Residue'
+            new_parent (ref:`packman.molecule.Chain`): The parent 'Chain' User wishes to assign to the given 'Residue'
         """
-        self.__parent=new_parent
+        self.__parent = new_parent
 
-    def set_domain_id(self,new_domain_id):
+    def set_domain_id(self, new_domain_id: str):
         """Set the Domain Identifier of the given 'Residue'.
 
         Note:
@@ -212,16 +220,17 @@ class Residue():
         Args:
             new_domain_id (str): The Domain Identifies User wishes to assign to the given 'Residue'
         """
-        self.__domain_id=new_domain_id
+        self.__domain_id = new_domain_id
     
-    def set_entropy(self, entropy_type, value):
+    def set_entropy(self, entropy_type: str, value: float):
         """Set the Packing Entropy of the given 'Residue'.
 
         Args:
-            type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
+            entropy_type (str): Type of entropy (Allowed Values: 1. PackingEntropy)
+            value (float)
 
         Note:
-            - More type of Entropies might be added in the future.
+            * More type of Entropies might be added in the future.
         """
         EntropyTypes = ['PackingEntropy']
         if(entropy_type in EntropyTypes):
@@ -229,7 +238,7 @@ class Residue():
         else:
             logging.warning('The property name provided is invalid. Please check the documentation for the details.')
 
-    def set_property(self,property_name,value):
+    def set_property(self, property_name, value):
         """Set the Property of the given 'Residue'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
@@ -248,11 +257,11 @@ class Residue():
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
     #Calculation/Processing Functions
-    def get_calpha(self):
+    def get_calpha(self) -> Union['Atom', None]:
         """Get the C-Alpha atom of the residue as an 'Atom' object.
 
         Returns:
-            packman.molecule.Atom if successful, None otherwise.
+            ref:`packman.molecule.Atom` if successful, None otherwise.
         """
         try:
             return [i for i in self.get_atoms() if i.get_name()=='CA'][0]
@@ -260,65 +269,65 @@ class Residue():
             #Later create warning that C-alpha is missing
             None
     
-    def get_centerofgravity(self):
+    def get_centerofgravity(self) -> numpy.ndarray:
         """Get the center of gravity of the given 'Residue'
 
         Note:
-            Yet to add the atomic masses.
+            * Yet to add the atomic masses.
 
         Returns:
-            Cartesian Coordinates as numpy.array of the centre of the gravity.
+            Cartesian Coordinates as numpy.ndarray of the centre of the gravity.
         """
-        atoms=self.get_atoms()
-        AtomicMass=1
-        XYZ_M=[0,0,0]
-        MassofAA=0
+        atoms = self.get_atoms()
+        AtomicMass = 1
+        XYZ_M = [0,0,0]
+        MassofAA = 0
         for i in atoms:
-            XYZ_M[0]+=i.get_location()[0]*AtomicMass
-            XYZ_M[1]+=i.get_location()[1]*AtomicMass
-            XYZ_M[2]+=i.get_location()[2]*AtomicMass
-            MassofAA=MassofAA+AtomicMass
-        return numpy.array([i/MassofAA for i in XYZ_M])
+            XYZ_M[0] += i.get_location()[0] * AtomicMass
+            XYZ_M[1] += i.get_location()[1] * AtomicMass
+            XYZ_M[2] += i.get_location()[2] * AtomicMass
+            MassofAA = MassofAA + AtomicMass
+        return numpy.array( [i/MassofAA for i in XYZ_M] )
     
-    def get_backbone(self):
+    def get_backbone(self) -> Union[List['Atom'], None]:
         """Get the Backbone atoms of the given 'Residue' as a list of 'Atom' object
 
         Note:
-            Some files like 1k20 are showing multiple backbone atoms because seperation of models is based on [Model] in this tool (Maybe Solved)
+            * Some files like 1k20 are showing multiple backbone atoms because seperation of models is based on [Model] in this tool (Maybe Solved)
 
         Returns:
             list of packman.molecule.Atom if successful, None otherwise.
         """
         return [i for i in self.get_atoms() if(i.get_name()=='N' or i.get_name()=='CA' or i.get_name()=='C' or i.get_name()=='O')]
     
-    def get_tip(self):
+    def get_tip(self) -> Union['Atom', None]:
         """Get the tip atom of the given 'Residue' as an 'Atom' object
 
         Note:
             ALA and GLY are small so their tip is C-alpha
 
         Returns:
-            packman.molecule.Atom if successful, None otherwise.
+            ref:`packman.molecule.Atom` if successful, None otherwise.
         """
-        CAlpha=self.get_calpha()
-        resname=self.get_name()
-        TipofAA=None
-        if(resname=='GLY'):
-            TipofAA=CAlpha
+        CAlpha  = self.get_calpha()
+        resname = self.get_name()
+        TipofAA = None
+        if(resname == 'GLY'):
+            TipofAA = CAlpha
         else:
             try:
-                MaxDistance=0
+                MaxDistance = 0
                 for i in self.get_atoms():
-                    tempdistance=CAlpha.calculate_distance(i)
-                    if(tempdistance>MaxDistance):
-                        MaxDistance=tempdistance
-                        TipofAA=i
+                    tempdistance = CAlpha.calculate_distance(i)
+                    if(tempdistance > MaxDistance):
+                        MaxDistance = tempdistance
+                        TipofAA = i
             except:
                 TipofAA = CAlpha
-                logging.warning('The tip atoms for '+resname+str(self.get_id())+' not found; Using C-Alpha atoms as a tip.')
+                logging.warning('The tip atoms for ' + resname + str(self.get_id()) + ' not found; Using C-Alpha atoms as a tip.')
         return TipofAA
     
-    def calculate_entropy(self,entropy_type,chains=None, probe_size=1.4, onspherepoints=30):
+    def calculate_entropy(self, entropy_type: str, chains: Union[str, List[str], None]=None, probe_size: float=1.4, onspherepoints: int=30):
         """Calculate the entropy for the each amino acid will be returned.
     
         The 'chains' argument should be used when the user wants to restrict the analysis to a chain or group of chains rather than the whole structure.

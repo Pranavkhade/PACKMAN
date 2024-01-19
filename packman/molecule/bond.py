@@ -12,16 +12,15 @@ Example::
     from packman.molecule import Bond
     help( Bond )
 
-
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
-
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
 import logging
+
+from typing import TYPE_CHECKING, Union, Tuple
+
+if(TYPE_CHECKING):
+    from . import Atom
 
 class Bond():
     """This class contains the information about the 'Bond' object (packman.molecule.Bond).
@@ -43,7 +42,7 @@ class Bond():
         type (str)                    : Bond can be either of the following type: (covalent, ionic, hydrogen or other)
         electrons (tuple)             : A python tuple containing information about shared electrons (eg.... (1,1) means the electrons shared between a single hydrocarbon bond if the atom1 is carbon and atom2 is hydrogen touple order here is (atom1, atom2).
     """
-    def __init__(self, id, atom1, atom2, type, source=None):
+    def __init__(self, id: int, atom1: 'Atom', atom2: 'Atom', type: str, source: Union[str, None]=None):
         self.__id = id
         self.__allowed_bond_types = ['non-covalent', 'covalent', 'covalent-single', 'covalent-double', 'covalent-triple' , 'ionic', 'hydrogen', 'salt-bridge', 'other']
         self.__atom1 = atom1
@@ -54,8 +53,11 @@ class Bond():
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
     
+    def __repr__(self) -> str:
+        return '<Bond ('+str(self.__type)+') '+str(self.__id)+' between Atom '+str(self.__atom1.get_id())+' and '+str(self.__atom2.get_id())+'>'
+    
     #Get Functions
-    def get_id(self):
+    def get_id(self) -> int:
         """Get the ID of the 'Bond'
 
         Returns:
@@ -63,7 +65,7 @@ class Bond():
         """
         return self.__id
 
-    def get_atoms(self):
+    def get_atoms(self) -> 'Atom':
         """Get the atoms involved in the bond.
 
         Returns:
@@ -71,7 +73,7 @@ class Bond():
         """
         return ( self.__atom1, self.__atom2 )
     
-    def get_type(self):
+    def get_type(self) -> str:
         """Get the type of the bond
 
         Returns:
@@ -79,7 +81,7 @@ class Bond():
         """
         return self.__type
     
-    def get_source(self):
+    def get_source(self) -> str:
         """Get the source of the information of the created bond.
 
         Returns:
@@ -87,7 +89,7 @@ class Bond():
         """
         return self.__source
     
-    def get_property(self,property_name):
+    def get_property(self, property_name):
         """Get the Property of the given 'Bond'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the set_property) feature is mainly useful for the user customization.
@@ -104,7 +106,7 @@ class Bond():
         except:
             logging.warning('The Property Name provided is not assigned.')
     
-    def get_torsion(self, neighbor1=None, neighbor2=None, radians=True):
+    def get_torsion(self, neighbor1: Union[int, 'Atom'], neighbor2: Union[int, 'Atom'], radians: bool=True) -> float:
         """Calculate the torsion angle of the given covalent bond with the corresponding selected neighbors.
 
         Note:
@@ -113,7 +115,7 @@ class Bond():
         Args:
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
-            radians   (True/False)                : Return value of the angle in radians (returns value in degrees if False; Default : True)
+            radians   (bool)                      : Return value of the angle in radians (returns value in degrees if False; Default : True)
         
         Returns:
             The torsion angle in radians/degrees if sucessful, None otherwise.
@@ -122,32 +124,42 @@ class Bond():
         return Model.get_torsion(self, neighbor1=neighbor1, neighbor2=neighbor2, radians=radians)
     
     #Set Functions
-    def set_atoms(self, new_pair):
+    def set_atoms(self, new_pair: Tuple['Atom', 'Atom']) -> bool:
         """Set the atoms involved in the bond.
         
         Args:
             atom_pair (tuple): Tuple of :ref:`packman.molecule.Atom` objects.
+        
+        Returns:
+            True if successful, False otherwise.
         """
         if(len(new_pair)!=2):
             logging.warning('The input provided for Bond.set_atoms() does not have valid length. Please make sure that exactly two atoms are provided. eg.. (Atom1, Atom2)')
+            return False
         else:
             self.__atom1 = new_pair[0]
             self.__atom2 = new_pair[1]
+            return True
     
-    def set_type(self,new_type):
+    def set_type(self, new_type: str) -> bool:
         """Set the bond type.
 
         Bond can be either of the following type: (covalent, ionic, hydrogen or other)
 
         Args:
-            new_type (str): 
+            new_type (str): New bond type
+        
+        Returns:
+            True if successful, False otherwise.
         """
         if(new_type in self.__allowed_bond_types):
             self.__type = new_type
+            return True
         else:
             logging.warning( 'Invalid bond type. Allowed types: '+', '.join(self.__allowed_bond_types) )
+            return False
 
-    def set_property(self,property_name,value):
+    def set_property(self, property_name, value) -> bool:
         """Set the Property of the given 'Bond'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
@@ -162,20 +174,22 @@ class Bond():
         """
         try:
             self.__properties[property_name] = value
+            return True
         except:
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
+            return False
     
-    def set_torsion(self, theta, neighbor1=None, neighbor2=None, radians=True):
+    def set_torsion(self, theta: float, neighbor1: Union[int, 'Atom'], neighbor2: Union[int, 'Atom'], radians: bool=True):
         """Set the torsion for the given covalent bond with the corresponding selected neighbors.
 
         Note:
             At least four atoms are needed to form two planes that change the torsional angles; therefore, along with the two bond atoms, the user needs to provide the additional two atoms that are ideally non-mutual neighbors of the atoms in the bond.
 
         Args:
-            theta     (int)                       : Set the torsional angle (see the 'radians' parameter description)
+            theta     (float)                     : Set the torsional angle (see the 'radians' parameter description)
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom1 as an 'Atom' object or Atom ID.
             neighbor1 (int/packman.molecule.Atom) : Neighbour of the Atom2 as an 'Atom' object or Atom ID.
-            radians   (True/False)                : Parameter 'theta' will be assuned to be in Radians if True, Degrees will be assumed when False. ( Default : True)
+            radians   (bool)                : Parameter 'theta' will be assuned to be in Radians if True, Degrees will be assumed when False. ( Default : True)
         
         Returns:
             True if successful, None otherwise

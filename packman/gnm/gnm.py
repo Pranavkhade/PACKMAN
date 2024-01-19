@@ -8,13 +8,8 @@ Example::
     from packman.GNM import GNM
     help( GNM )
 
-Notes:
-    * Tutorial:
-
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
+Note:
+    * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/GNM.html#tutorials-gnm-api
 
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
@@ -23,6 +18,10 @@ Authors:
 
 import numpy
 import logging
+
+from .. import Atom
+
+from typing import List, Union
 
 '''
 ##################################################################################################
@@ -33,11 +32,8 @@ import logging
 class GNM:
     """This class contains the functions essential to carry out the Gaussian Network Model.
 
-        Notes:
-        * Tutorial:
-
-        Todo:
-            * Add set_ functions
+        Note:
+        * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/GNM.html#tutorials-gnm-api
         
         Args:
             coords ([float])       : Two dimentional array of three dimentional points in the space.
@@ -46,7 +42,7 @@ class GNM:
             power (int, optional)  : Power of distance (mainly useful in non-parametric mode).   Defaults to 0.
     """
     
-    def __init__(self, atoms, gamma=1.0, dr=7.3, power=0):
+    def __init__(self, atoms: List[Atom], gamma: float=1.0, dr: float=7.3, power: int=0):
         self.gamma   = gamma
         self.dr      = dr
         self.power   = power
@@ -62,10 +58,10 @@ class GNM:
         self.crosscorrelation   = None
 
     '''Get Functions'''
-    def get_kirchhoff(self):
-        """Get the Hessian Matrix of the ANM model.
+    def get_kirchhoff(self) -> numpy.ndarray:
+        """Get the Hessian Matrix of the GNM model.
 
-        Notes:
+        Note:
             * Make sure that the GNM().calculate_kirchhoff() is called before calling this function. (will return None otherwise)
         
         Returns:
@@ -73,32 +69,32 @@ class GNM:
         """
         return self.kirchhoff
     
-    def get_eigenvalues(self):
+    def get_eigenvalues(self) -> numpy.ndarray:
         """Get the Eigenvalues obtained by decomposing the Hessian Matrix of the ANM model.
         
-        Notes:
-            * Make sure that the ANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
+        Note:
+            * Make sure that the GNM().get_kirchhoff() and GNM().calculate_decomposition() is called before calling this function. (will return None otherwise)
 
         Returns:
             numpy.ndarray: Eigenvalues if successful; None otherwise
         """
         return self.eigen_values
     
-    def get_eigenvectors(self):
+    def get_eigenvectors(self) -> numpy.ndarray:
         """Get the Eigenvectors obtained by decomposing the Hessian Matrix of the ANM model.
         
-        Notes:
-            * Make sure that the ANM().calculate_hessian() and ANM().calculate_decomposition() is called before calling this function. (will return None otherwise)
+        Note:
+            * Make sure that the GNM().get_kirchhoff() and GNM().calculate_decomposition() is called before calling this function. (will return None otherwise)
 
         Returns:
             numpy.ndarray: Eigenvectors if successful; None otherwise
         """
         return self.eigen_vectors
     
-    def get_fluctuations(self):
+    def get_fluctuations(self) -> numpy.ndarray:
         """Get the Fluctuations obtained from Eigenvectors and Eigenvalues
         
-        Notes:
+        Note:
             * Make sure that the GNM().calculate_kirchhoff(), GNM().calculate_decomposition() and GNM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -106,10 +102,10 @@ class GNM:
         """
         return self.fluctuations
     
-    def get_crosscorrelation(self):
+    def get_crosscorrelation(self) -> numpy.ndarray:
         """Get the crosscorrelations.
 
-        Notes:
+        Note:
             * Make sure that the GNM().calculate_kirchhoff(), GNM().calculate_decomposition() and GNM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -117,10 +113,10 @@ class GNM:
         """
         return self.crosscorrelation
     
-    def get_pseudoinverse(self):
+    def get_pseudoinverse(self) -> numpy.ndarray:
         """Get the pseudoinverse of the Kirchhoff's matrix.
 
-        Notes:
+        Note:
             * Make sure that the GNM().calculate_kirchhoff(), GNM().calculate_decomposition() and GNM().calculate_fluctuations() is called before calling this function. (will return None otherwise)
 
         Returns:
@@ -129,10 +125,10 @@ class GNM:
         return self.pseduinverse
 
     '''Calculate Functions'''
-    def calculate_kirchhoff(self, gamma = 1.0):
+    def calculate_kirchhoff(self, gamma:float = 1.0) -> bool:
         """Calculate the Gaussian Network Model (GNM) kirchhoff Matrix.
 
-        The matrix is stored in the self.GNM_MAT variable.
+        The matrix is stored in the self.kirchhoff variable.
         
         Returns:
             True if successful; None otherwise.
@@ -154,28 +150,24 @@ class GNM:
         
         return True
     
-    def calculate_decomposition(self):
-        """Decompose the Hessian Matrix of the ANM model.
+    def calculate_decomposition(self) -> bool:
+        """Decompose the Hessian Matrix of the GNM model.
         
         Note:
-            Eigen values and Eigen Vectors are calculated. use ANM().get_eigenvalues() and ANM().get_eigenvectors() to obtain them.
+            Eigen values and Eigen Vectors are calculated. use GNM().get_eigenvalues() and GNM().get_eigenvectors() to obtain them.
         """
         self.eigen_values,self.eigen_vectors=numpy.linalg.eigh(self.kirchhoff)
         return True
 
-    def calculate_fluctuations(self, endmode=None):
-        """Calculate the Fluctuations of the ANM model.
+    def calculate_fluctuations(self, endmode: Union[int, None]=None) -> bool:
+        """Calculate the Fluctuations of the GNM model.
 
         The fluctualtions/ theoretical b-factors are calculated using this method.
         
         Note:
-            - Fluctuations are calculated. use ANM().get_fluctuations() to obtain the fluctuations.
+            - Fluctuations are calculated. use GNM().get_fluctuations() to obtain the fluctuations.
             - Endmode needs to be put in the code if and when required.
         """
-        '''
-            inverse=inverse+(float(1)/eigen_values[i])*eigen_vectors[:,i]*eigen_vectors[:,i].transpose()
-        return inverse.diagonal()
-        '''
         #Initiate
         if(endmode is None):
             stop_at = len(self.eigen_values)
@@ -193,8 +185,9 @@ class GNM:
         self.fluctuations = self.pseduinverse.diagonal()
         return True
     
-    def calculate_crosscorrelation(self):
+    def calculate_crosscorrelation(self) -> bool:
         """Calculate the cross-correlation. (Read the paper for more details)
+
         Returns:
             True if successful; None otherwise.
         """

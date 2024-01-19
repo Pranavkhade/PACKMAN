@@ -18,9 +18,10 @@ Todo:
     * Finish optimizing the performance.
 
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
-
+from typing import List, Union
+from . import Atom, Residue
 
 '''
 ##################################################################################################
@@ -43,15 +44,18 @@ class Hinge():
         stats ([float])                    : Everything about the statistics (mean/median/mode of B-factors)
         p (float)                          : p-value obtained from the permutation test (Please read the paper for more details)
     """
-    def __init__(self,hid,alpha_value,elements,stats,p):
+    def __init__(self, hid:int, alpha_value: float,elements: List[Atom], stats: List[float], p: float):
         self.__id=hid
         self.__alpha_value=alpha_value
         self.__elements=elements
         self.__stats=stats
         self.__p=p
+    
+    def __repr__(self) -> str:
+        return '<Hinge ID:'+str(self.__id)+'>'
 
     #Get functions
-    def get_id(self):
+    def get_id(self) -> Union[int, None]:
         """Get the ID of the 'Hinge'
 
         Returns:
@@ -59,7 +63,7 @@ class Hinge():
         """
         return self.__id
     
-    def get_alpha_value(self):
+    def get_alpha_value(self) -> Union[int, None]:
         """Get the hinge prediction algorithm parameter (Alpha Value) of the 'Hinge'.
 
         Returns:
@@ -67,7 +71,7 @@ class Hinge():
         """
         return self.__alpha_value
 
-    def get_elements(self):
+    def get_elements(self) -> List[Residue]:
         """Get the elements (Currently residue objects) of the 'Hinge'
 
         Returns:
@@ -83,7 +87,7 @@ class Hinge():
         """
         return self.__stats
 
-    def get_pvalue(self):
+    def get_pvalue(self) -> float:
         """Get the statistics of the 'Hinge'
 
         Returns:

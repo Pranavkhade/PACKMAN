@@ -3,15 +3,15 @@
 """The 'DCI' object host file.
 This is file information, not the class information. This information is only for the API developers.
 Please read the 'DCI' object documentation for details.
+
 Example::
     from packman.apps import DCI
     help( DCI )
-Notes:
-    * Tutorial: 
-    * For more details about the parameters for compliance, or to site this, read the following paper: 
-Todo:
-    * Finish writing up the documentation.
-    * Finish optimizing the performance.
+
+Note:
+    * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/dci_cli.html#tutorials-dci-cli
+    * For more details about the parameters for compliance, or to site this, read the following paper: https://doi.org/10.1093/bioinformatics/btac159
+
 Authors:
     * Ambuj Kumar  (ambuj@iastate.edu)
     * Pranav Khade (https://github.com/Pranavkhade)
@@ -29,9 +29,9 @@ class DCI():
     """This class contains the code for DCI analysis.
 
     Notes:
-        * Tutorial: 
-        * Webserver: 
-        * Publication:
+        * Tutorial: https://py-packman.readthedocs.io/en/1.4.10/tutorials/dci_cli.html#tutorials-dci-cli
+        * Webserver: https://dci.bb.iastate.edu/
+        * Publication:  https://doi.org/10.1093/bioinformatics/btac159
     
     Args:
         mol (packman.molecule.Protein) : Structure in the 'Protein' object.

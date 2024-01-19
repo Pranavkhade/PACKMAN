@@ -8,9 +8,6 @@ How to use::
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """
-import numpy
-
-import traceback
 import logging
 
 from .. import molecule

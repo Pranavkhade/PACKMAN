@@ -12,21 +12,23 @@ Example::
     from packman.molecule import Atom
     help( Atom )
 
-
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
-
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
 
 import numpy
 
 import logging
 
-from packman import molecule
+from typing import List, TYPE_CHECKING, Union
+
+try:
+    from typing import Self
+except:
+    from typing_extensions import Self
+
+if(TYPE_CHECKING):
+    from . import Residue, Bond, HetMol
 
 
 class Atom():
@@ -37,8 +39,9 @@ class Atom():
     Please read the Tutorials and Documentation for more details.
 
     Note:
-        - Most essential class of all as it stores the actual data of the atoms.
-        - Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
+        * Most essential class of all as it stores the actual data of the atoms.
+        * Please refer to the [https://web.archive.org/web/20080905024351/http://www.wwpdb.org/docs.html] for the description of the arguments.
+        * In the future, atom definition will become less stringent for better utility.
     
     Args:
         id (int): Atom ID from the PDB file as it is. Each Atom in a PDB file Model/Frame has unique ID. (essential)
@@ -52,24 +55,28 @@ class Atom():
         AlternateLocationIndicator (bool): If the alternate location available for the atom (To be removed in future)
 
     """
-    def __init__(self,id,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,parent):
-        self.__id=id
-        self.__AtomName=AtomName
-        self.__AlternateLocationIndicator=None #remove it later
-        self.__parent=parent
-        self.__Coordinates=Coordinates
-        self.__Occupancy=Occupancy
-        self.__bfactor=bfactor
-        self.__SegmentIdentifier=None
-        self.__Element=Element
-        self.__Charge=Charge
+    def __init__(self, id: int, AtomName: str, Coordinates: numpy.ndarray, Occupancy: float, bfactor: float, Element: str, Charge: str, parent: 'Residue'):
+        self.__id          = id
+        self.__AtomName    = AtomName
+        self.__Coordinates = Coordinates
+        self.__Occupancy   = Occupancy
+        self.__bfactor     = bfactor
+        self.__Element     = Element
+        self.__Charge      = Charge
+        self.__parent      = parent
 
         #Properties are the entities that are not included in the PDB files and are obtained by calculations
         self.__properties = {}
         self.__Bonds = []
+    
+    def __repr__(self) -> str:
+        if(self.__parent.__class__.__name__=='Residue'):
+            return '<Atom '+str(self.__id)+' from Residue: '+str(self.__parent.get_id())+' Chain: '+str(self.__parent.get_parent().get_id())+' Model: '+str(self.__parent.get_parent().get_parent().get_id())+'>'
+        elif(self.__parent.__class__.__name__=='HetMol'):
+            return '<Atom '+str(self.__id)+' from HetMol: '+str(self.__parent.get_id())+' Chain: '+str(self.__parent.get_parent().get_id())+' Model: '+str(self.__parent.get_parent().get_parent().get_id())+'>'
 
     #Get Functions
-    def get_id(self):
+    def get_id(self) -> int:
         """Get the ID of the 'Atom'
 
         Returns:
@@ -77,7 +84,7 @@ class Atom():
         """
         return self.__id
     
-    def get_name(self):
+    def get_name(self) -> str:
         """Get the Name of the 'Atom'
 
         Returns:
@@ -85,18 +92,7 @@ class Atom():
         """
         return self.__AtomName
     
-    def get_alternatelocationindicator(self):
-        """Know if the given 'Atom' has Alternate Location Information
-
-        Note:
-            This feature might be removed in the future.
-
-        Returns:
-            True if successful, False otherwise.
-        """
-        return self.__AlternateLocationIndicator
-
-    def get_parent(self):
+    def get_parent(self) -> 'Residue':
         """Get the 'Residue' the given 'Atom' belongs to.
 
         Returns:
@@ -104,7 +100,7 @@ class Atom():
         """
         return self.__parent
     
-    def get_location(self):
+    def get_location(self) -> numpy.ndarray:
         """Get the Coordinates/Location of the given 'Atom'
 
         Returns:
@@ -112,7 +108,7 @@ class Atom():
         """
         return self.__Coordinates
     
-    def get_occupancy(self):
+    def get_occupancy(self) -> float:
         """Get the Occupancy of the given 'Atom'
 
         Returns:
@@ -120,7 +116,7 @@ class Atom():
         """
         return self.__Occupancy
     
-    def get_bfactor(self):
+    def get_bfactor(self) -> float:
         """Get the B-factor/Temperature Factor/ Debye Waller Factor of the given 'Atom'
 
         Returns:
@@ -128,15 +124,7 @@ class Atom():
         """
         return self.__bfactor
     
-    def get_segmentidentifier(self):
-        """Get the Segment Identifier of the given 'Atom'
-
-        Returns:
-            str if successful, None otherwise.
-        """
-        return self.__SegmentIdentifier
-    
-    def get_element(self):
+    def get_element(self) -> str:
         """Get the Element of the given 'Atom'
 
         Returns:
@@ -144,15 +132,18 @@ class Atom():
         """
         return self.__Element
     
-    def get_charge(self):
+    def get_charge(self) -> str:
         """Get the Charge of the given 'Atom'
 
+        Note:
+            Charge will be made float in the future.
+
         Returns:
-            str if successful, None otherwise.
+            float if successful, None otherwise.
         """
         return self.__Charge
     
-    def get_domain_id(self):
+    def get_domain_id(self) -> str:
         """Get the Domain Identifier of the given 'Atom'. Hinge Prediction is Necessary for this option.
 
         Note:
@@ -175,14 +166,14 @@ class Atom():
             property_name (object): The 'Key' or a name the user wants to assign to to the property
         
         Note:
-            - Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
+            * Users can add custom annotations; for example: If particular chain becomes disordered, it can be annotated with this feature.
         """
         try:
             return self.__properties[property_name]
         except:
             logging.warning('The Property Name provided is not assigned.')
     
-    def get_bonds(self):
+    def get_bonds(self) -> List['Bond']:
         """Get the bonds for the given 'Atom'
 
         Returns:
@@ -190,7 +181,7 @@ class Atom():
         """
         return self.__Bonds
     
-    def get_bond(self,atom2):
+    def get_bond(self, atom2: Union[int, Self]) -> 'Bond':
         """Get the specific bond with the specific atom.
 
         Args:
@@ -210,87 +201,71 @@ class Atom():
         return list(set(self.get_bonds()).intersection( atom2.get_bonds() ))[0]
 
     #Set Functions
-    def set_id(self,new_id):
+    def set_id(self, new_id: int):
         """Set the ID of the given 'Atom'
 
         Args:
             new_id (int): The ID User wishes to assign to the given 'Atom'
         """
-        self.__id=new_id
+        self.__id = new_id
     
-    def set_name(self,new_name):
+    def set_name(self, new_name: str):
         """Set the Name of the given 'Atom'
 
         Args:
             new_name (str): The Name User wishes to assign to the given 'Atom'
         """
-        self.__AtomName=new_name    
+        self.__AtomName = new_name    
     
-    def set_alternatelocationindicator(self,new_alternatelocationindicator):
-        """Set the Alternate Location Indicator of the given 'Atom'
-
-        Args:
-            new_alternatelocationindicator: The Alternate Location Indicator User wishes to assign to the given 'Atom'
-        """
-        self.__AlternateLocationIndicator=new_alternatelocationindicator
-
-    def set_parent(self,new_parent):
+    def set_parent(self, new_parent: Union['Residue', 'HetMol']):
         """Set the Parent 'Residue' of the given 'Atom'
 
         Args:
             new_parent (packman.molecule.residue.Residue): The parent 'Residue' User wishes to assign to the given 'Atom'
         """
-        self.__parent=new_parent
+        self.__parent = new_parent
     
-    def set_location(self,new_location):
+    def set_location(self, new_location: numpy.ndarray):
         """Set the Coordinates/Location of the given 'Atom'
 
         Args:
-            new_location (numpy.array): The Coordinates/Location User wishes to assign to the given 'Atom'
+            new_location (numpy.ndarray): The Coordinates/Location User wishes to assign to the given 'Atom'
         """
-        self.__Coordinates=new_location
+        self.__Coordinates = new_location
     
-    def set_occupancy(self,new_occupancy):
+    def set_occupancy(self, new_occupancy: float):
         """Set the Occupancy of the given 'Atom'
 
         Args:
             new_occupancy: The Occupancy User wishes to assign to the given 'Atom'
         """
-        self.__Occupancy=new_occupancy
+        self.__Occupancy = new_occupancy
     
-    def set_bfactor(self,new_bfactor):
+    def set_bfactor(self, new_bfactor: float):
         """Set the B-factor/Temperature Factor/ Debye Waller Factor of the given 'Atom'
 
         Args:
             new_bfactor (float): The B-factor/Temperature Factor/ Debye Waller Factor User wishes to assign to the given 'Atom'
         """
-        self.__bfactor=new_bfactor
+        self.__bfactor = new_bfactor
     
-    def set_segmentidentifier(self,new_segmentidentifier):
-        """Set the Segment Identifier of the given 'Atom'
-
-        Args:
-            new_segmentidentifier (str): The Segment Identifier User wishes to assign to the given 'Atom'
-        """
-        self.__SegmentIdentifier=new_segmentidentifier
-    
-    def set_elment(self,new_element):
+    def set_elment(self, new_element: str):
         """Set the Element of the given 'Atom'
 
         Args:
             new_element (str): The Element User wishes to assign to the given 'Atom'
         """
-        self.__Element=new_element
+        self.__Element = new_element
     
-    def set_charge(self,new_charge):
+    def set_charge(self, new_charge: str):
         """Set the Charge of the given 'Atom'
 
         Args:
             new_charge (str): The Charge User wishes to assign to the given 'Atom'
         """
-        self.__Charge=new_charge
+        self.__Charge = new_charge
     
-    def set_property(self,property_name,value):
+    def set_property(self, property_name, value):
         """Set the Property of the given 'Atom'.
 
         Property is any key and value combination that can be assigned to this object. This (along with the get_property) feature is mainly useful for the user customization.
@@ -308,25 +283,25 @@ class Atom():
         except:
             logging.warning('Please check the property name. Check the allowed Python dictionary key types for more details.')
 
-    def set_bond(self,new_bond):
+    def set_bond(self, new_bond: 'Bond'):
         """Set the atom to the given 'Atom'
 
         Args:
             new_bond (packman.molecule.Bond) : Add new bond to the given 'Atom'
         
         Note:
-            - Yet to add the functionality to delete the specific bonds.
+            * Yet to add the functionality to delete the specific bonds.
         """
-        self.__Bonds.append(new_bond)
+        self.__Bonds.append( new_bond )
 
     #Calculation Functions
-    def calculate_distance(self,another_atom):
+    def calculate_distance(self, another_atom: Self) -> float:
         """Calculate the Distance between the given 'Atom' and another 'Atom'
 
         Args:
             another_atom (packman.molecule.atom.Atom): The 'Atom' User wishes to calculate distance from.
         
         Returns:
-            float if successful, None otherwise.
+            Distance (float) in Angstrom if successful, None otherwise.
         """
         return numpy.linalg.norm(self.__Coordinates-another_atom.get_location())

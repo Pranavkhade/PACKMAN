@@ -9,15 +9,6 @@ Example::
     from packman.apps import predict_hinge
     help( predict_hinge )
 
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Move the marked functions to the geometry module
-    * Clear and annotate the subclasses properly
-    * Annotate 'error', 'cross'
-    * Finish optimizing the performance.
-    * Convert GetExample() functions to get_example() to make it uniform with rest of the API.
-
 Authors:
     * Pranav Khade(https://github.com/Pranavkhade)
 """

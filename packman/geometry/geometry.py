@@ -20,11 +20,15 @@ Authors:
 """
 import numpy
 
+from typing import TYPE_CHECKING, List, Iterable, Union, Tuple
+
 from scipy.spatial import Delaunay
 
 from networkx import Graph
 
-def Circumsphere(Tetrahydron):
+from .. import Atom
+
+def Circumsphere(Tetrahydron: List[Atom]) -> (float, float):
     """Get the Circumsphere of the set of four points.
     
     Given any four three dimentional points, this function calculates the features of the circumsphere having the given four points on it's surface.
@@ -53,36 +57,35 @@ def Circumsphere(Tetrahydron):
     return Centre, Radius
 
 
-def AlphaShape( atoms, alpha, get_graph=False, write_objfile=None ):
+def AlphaShape( atoms: Iterable[Atom], alpha: float, get_graph: bool=True ) -> Union[ List[Atom], Tuple[List[Atom], Graph] ]:
     """Get the Alpha Shape of the atoms.
 
     Given set of atoms as 'Atom' (packman.molecule.Atom) object(s) and the alpha value, this class will calculate and return the alpha shape tessellations. It will also write the .obj file if the filename is provided as an input.
 
-    Notes:
+    Note:
         * Tip: If you do not want to use the function multiple times to save computation, calculate it once with alpha = float('Inf') and then use the tessellations to calculate radius and save it as a dictionary to retrieve. Tessellations with any cutoff.
         * For more information on the alpha shape, read the following paper:
             EdelsbrunnerandE. P. M ̈ucke.Three-dimensional alpha shapes.
             Manuscript UIUCDCS-R-92-1734, Dept.Comput.Sci. ,Univ.Illinois, Urbana-Champaign, IL, 1992.
     
     Args:
-        atoms (packman.molecule.Atom) : 
-        alpha (float)                 : 
-        get_graph (networkx.Graph)    : 
-        write_objfile (str)           : 
+        atoms (packman.molecule.Atom) : Iterable that returns Atom type.
+        alpha (float)                 : Alpha cutoff value.
+        get_graph (networkx.Graph)    : Return graph of the Atoms for the given alpha parameter.
     
     Returns:
         - Alpha Shape Tessellations                ; if 'get_graph' = False
         - Alpha Shape Tessellations, Protein Graph ; if 'get_graph' = True
     """
-    def calculate_alphafitness(alpha, circumradius):
+    def calculate_alphafitness(alpha: float, circumradius: float) -> bool:
         """Alpha Test as per the paper.
         
-        Notes:
+        Note:
             * Resides inside 'get_alphashape' function.
 
         Args:
-            alpha (float)                  : Alpha.                            (Read parent method description)
-            circumradius ([float])         : Circumradius of the circumsphere. (Read parent method description)
+            alpha (float)                : Alpha.                              (Read parent method description)
+            circumradius (float)         : Circumradius of the circumsphere.   (Read parent method description)
         
         Returns:
             bool: True if alpha test is passed. False otherwise.

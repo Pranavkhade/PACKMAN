@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""The 'predict_hinge' object host file.
+"""The 'calculate_entropy' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
 Please read the 'predict_hinge' object documentation for details.

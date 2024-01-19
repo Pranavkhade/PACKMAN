@@ -289,7 +289,7 @@ THREE_LETTER_TO_ONE_LETTER = {
 'VAL':'V',
 'ASX':'B',
 'GLX':'Z',
-'XAA':'X',
+'XAA':'x',
 'XLE':'J',
 'UNK':'X'
 }

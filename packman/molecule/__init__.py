@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Author: Pranav Khade, Iowa State University
-# Please read the project licence file for the Copyrights.
-
+# Author: Pranav Khade
 """The 'packman.molecule' module is used to read, write, manipulate and analyze the molecule.
 
 This module is the base of the tool packman. It is used as a base module for all the packman utilities

@@ -6,7 +6,7 @@ import unittest
 import logging
 from os import remove as rm
 
-class TestGeometry(unittest.TestCase):
+class Test_Geometry(unittest.TestCase):
 
     def setUp(self):
         self.mol = molecule.load_structure('packman/tests/data/4hla.cif',ftype='cif')
@@ -19,10 +19,13 @@ class TestGeometry(unittest.TestCase):
 
     def test_AlphaShape(self):
         #Checked only one instance of the atom
-        self.assertIsInstance( geometry.AlphaShape( [j for i in self.mol[0].get_backbone() for j in i], 4 )[0][0], molecule.Atom )
+        try:
+            self.assertIsInstance( geometry.AlphaShape( [j for i in self.mol[0].get_backbone() for j in i], 4 )[0][0], molecule.Atom )
+        except:
+            self.assertIsInstance( geometry.AlphaShape( [j for i in self.mol[0].get_backbone() for j in i], 4 )[0][0][0], molecule.Atom )
         
     def tearDown(self):
-        logging.info('Molecule Test Done.')
+        logging.info('Geometry Test Done.')
 
 if(__name__=='__main__'):
     unittest.main()

@@ -2,23 +2,18 @@
 """The 'Molecule' object host file.
 
 This is file information, not the class information. This information is only for the API developers.
-Please read the 'Model' object documentation for details.
+Please read the 'Molecule' object documentation for details.
 
 Citation:
     Pranav M Khade, Robert L Jernigan, PACKMAN-Molecule: Python Toolbox for Structural Bioinformatics, Bioinformatics Advances, 2022;, vbac007, https://doi.org/10.1093/bioadv/vbac007
 
 Example::
 
-    from packman.molecule import Model
-    help( Model )
-
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
+    from packman import molecule
+    help( molecule )
 
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
 
 import numpy
@@ -40,127 +35,128 @@ from .hetmol import HetMol
 ##################################################################################################
 '''
 
-def load_pdb(filename):
+def load_pdb(filename: str) -> Protein:
     """
     Load the PDB (.pdb) file into the 'Protein' Object.
     """
 
-    Models=[]
+    Models         = []
     AllAnnotations = []
-    start=0
+    start          = 0
 
-    fh=open(filename).read()
+    fh = open( filename ).read()
 
-    frames=fh.split('\nMODEL')
+    frames = fh.split('\nMODEL')
 
-    if(len(frames)>1):
+    if(len(frames) > 1):
         start=1
     else:
         start=0
-    for FrameNumber,frame in enumerate(frames[start:]):
+    for FrameNumber, frame in enumerate(frames[start:]):
         #Map
-        AllAtoms={}
-        AllResidues={}
-        AllChains={}
+        AllAtoms    = {}
+        AllResidues = {}
+        AllChains   = {}
 
-        AllHetAtoms={}
-        AllHetMols={}
+        AllHetAtoms = {}
+        AllHetMols  = {}
 
         lines=frame.split('\n')   
         for _ in lines:
-            if(_[0:4]=='ATOM'):
-                #NOTE: MAPS CAN BE REMOVED SAFELY
-                #Chain Defined
+            if(_[0:4] == 'ATOM'):
+                # Chain Defined
                 ChainID=_[21]
-                if(ChainID not in AllChains.keys()):AllChains[ChainID]=Chain(ChainID)
+                if(ChainID not in AllChains.keys()): AllChains[ChainID] = Chain(ChainID)
 
-                #Residue Defined
-                ResidueNumber=int(_[22:26].strip())
-                ResidueName=_[17:20]
-                if(str(ResidueNumber)+ChainID not in AllResidues.keys()):AllResidues[str(ResidueNumber)+ChainID]=Residue(ResidueNumber,ResidueName,AllChains[ChainID])
+                # Residue Defined
+                ResidueNumber = int(_[22:26].strip())
+                ResidueName   = _[17:20]
+                if(str(ResidueNumber)+ChainID not in AllResidues.keys()): AllResidues[str(ResidueNumber)+ChainID] = Residue(ResidueNumber,ResidueName,AllChains[ChainID])
 
-                #Residue Added to the chain
-                AllChains[ChainID].__setitem__(ResidueNumber,AllResidues[str(ResidueNumber)+ChainID],Type='Residue')
+                # Residue Added to the chain
+                AllChains[ChainID].__setitem__(ResidueNumber, AllResidues[str(ResidueNumber)+ChainID], Type='Residue')
 
-                #Atom Defined
-                id=int(_[6:11])
-                AtomName=_[12:16].strip()
-                Coordinates=numpy.array([float(_[30:38]),float(_[38:46]),float(_[46:54])])
-                Occupancy=float(_[54:60])
-                bfactor=float(_[60:66])
-                Element=_[76:78].strip()
-                Charge=_[78:80]
-                AllAtoms[id]=Atom(id,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,AllResidues[str(ResidueNumber)+ChainID])
+                # Atom Defined
+                id           = int(_[6:11])
+                AtomName     = _[12:16].strip()
+                Coordinates  = numpy.array([float(_[30:38]),float(_[38:46]),float(_[46:54])])
+                Occupancy    = float(_[54:60])
+                bfactor      = float(_[60:66])
+                Element      = _[76:78].strip()
+                Charge       = _[78:80]
+                AllAtoms[id] = Atom(id, AtomName, Coordinates, Occupancy, bfactor, Element, Charge, AllResidues[str(ResidueNumber)+ChainID])
                 
-                #Atom added to the residue
-                AllResidues[str(ResidueNumber)+ChainID].__setitem__(id,AllAtoms[id])
+                # Atom added to the residue
+                AllResidues[ str(ResidueNumber)+ChainID ].__setitem__(id,AllAtoms[id])
 
-                #What to do with these?
+                # Recordred but not used.
                 AlternateLocationIndicator=_[16]
                 CodeForInsertions=_[26]
                 SegmentIdentifier=_[72:76]
-            elif(_[0:6]=='HETATM'):
-                ChainID=_[21]
-                if(ChainID not in AllChains.keys()):AllChains[ChainID]=Chain(ChainID)
 
-                #HetMol Defined
-                HetMolNumber=int(_[22:26].strip())
-                HetMolName=_[17:20]
-                if(str(HetMolNumber)+ChainID not in AllHetMols.keys()):AllHetMols[str(HetMolNumber)+ChainID]=HetMol(HetMolNumber,HetMolName,AllChains[ChainID])
+            elif(_[0:6] == 'HETATM'):
+                ChainID = _[21]
+                if(ChainID not in AllChains.keys()): AllChains[ChainID] = Chain(ChainID)
 
-                #HetMol Added to the chain
-                AllChains[ChainID].__setitem__(HetMolNumber,AllHetMols[str(HetMolNumber)+ChainID],Type='HetMol')
+                # HetMol Defined
+                HetMolNumber = int(_[22:26].strip())
+                HetMolName   = _[17:20]
+                if(str(HetMolNumber)+ChainID not in AllHetMols.keys()): AllHetMols[str(HetMolNumber)+ChainID] = HetMol(HetMolNumber,HetMolName,AllChains[ChainID])
 
-                #HetAtom Defined
-                AtomID=int(_[6:11])
-                AtomName=_[12:16].strip()
-                Coordinates=numpy.array([float(_[30:38]),float(_[38:46]),float(_[46:54])])
-                Occupancy=float(_[54:60])
-                bfactor=float(_[60:66])
-                Element=_[76:78].strip()
-                Charge=_[78:80]
-                AllHetAtoms[AtomID]=Atom(AtomID,AtomName,Coordinates,Occupancy,bfactor,Element,Charge,AllHetMols[str(HetMolNumber)+ChainID])
+                # HetMol Added to the chain
+                AllChains[ChainID].__setitem__(HetMolNumber, AllHetMols[str(HetMolNumber)+ChainID], Type='HetMol')
+
+                # HetAtom Defined
+                AtomID              = int(_[6:11])
+                AtomName            = _[12:16].strip()
+                Coordinates         = numpy.array([float(_[30:38]),float(_[38:46]),float(_[46:54])])
+                Occupancy           = float(_[54:60])
+                bfactor             = float(_[60:66])
+                Element             = _[76:78].strip()
+                Charge              = _[78:80]
+                AllHetAtoms[AtomID] = Atom(AtomID, AtomName, Coordinates, Occupancy, bfactor, Element, Charge, AllHetMols[str(HetMolNumber)+ChainID])
                 
-                #HetAtom added to the residue
-                AllHetMols[str(HetMolNumber)+ChainID].__setitem__(AtomID,AllHetAtoms[AtomID])
+                # HetAtom added to the residue
+                AllHetMols[ str(HetMolNumber)+ChainID ].__setitem__(AtomID, AllHetAtoms[AtomID])
 
-                #What to do with these?
+                # Recordred but not used.
                 AlternateLocationIndicator=_[16]
                 CodeForInsertions=_[26]
                 SegmentIdentifier=_[72:76]
             else:
                 AllAnnotations.append(_)
 
-        Models.append(Model(FrameNumber,AllAtoms,AllResidues,AllChains,AllHetAtoms,AllHetMols))
-        for i in AllChains:AllChains[i].set_parent(Models[FrameNumber])
+        # Model created and chains are assigned it.
+        Models.append(  Model(FrameNumber, AllAtoms, AllResidues, AllChains, AllHetAtoms, AllHetMols)  )
+        for i in AllChains: AllChains[i].set_parent( Models[FrameNumber] )
 
-    if(len(Models)>2):
+    if( len(Models) > 2 ):
         #NMR
         logging.debug('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
-        All_Coords=[]
+        All_Coords = []
         for i in Models:
-            All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))
-        All_Coords=numpy.array(All_Coords)
+            All_Coords.append( numpy.array([j.get_location() for j in i.get_atoms()]) )
+        All_Coords = numpy.array(All_Coords)
         
-        flattened_std=[]
-        for i in range(0,All_Coords.shape[1]):
-            xyz_var=0
+        flattened_std = []
+        for i in range(0, All_Coords.shape[1]):
+            xyz_var = 0
             for j in All_Coords[:,i].T:
-                xyz_var=xyz_var+numpy.var(j)
-            flattened_std.append(numpy.sqrt(xyz_var))
+                xyz_var = xyz_var + numpy.var(j)
+            flattened_std.append( numpy.sqrt(xyz_var) )
         
         for i in Models:
             for numj,j in enumerate(i.get_atoms()):
-                j.set_bfactor(flattened_std[numj])
+                j.set_bfactor( flattened_std[numj] )
         
-    prot = Protein(filename,Models)
-    prot.set_data(AllAnnotations)
+    prot = Protein(filename, Models)
+    prot.set_data( AllAnnotations )
     #Setting parent to the model object
     for i in prot: i.set_parent(prot)
     return prot
 
 
-def load_cif(filename):
+def load_cif(filename: str) -> Protein:
     """
     Load the CIF (.cif) file into the 'Protein' Object.
 
@@ -169,32 +165,32 @@ def load_cif(filename):
     """
 
     #Global Variables
-    AllChains = []
-    AllResidues = []
-    AllAtoms = []
+    AllChains      = []
+    AllResidues    = []
+    AllAtoms       = []
 
-    AllHetMols = []
-    AllHetAtoms =[]
+    AllHetMols     = []
+    AllHetAtoms    = []
 
     AllAnnotations = []
 
-    sections = open(filename,'r').read().split('loop_\n')
+    sections = open(filename, 'r').read().split('loop_\n')
     for section in sections:
-        for subsection in section.split('#'):
+        for subsection in section.split( '#' ):
             column_indices = {}
-            column_names = {}
-            for n_line, line in enumerate(subsection.split('\n')):
+            column_names   = {}
+            for n_line, line in enumerate( subsection.split('\n') ):
                 try:
                     _ = line.split()
                     
                     # When the data is next to the columm description
                     if(line[0] == '_' and len(_) > 1):
-                        AllAnnotations.append(line.strip())
+                        AllAnnotations.append( line.strip() )
 
                     # When the data columns are below the description section
                     elif(line[0] == '_' and len(_) == 1):
-                        AllAnnotations.append(line.strip())
-                        column_indices[n_line] = line.strip()
+                        AllAnnotations.append( line.strip() )
+                        column_indices[n_line]     = line.strip()
                         column_names[line.strip()] = n_line
 
                     else:
@@ -208,10 +204,10 @@ def load_cif(filename):
                             
                             #Initiate Chain (Frame number, Chain)
                             try:
-                                ChainID = _[ column_names['_atom_site.auth_asym_id'] ]
+                                ChainID  = _[ column_names['_atom_site.auth_asym_id'] ]
                                 flags[0] = True
                             except:
-                                ChainID = _[ column_names['_atom_site.label_asym_id'] ]
+                                ChainID  = _[ column_names['_atom_site.label_asym_id'] ]
 
                             try:
                                 if( ChainID not in AllChains[FrameNumber-1].keys() ): AllChains[FrameNumber-1][ChainID] = Chain(ChainID)
@@ -377,12 +373,12 @@ def load_cif(filename):
                 except Exception as e:
                     None
             try:
-                if(AllAnnotations[-1]!='#'): AllAnnotations.append('#')
+                if(AllAnnotations[-1] != '#'): AllAnnotations.append( '#' )
             except:
                 logging.info('Annotations are missing from the mmCIF file.')
-        AllAnnotations.append('loop_')
+        AllAnnotations.append( 'loop_' )
             
-    total_models = max([len(AllAtoms),len(AllHetAtoms)])
+    total_models = max( [len(AllAtoms),len(AllHetAtoms)] )
         
     AllModels = []
     for i in range(0,total_models):
@@ -413,27 +409,27 @@ def load_cif(filename):
         for j in AllModels[i].get_chains(): j.set_parent(AllModels[i])
     
 
-    if(len(AllModels)>2):
+    if(len(AllModels) > 2):
         #NMR
         logging.info('Multiple models/frames are detected (B-factor field is now a calculated parameter, i.e., the scalar standard deviation of the atom location of all frames)')
-        All_Coords=[]
+        All_Coords = []
         for i in AllModels:
             All_Coords.append(numpy.array([j.get_location() for j in i.get_atoms()]))
         All_Coords=numpy.array(All_Coords)
         
-        flattened_std=[]
+        flattened_std = []
         for i in range(0,All_Coords.shape[1]):
-            xyz_var=0
+            xyz_var = 0
             for j in All_Coords[:,i].T:
-                xyz_var=xyz_var+numpy.var(j)
-            flattened_std.append(numpy.sqrt(xyz_var))
+                xyz_var = xyz_var+numpy.var(j)
+            flattened_std.append( numpy.sqrt(xyz_var) )
         
         for i in AllModels:
             for numj,j in enumerate(i.get_atoms()):
                 j.set_bfactor(flattened_std[numj])
 
     prot = Protein( filename, AllModels )
-    prot.set_data(AllAnnotations)
+    prot.set_data( AllAnnotations )
     #Setting parent to the model object
     for i in prot:
         i.set_parent(prot)
@@ -451,7 +447,7 @@ def load_cif(filename):
 '''
 
 
-def load_structure(filename, ftype = 'cif'):
+def load_structure(filename: str, ftype: str= 'cif') -> Protein:
     """Load a Molecule from a file.
 
     This class helps user to load the 3D structure of the protein onto a packman.molecule.Protein object.
@@ -467,7 +463,7 @@ def load_structure(filename, ftype = 'cif'):
         ftype    (str)          : Format name ('cif' or 'pdb'); Default: cif
     
     Returns:
-        packman.molecule.Protein: Protein object containing all the information about the Protein
+        ref:`packman.molecule.Protein`: Protein object containing all the information about the Protein
     """
     try:
         possible_ftype = filename.split('.')[1]
@@ -481,7 +477,7 @@ def load_structure(filename, ftype = 'cif'):
     elif(ftype == 'pdb'):
         return load_pdb(filename)
     else:
-        print('Please provide appropriate "ftype" argument. (cif/pdb).')
+        logging.warning('Please provide appropriate "ftype" argument. (cif/pdb).')
 
 
 '''
@@ -490,8 +486,8 @@ def load_structure(filename, ftype = 'cif'):
 ##################################################################################################
 '''
 
-def download_structure(pdbid,save_name=None,ftype='cif'):
-    """This class helps user to download the 3D structure of the protein and save it on a disk.
+def download_structure(pdbid: str, save_name: str=None, ftype: str='cif'):
+    """This function downloads the 3D protein structure.
 
     Example::
 
@@ -505,21 +501,22 @@ def download_structure(pdbid,save_name=None,ftype='cif'):
     """
     import urllib.request as ur
 
-    if(ftype=='cif'):
+    if(ftype == 'cif'):
         response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.cif')
-    elif(ftype=='pdb'):
+    elif(ftype == 'pdb'):
         response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb')
     else:
-        print('Please provide appropriate "ftype" argument. (cif/pdb).')
+        logging.warning('Please provide appropriate "ftype" argument. (cif/pdb).')
+        return
 
     if(save_name is None):
         try:
-            open(pdbid+'.'+ftype,'wb').write(response.read())
+            open(pdbid+'.'+ftype,'wb').write( response.read() )
         except(IOError):
             None
     else:
         try:
-            open(save_name+'.'+ftype,'wb').write(response.read())
+            open(save_name+'.'+ftype,'wb').write( response.read() )
         except(IOError):
             None
     return True

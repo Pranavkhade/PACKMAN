@@ -12,23 +12,19 @@ Example::
     from packman.molecule import Protein
     help( Protein )
 
-Note:
-    * Top in the hierarchy
-    
-Todo:
-    * Finish writing up the documentation.
-    * Finish error handling.
-    * Finish optimizing the performance.
-
 Authors:
-    * Pranav Khade(https://github.com/Pranavkhade)
+    * Pranav Khade (https://github.com/Pranavkhade)
 """
 
 from numpy import around
-from . import model
+
+from typing import TYPE_CHECKING, List, Iterable, Union
+
+if(TYPE_CHECKING):
+    from . import Model
 
 class Protein():
-    """This class contains the information about the 'Protein' object (packman.molecule.Protein).
+    """This class contains the information about the 'Protein' object (ref:`packman.molecule.Protein`).
 
     This class contains all the information available about the Protein and stores everything in itself. The Protein class is the highest in the hierarchy of the 'molecule' API classes.
     the order of hierarchy being: Protein> Model> Chain> Residue> Atom. This class is also the component of the 'molecule' module API.
@@ -44,28 +40,31 @@ class Protein():
         Models ([packman.molecule.Model]): Protein models/frames of the structure. (NMR files usually have multiple conformers of the same protein)
     """
     
-    def __init__(self,id,Models):
-        self.__id=id
-        self.__Models=Models
+    def __init__(self, id: int, Models: List['Model']):
+        self.__id = id
+        self.__Models = Models
         self.__Data = None
     
-    #Get Functions
-    def __getitem__(self,ModelNumber):
+    def __getitem__(self, ModelNumber: int) -> 'Model':
         return self.__Models[ModelNumber]
     
-    def get_id(self):
+    def __repr__(self) -> str:
+        return '<Protein from '+str(self.__id)+'>'
+
+    #Get Functions
+    def get_id(self) -> int:
         """Get the ID for the Protein object.
 
         Returns:
-            String if successful, None otherwise.
+            int if successful, None otherwise.
         """
         return self.__id
 
-    def get_models(self):
+    def get_models(self) -> Iterable['Model']:
         """Get all the models at once. Useful for the iterations.
 
         Returns:
-            Generator of all the models in the PDB file.
+            Generator of all the 'models' in the PDB file.
         """
         yield self.__Models
 
@@ -77,8 +76,8 @@ class Protein():
         """
         return self.__Data
 
-    def get_sequence(self, all_models = False):
-        """_summary_
+    def get_sequence(self, all_models: bool= False):
+        """Get the sequence of the protein.
 
         Args:
             all_models (bool, optional): Get sequence of the all frames; useless if sequence accross the models is identical. Defaults to False.
@@ -95,27 +94,27 @@ class Protein():
                 break
 
     #Set functions
-    def set_data(self,data):
+    def set_data(self, data):
         """Set the misc data (other than coordiantes) to the Protein object.
 
         Args:
             data (array): Array of String 
         
         Note:
-            - All the properties are planned to be put in specific format to achieve complete interformat conversion.
+            * All the properties are planned to be put in specific format to achieve complete interformat conversion.
         """
         self.__Data = data
 
 
     #Wite Functions
-    def write_pdb(self,filename):
+    def write_pdb(self, filename: str) -> Union[bool, None]:
         """Write a PDB (.pdb) file from the Protein object.
         
         Args:
             filename (str): Name of the output file user wishes to assign.
         """
-        open(filename,'w').write('')
-        fh=open(filename,'a')
+        open(filename, 'w').write('')
+        fh=open(filename, 'a')
         #Annotations
         try:
             for i in self.get_data():
@@ -132,15 +131,15 @@ class Protein():
         fh.close()
         return True
     
-    def write_cif(self,filename):
+    def write_cif(self, filename: str) -> Union[bool, None]:
         """Write a PDBx/mmCIF (.cif) file from the Protein object.
         
         Args:
             filename (str): Name of the output file user wishes to assign.
         """
         #Annotations
-        open(filename,'w').write('data_'+filename+'\n#\n')
-        fh=open(filename,'a')
+        open(filename, 'w').write('data_' + filename + '\n#\n')
+        fh=open(filename, 'a')
         if(self.__Data is not None):
             
             #To check what was the input format so that annotation can be written accordingly (currently only supports PDB an mmCIF) | if first line has '#' or '_', it is assumed to be mmCIF file; PDB otherwise.
@@ -164,12 +163,12 @@ class Protein():
         cols = ['_atom_site.group_PDB', '_atom_site.id', '_atom_site.type_symbol', '_atom_site.label_atom_id', '_atom_site.label_alt_id', '_atom_site.label_comp_id', '_atom_site.label_asym_id', '_atom_site.label_entity_id', '_atom_site.label_seq_id', '_atom_site.pdbx_PDB_ins_code', '_atom_site.Cartn_x', '_atom_site.Cartn_y', '_atom_site.Cartn_z', '_atom_site.occupancy', '_atom_site.B_iso_or_equiv', '_atom_site.pdbx_formal_charge', '_atom_site.auth_seq_id', '_atom_site.auth_comp_id', '_atom_site.auth_asym_id', '_atom_site.auth_atom_id', '_atom_site.pdbx_PDB_model_num']
 
         for i in cols:
-            fh.write(i+'\n')
+            fh.write(i + '\n')
         
         for num_,_ in enumerate(self):
             for i in _.get_atoms():
                 local_charge = i.get_charge()
-                if(i.get_charge()=='  '): local_charge = '?'
+                if(i.get_charge() == '  '): local_charge = '?'
                 fh.write("ATOM\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"%( i.get_id(), i.get_element(), i.get_name(), '.' , i.get_parent().get_name(), i.get_parent().get_parent().get_id() , '1', i.get_parent().get_id(), '?', around(i.get_location()[0],decimals=3).real, around(i.get_location()[1],decimals=3).real, around(i.get_location()[2],decimals=3).real, i.get_occupancy(), round(i.get_bfactor(),2), local_charge, i.get_parent().get_id(), i.get_parent().get_name(), i.get_parent().get_parent().get_id(), i.get_name(), num_+1  ) )
         
         fh.flush()
@@ -177,7 +176,7 @@ class Protein():
 
         return True
     
-    def write_structure(self,filename,ftype='cif'):
+    def write_structure(self, filename: str, ftype: str='cif') -> Union[bool, None]:
         """Write the 'Protein' object to the file.
         
         CIF file format is default because it has more advantages over PDB format and PDB format is 'frozen'. Please read following for more information::
