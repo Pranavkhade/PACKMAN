@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/py-packman.svg)](https://badge.fury.io/py/py-packman) [![Build Status](https://travis-ci.com/Pranavkhade/PACKMAN.svg?branch=master)](https://travis-ci.com/Pranavkhade/PACKMAN) [![Documentation Status](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/py-packman)](https://pepy.tech/project/py-packman)
+[![PyPI version](https://badge.fury.io/py/py-packman.svg)](https://badge.fury.io/py/py-packman) [![Continuous Integration](https://github.com/Pranavkhade/PACKMAN/actions/workflows/python-package.yml/badge.svg)](https://github.com/Pranavkhade/PACKMAN/actions/workflows/python-package.yml) [![Documentation Status](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/py-packman)](https://pepy.tech/project/py-packman)
 
 
 PACKMAN: PACKing and Motion ANalysis
