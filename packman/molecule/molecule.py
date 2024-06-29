@@ -486,7 +486,7 @@ def load_structure(filename: str, ftype: str= 'cif') -> Protein:
 ##################################################################################################
 '''
 
-def download_structure(pdbid: str, save_name: str=None, ftype: str='cif'):
+def download_structure(pdbid: str, save_name: str=None, ftype: str='cif', biological_assembly: bool = False):
     """This function downloads the 3D protein structure.
 
     Example::
@@ -495,16 +495,23 @@ def download_structure(pdbid: str, save_name: str=None, ftype: str='cif'):
         molecule.download_structure('1prw')
 
     Args:
-        pdbid     (str) : A Unique 4 Letter PDB ID (eg.. 1PRW) 
-        save_name (str) : Save name of the downloaded file (extension will be added automatically depending on the ftype argument).
-        ftype     (str) : Format name ('.cif' or '.pdb')
+        pdbid               (str) : A Unique 4 Letter PDB ID (eg.. 1PRW) 
+        save_name           (str) : Save name of the downloaded file (extension will be added automatically depending on the ftype argument).
+        ftype               (str) : Format name ('.cif' or '.pdb')
+        biological_assembly (bool) : Download biological assemblies in lieu of PDB entry. (Default: False)
     """
     import urllib.request as ur
 
     if(ftype == 'cif'):
-        response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.cif')
+        if(biological_assembly):
+            response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'-assembly1.cif')
+        else:
+            response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.cif')
     elif(ftype == 'pdb'):
-        response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb')
+        if(biological_assembly):
+            response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb1')
+        else:
+            response=ur.urlopen('https://files.rcsb.org/view/'+pdbid+'.pdb')
     else:
         logging.warning('Please provide appropriate "ftype" argument. (cif/pdb).')
         return
