@@ -497,7 +497,7 @@ def download_structure(pdbid: str, save_name: str=None, ftype: str='cif', biolog
     Args:
         pdbid               (str) : A Unique 4 Letter PDB ID (eg.. 1PRW) 
         save_name           (str) : Save name of the downloaded file (extension will be added automatically depending on the ftype argument).
-        ftype               (str) : Format name ('.cif' or '.pdb')
+        ftype               (str) : Format name ('cif' or 'pdb')
         biological_assembly (bool) : Download biological assemblies in lieu of PDB entry. (Default: False)
     """
     import urllib.request as ur
