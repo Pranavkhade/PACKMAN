@@ -71,5 +71,5 @@ setup(name='py-packman',
       entry_points = {
               'console_scripts': SCRIPTS,
                 },
-    install_requires = ['numpy', 'scipy', 'networkx', 'mlxtend', 'scikit-learn'],
+    install_requires = ['numpy', 'scipy', 'networkx', 'mlxtend', 'scikit-learn', 'tqdm', 'typing_extensions'],
       )
