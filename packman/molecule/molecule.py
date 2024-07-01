@@ -18,6 +18,7 @@ Authors:
 
 import numpy
 import logging
+from typing import List
 
 from .protein import Protein
 from .model import Model
@@ -527,3 +528,43 @@ def download_structure(pdbid: str, save_name: str=None, ftype: str='cif', biolog
         except(IOError):
             None
     return True
+
+def batch_download(entry_list: List[str], save_location: str = 'structure_files', ftype: str='cif', biological_assembly: bool = False) -> bool:
+    '''This function downloads structures from PDB database parallelly.
+
+    Degree of parallelism depends on your CPU count. Duplicates will be removed automatically.
+
+    Example::
+        from packman import molecule
+        molecule.batch_download(['1prw', '1exr', '4hla'])
+    
+    Args:
+        entry_list (List[str]) : List of PDBIDS
+        save_location (str) : Location where the downloaded files will be stored.
+        save_name           (str) : Save name of the downloaded file (extension will be added automatically depending on the ftype argument).
+        ftype               (str) : Format name ('cif' or 'pdb')
+        biological_assembly (bool) : Download biological assemblies in lieu of PDB entry. (Default: False)
+    
+    '''
+    import os
+    import multiprocessing
+    from multiprocessing.dummy import Pool
+    from tqdm import tqdm
+
+    def single_download(entry):
+        try:
+            download_structure(entry)
+            return entry, True
+        except:
+            return entry, False
+
+    if not os.path.exists(save_location):
+        os.makedirs(save_location)
+
+    multiprocessing_input = list(set(entry_list))
+
+    # Multiprocessing
+    pool = Pool( multiprocessing.cpu_count() )
+    for result in tqdm(pool.imap_unordered( single_download, multiprocessing_input ), total=len(multiprocessing_input)):
+        if(result[1] is False):
+            print('\n',result[0],' failed to download.')
