@@ -42,7 +42,7 @@ class DCI():
         
     def __init__(self, mol, cutoff = 7.0, chain = None, n_com = None):
         self.molObj = mol
-        assert type( self.molObj ) == Protein, "mol should be a packman.molecule.Protein object."
+        assert isinstance(self.molObj, Protein), "mol should be a packman.molecule.Protein object."
 
         if chain:
             self.atoms = [i for i in self.molObj[0][chain].get_calpha()]

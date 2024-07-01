@@ -66,7 +66,7 @@ def superimporse(reference: 'Chain', target: 'Chain', use: str='calpha', ids: Li
     Bm = numpy.subtract(atoms2_location, Centroid2)
 
     #Dot is matrix multiplication for array
-    H = numpy.mat(Bm.T) * numpy.mat(Am)
+    H = numpy.asmatrix(Bm.T) * numpy.asmatrix(Am)
 
     #Find Rotation
     U, S, Vt = numpy.linalg.svd(H)
