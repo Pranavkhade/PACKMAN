@@ -13,4 +13,4 @@ from .utilities import *
 
 
 #VERSION CHANGE HERE CHANGES IT IN docs AND setup.py
-__version__='1.4.12'
+__version__='1.4.13'
