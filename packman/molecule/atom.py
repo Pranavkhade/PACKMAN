@@ -190,7 +190,7 @@ class Atom():
         Returns:
             Bond (packman.molecule.Bond) if successful, None if bond does not exist.
         """
-        if(type(atom2) == type(self)):
+        if(type(atom2) is type(self)):
             None
         elif(isinstance(atom2, int)):
             Model = self.get_parent().get_parent().get_parent()

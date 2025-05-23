@@ -1,7 +1,7 @@
 '''
-Notes:
-    * Do something about trash.txt
+Pranav Khade
 '''
+import os
 
 from packman.apps import predict_hinge
 from packman import molecule
@@ -27,10 +27,10 @@ def IO():
     return args
 
 
-def hinge_scanner(atoms,filename,alpha_start, alpha_stop, step_size):
+def hinge_scanner(atoms, fn_wt_path, alpha_start, alpha_stop, step_size):
     """
     """
-    chain=atoms[0].get_parent().get_parent().get_id()
+    chain = atoms[0].get_parent().get_parent().get_id()
 
     for i in numpy.arange(alpha_start, alpha_stop, step_size):
         i = numpy.around(i, decimals=1)
@@ -74,26 +74,32 @@ def hinge_scanner(atoms,filename,alpha_start, alpha_stop, step_size):
         if(flag):
             overlap.append(pre_overlap[i])
 
+    # Filter to remove hinges at the end
+    max_minus_3 =  max([i.get_parent().get_id() for i in atoms]) - 3
+
     # Sort overlap
     overlap = sorted(overlap, key=lambda x: x[0])
-    overlap = [sorted(i) for i in overlap]
+    overlap = [sorted(i) for i in overlap if max_minus_3 not in i]
 
     output=[]
+    
     for i in range(0, len(overlap)):
-
-        if(i == 0):
-            output.append(filename+'_'+chain+'\tD'+str(i+1)+'\t1:'+str(overlap[i][0]-1) + '\n'
-                              + filename+'_'+chain+'\tH' +
-                              str(i+1)+'\t' +
-                              str(overlap[i][0])+':'+str(overlap[i][-1])+'\n'
-                              + filename+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+str(overlap[i+1][0]-1)+'\n')
+        if( len(overlap) == 1):
+            output.append(fn_wt_path+'_'+chain+'\tD'+str(i+1)+'\t1:'+ str(overlap[i][0]-1) + '\n'
+                        + fn_wt_path+'_'+chain+'\tH'+str(i+1)+'\t' + str(overlap[i][0])+':'+str(overlap[i][-1])+'\n'
+                        + fn_wt_path+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+str(max_minus_3+3)+'\n')
+            
+        elif(i == 0):
+            output.append(fn_wt_path+'_'+chain+'\tD'+str(i+1)+'\t1:'+str(overlap[i][0]-1) + '\n'
+                        + fn_wt_path+'_'+chain+'\tH' +str(i+1)+'\t' +  str(overlap[i][0])+':'+str(overlap[i][-1])+'\n'
+                        + fn_wt_path+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+str(overlap[i+1][0]-1)+'\n')
         else:
             try:
-                output.append(filename+'_'+chain+'\tH'+str(i+1)+'\t'+str(overlap[i][0]) + ':'+str(overlap[i][-1]) + '\n'
-                                  + filename+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+str(overlap[i+1][0]-1)+'\n')
+                output.append(fn_wt_path+'_'+chain+'\tH'+str(i+1)+'\t'+str(overlap[i][0]) + ':'+str(overlap[i][-1]) + '\n'
+                            + fn_wt_path+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+str(overlap[i+1][0]-1)+'\n')
             except:
-                output.append(filename+'_'+chain+'\tH'+str(i+1)+'\t'+str(overlap[i][0]) + ':'+str(overlap[i][-1]) + '\n'
-                                  + filename+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+'Inf\n')
+                output.append(fn_wt_path+'_'+chain+'\tH'+str(i+1)+'\t'+str(overlap[i][0]) + ':'+str(overlap[i][-1]) + '\n'
+                            + fn_wt_path+'_'+chain+'\tD'+str(i+2)+'\t'+str(overlap[i][-1]+1)+':'+'Inf\n')
 
     return output
 
@@ -106,27 +112,34 @@ def main():
     alpha_stop = float(ARGS.end)
     step_size = float(ARGS.step_size)
 
+    fn_wt_path_and_format = os.path.basename(filename).split('.')[0]
+
     if(ARGS.outfilename=='output.hng'):
-        output_file = open(filename+'.hng', 'w', encoding='UTF-8')
+        output_file = open(fn_wt_path_and_format+'.hng', 'w', encoding='UTF-8')
     else:
         output_file = open(ARGS.outfilename, 'w', encoding='UTF-8')
 
-    mol = molecule.load_structure(filename)
+    try:
+        mol = molecule.load_structure(filename, ftype='cif')
+    except:
+        mol = molecule.load_structure(filename, ftype='pdb')
 
 
     if(chain is None):
         for i in [i.get_id() for i in mol[0].get_chains()]:
             backbone = [k for j in mol[0][i].get_backbone() for k in j if k is not None]
-            output=hinge_scanner(backbone,filename,alpha_start,alpha_stop,step_size)
+            output=hinge_scanner(backbone, fn_wt_path_and_format, alpha_start, alpha_stop,step_size)
             for j in output:output_file.write(j)
         
     else:
         backbone = [j for i in mol[0][chain].get_backbone() for j in i if j is not None]
-        output=hinge_scanner(backbone,filename,alpha_start,alpha_stop,step_size)
+        output=hinge_scanner(backbone, fn_wt_path_and_format, alpha_start, alpha_stop, step_size)
         for i in output:output_file.write(i)
         
     output_file.flush()
     output_file.close()
+
+    os.remove('trash.txt')
     
     return True
 
