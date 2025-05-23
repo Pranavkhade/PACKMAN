@@ -295,7 +295,7 @@ class Model():
         Returns:
             The torsion angle in radians/degrees if sucessful, None otherwise.
         """
-        assert type(bond) == Bond, 'The bond varible should be a packman.molecule.Bond object'
+        assert type(bond) is Bond, 'The bond varible should be a packman.molecule.Bond object'
 
         try:
             if(self.__AllBonds == {}):
@@ -317,7 +317,7 @@ class Model():
         
         if(isinstance(neighbor1, int)):
             neighbor1 = self.__AllAtoms[neighbor1]
-        elif(type(neighbor1) == type(atom1)):
+        elif(type(neighbor1) is type(atom1)):
             None
         else:
             logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
@@ -325,7 +325,7 @@ class Model():
         
         if(isinstance(neighbor2, int)):
             neighbor2 = self.__AllAtoms[neighbor2]
-        elif(type(neighbor2) == type(atom2)):
+        elif(type(neighbor2) is type(atom2)):
             None
         else:
             logging.error('neighbour2 should either be an integer or a packman.molecule.Atom object.')
@@ -423,7 +423,7 @@ class Model():
         Returns:
             True if successful; None otherwise
         """
-        assert type(bond) == Bond, 'The bond varible should be a packman.molecule.Bond object'
+        assert type(bond) is Bond, 'The bond varible should be a packman.molecule.Bond object'
 
         try:
             if(self.__AllBonds=={}):
@@ -445,7 +445,7 @@ class Model():
         
         if(isinstance(neighbor1, int)):
             neighbor1 = self.__AllAtoms[neighbor1]
-        elif(type(neighbor1)==type(atom1)):
+        elif(type(neighbor1) is type(atom1)):
             None
         else:
             logging.error('neighbour1 should either be an integer or a packman.molecule.Atom object.')
@@ -453,7 +453,7 @@ class Model():
         
         if(isinstance(neighbor2, int)):
             neighbor2 = self.__AllAtoms[neighbor2]
-        elif(type(neighbor2)==type(atom2)):
+        elif(type(neighbor2) is type(atom2)):
             None
         else:
             logging.error('neighbour2 should either be an integer or a packman.molecule.Atom object.')
