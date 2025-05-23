@@ -7,6 +7,8 @@ PACKMAN: PACKing and Motion ANalysis
 
 This package focuses on studying molecular structures and their dynamics using a simple yet informative property known as Protein Packing. Over the last few years, we have worked on several techniques to capture and quantify the protein packing, resulting in a few publications. This package has all the code to repeat and further develop these techniques.
 
+✨ What's new?
+* Improved support for hinge prediction across multiple alpha parameters. You can now run and combine results for multiple structures using a single script: additional codes/ScanAlpha.py. This streamlines batch processing and saves time. Run `python3 ScanAlpha.py -h` for more information (Copy the script to PWD).
 
 DOCUMENTATION
 -------------
