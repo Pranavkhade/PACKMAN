@@ -448,7 +448,7 @@ def load_cif(filename: str) -> Protein:
 '''
 
 
-def load_structure(filename: str, ftype: str= 'cif') -> Protein:
+def load_structure(filename: str, ftype: str= None) -> Protein:
     """Load a Molecule from a file.
 
     This class helps user to load the 3D structure of the protein onto a packman.molecule.Protein object.
@@ -461,17 +461,25 @@ def load_structure(filename: str, ftype: str= 'cif') -> Protein:
 
     Args:
         filename (str)          : Name of the input file
-        ftype    (str)          : Format name ('cif' or 'pdb'); Default: cif
+        ftype    (str)          : Format name ('cif' or 'pdb'); Default: None (Automatically detects the file type from the filename)
     
     Returns:
         ref:`packman.molecule.Protein`: Protein object containing all the information about the Protein
     """
+    possible_ftype = None
     try:
         possible_ftype = filename.split('.')[1]
         if(possible_ftype == 'cif' or possible_ftype == 'pdb'):
             ftype = possible_ftype
     except:
         None
+    
+    if(possible_ftype is None and ftype is None):
+        logging.warning('Please provide appropriate "ftype" argument. (cif/pdb).')
+        return
+    
+    if(ftype is None):
+        ftype = possible_ftype
 
     if(ftype == 'cif'):
         return load_cif(filename)

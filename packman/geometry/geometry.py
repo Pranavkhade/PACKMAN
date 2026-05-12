@@ -28,7 +28,7 @@ from networkx import Graph
 
 from .. import Atom
 
-def Circumsphere(Tetrahydron: List[Atom]) -> (float, float):
+def Circumsphere(Tetrahydron: List[Atom]) -> Tuple[float, float]:
     """Get the Circumsphere of the set of four points.
     
     Given any four three dimentional points, this function calculates the features of the circumsphere having the given four points on it's surface.
