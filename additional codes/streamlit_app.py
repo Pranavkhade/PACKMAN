@@ -198,7 +198,6 @@ def page_home():
         st.markdown("""
         - 📚 [Documentation](https://py-packman.readthedocs.io/)
         - 🐙 [GitHub Repository](https://github.com/Pranavkhade/PACKMAN)
-        - 🌐 [Online Server](https://packman.umaryland.edu/)
         """)
     
     st.divider()
@@ -350,12 +349,26 @@ def page_hinge_prediction():
             st.warning(f"Could not render 3D visualization: {str(e)}")
         
         # Download results
-        st.subheader("Download Results")
+        st.subheader("Download .HNG file. (Necessary for hdANM hinge-based analysis)")
         
         # Select hinge numbers to download in .hng file
         selected_hinge_ids = st.multiselect("Select hinges to download:", [h['ID'] for h in all_hinges_data], key="hinge_ids")
 
-        hng_content = generate_hng_file(pdb_path, all_hinges_data, selected_hinge_ids)
+        # chain lengths for .hng file
+        chain_lengths = {}
+        
+        if( os.path.splitext(pdb_path)[-1] == '' ):
+            mol = molecule.load_structure(pdb_path + '.cif')
+        else:
+            mol = molecule.load_structure(pdb_path)
+            
+        for ch in mol[0].get_chains():
+            try:
+                chain_lengths[ch.get_id()] = max([r.get_id() for r in mol[0][ch.get_id()].get_residues()])
+            except:
+                continue
+
+        hng_content = generate_hng_file(pdb_path, all_hinges_data, selected_hinge_ids, chain_lengths)
         st.download_button(
             label="Download .HNG file",
             data=hng_content,
@@ -363,18 +376,44 @@ def page_hinge_prediction():
             mime="text/plain"
         )
 
-def generate_hng_file(pdb_path, hinges_data, selected_ids):
+def generate_hng_file(pdb_path, hinges_data, selected_ids, chain_lengths):
     """Generate .hng format file"""
     filename = Path(pdb_path).stem
     content = []
     
-    for hinge in hinges_data:
+    prev_end = 0
+    domain_count = 1
+    for i, hinge in enumerate(hinges_data):
         if hinge['ID'] in selected_ids:
             chain = hinge['Chain']
             start = hinge['Start']
             end = hinge['End']
+            
+            # add domain information
+            if(i==0):
+                content.append(f"{filename}_{chain}\tD{domain_count}\t1:{start - 1}")
+                domain_count += 1
+            elif(hinge['Chain'] != hinges_data[i-1]['Chain']):
+                content.append(f"{filename}_{chain}\tD{domain_count}\t1:{start - 1}")
+                domain_count += 1
+            else:
+                # start from previous hinge end + 1
+                content.append(f"{filename}_{chain}\tD{domain_count}\t{prev_end + 1}:{start - 1}")
+                domain_count += 1
+
             content.append(f"{filename}_{chain}\tH{hinge['ID']}\t{start}:{end}")
-    
+
+            # add domain information if another hinge doesnt exist in the given chain
+            next_chain = hinges_data[i + 1]['Chain'] if i + 1 < len(hinges_data) else None
+            if next_chain != chain:
+                content.append(f"{filename}_{chain}\tD{domain_count}\t{end + 1}:{chain_lengths[chain]}")
+                domain_count += 1
+                # display warning if less than 3 residues in the last domain
+                if(chain_lengths[chain] - end < 3):
+                    st.warning(f"Warning: Last domain in chain {chain} has less than 3 residues, which may affect hdANM analysis.")
+            
+            prev_end = end
+        
     return "\n".join(content)
 
 def page_hdanm():
@@ -709,9 +748,7 @@ def main():
         st.info(f"PACKMAN v{get_version()}")
         st.markdown("""
         [GitHub](https://github.com/Pranavkhade/PACKMAN) • 
-        [Docs](https://py-packman.readthedocs.io/) • 
-        [Citation](https://packman.umaryland.edu/)
-        """)
+        [Docs](https://py-packman.readthedocs.io/)""")
     
     # Route to pages
     if page == "🏠 Home":
