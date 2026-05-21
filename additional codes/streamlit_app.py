@@ -115,6 +115,28 @@ def render_protein_with_hinges(pdb_path, hinge_residues, chain_id=None):
     except Exception as e:
         st.error(f"Error rendering structure: {str(e)}")
 
+def render_generated_movie(cif_file):
+    """Render generated movie from hdANM"""
+    #cif_file = '1DMP.cif'  # Example file, replace with actual generated movie file
+    try:
+        view = py3Dmol.view(width=800, height=600)
+        with open(cif_file, 'r') as f:
+            cif_content = f.read()
+        view.addModelsAsFrames(cif_content, 'cif')
+        
+        view.setStyle({'ss': 'h'}, {'cartoon': {'color': 'white'}})
+        view.setStyle({'ss': 's'}, {'cartoon': {'color': 'white'}})
+        view.setStyle({'ss': 'c'}, {'cartoon': {'color': 'white'}})
+        # display all frames in the movie
+        #view.animate({"loop": "backAndForth", "interval": 100}) 
+        # draw box around the frame
+        view.zoomTo()
+        
+        stmol.showmol(view, height=600, width=800)
+
+    except Exception as e:
+        st.error(f"Error rendering movie: {str(e)}")
+
 def scan_alpha_hinge_prediction(backbone_atoms, alpha_start, alpha_stop, step_size):
     """
     Scan alpha values for hinge prediction.
@@ -421,7 +443,7 @@ def page_hdanm():
     st.title("📊 hdANM Analysis")
     
     st.write("""
-    hdANM (Hierarchical-Domain Anisotropic Network Model) is a comprehensive 
+    hdANM (Hinge-Domain Anisotropic Network Model) is a comprehensive 
     elastic network model for protein dynamics analysis. This tool generates 
     all modes of motion for your protein structure.
     """)
@@ -444,16 +466,24 @@ def page_hdanm():
         else:
             pdb_id = st.text_input("Enter PDB ID (e.g., 1EXR):", value="1EXR", key="hdanm_pdb_id")
             pdb_path = pdb_id
+        
+        uploaded_hng_file = st.file_uploader("Upload .HNG file for hinge-based analysis", type=["hng"], key="hdanm_hng_file")
+        if uploaded_hng_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{input_type.lower()}") as f:
+                f.write(uploaded_hng_file.read())
+                hng_path = f.name
+
+
     
     with col2:
         st.subheader("ANM Parameters")
-        cutoff = st.number_input("Cutoff Distance (Å):", min_value=1.0, max_value=30.0, value=15.0, step=0.5)
-        power = st.number_input("Power of Distance:", min_value=-5, max_value=5, value=0, step=1)
+        cutoff = st.number_input("Cutoff Distance (Å):", min_value=1.0, max_value=30.0, value=15.0)
+        power = st.number_input("Power of Distance:", min_value=-5, max_value=5, value=0)
         mass_type = st.selectbox("Mass Type:", ["Molecular Weight", "Unit", "Atomics Mass"])
     
     chain_id = st.text_input("Chain ID (leave empty for all):", value="", key="hdanm_chain")
     
-    if st.button("Run hdANM Analysis", type="primary", width=True):
+    if st.button("Run hdANM Analysis", type="primary", width=True, use_container_width=True):
         try:
             with st.spinner("Loading structure..."):
                 try:
@@ -494,7 +524,7 @@ def page_hdanm():
             
             with st.spinner("Computing hdANM..."):
                 # Run hdANM
-                Model = hdANM(calpha, dr=cutoff, power=power)
+                Model = hdANM(calpha, hng_path, dr=cutoff, power=power)
                 
                 mass_map = {
                     "Molecular Weight": "residue",
@@ -503,89 +533,110 @@ def page_hdanm():
                 }
                 Model.calculate_hessian(mass_type=mass_map[mass_type])
                 Model.calculate_decomposition()
+                
             
             st.success("Analysis complete!")
             
-            # Display eigenvalues
-            st.subheader("Eigenvalue Spectrum")
-            eigenvalues = Model.get_eigenvalues()
-            eigenvalues_sorted = sorted(eigenvalues)[:50]  # Show first 50
-            
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.line_chart(eigenvalues_sorted)
-            with col2:
-                st.metric("Number of Modes", len(eigenvalues))
-                st.metric("First Non-rigid Mode", "6" if len(eigenvalues) >= 6 else len(eigenvalues))
-            
-            # Download options
-            st.subheader("Download Results")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                eigenvectors_csv = np.array2string(Model.get_eigenvectors(), separator=',')
-                st.download_button(
-                    label="Download Eigenvectors (CSV)",
-                    data=eigenvectors_csv,
-                    file_name="eigenvectors.csv",
-                    mime="text/csv"
-                )
-            
-            with col2:
-                eigenvalues_csv = np.array2string(Model.get_eigenvalues(), separator=',')
-                st.download_button(
-                    label="Download Eigenvalues (CSV)",
-                    data=eigenvalues_csv,
-                    file_name="eigenvalues.csv",
-                    mime="text/csv"
-                )
-            
-            # Movie generation
-            st.subheader("Generate Motion Movies")
-            
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                mode_num = st.number_input("Mode Number:", min_value=6, max_value=len(eigenvalues), value=6)
-            with col2:
-                n_frames = st.number_input("Number of Frames:", min_value=5, max_value=50, value=10)
-            with col3:
-                scale = st.number_input("Movie Scale:", min_value=0.1, max_value=100.0, value=10.0)
-            with col4:
-                projection = st.selectbox("Projection Method:", ["Curvilinear", "Linear"])
-            
-            ca_to_aa = st.checkbox("Project C-Alpha motions to all atoms", value=False)
-            
-            if st.button("Generate Movie"):
-                try:
-                    with st.spinner("Generating movie..."):
-                        projection_map = {"Curvilinear": "curvilinear", "Linear": "linear"}
-                        Model.calculate_movie(
-                            mode_num,
-                            n=n_frames,
-                            scale=scale,
-                            extrapolation=projection_map[projection],
-                            ca_to_aa=ca_to_aa
-                        )
-                    st.success(f"Movie generated for mode {mode_num}!")
-                    
-                    # Try to load and display
-                    movie_file = f"{mode_num}.pdb"
-                    if os.path.exists(movie_file):
-                        with open(movie_file, 'r') as f:
-                            movie_content = f.read()
-                        st.download_button(
-                            label="Download Movie (PDB)",
-                            data=movie_content,
-                            file_name=movie_file,
-                            mime="text/plain"
-                        )
-                except Exception as e:
-                    st.error(f"Error generating movie: {str(e)}")
-        
+            st.session_state['hdanm_model'] = Model
+            st.session_state['hdanm_eigenvalues'] = Model.get_eigenvalues()
+            st.session_state['hdanm_eigenvectors'] = Model.get_eigenvectors()
         except Exception as e:
             st.error(f"Error during hdANM analysis: {str(e)}")
             logger.exception("hdANM error")
 
+    if 'hdanm_model' in st.session_state:
+        # Display eigenvalues
+        st.subheader("Eigenvalue Spectrum")
+        eigenvalues = st.session_state['hdanm_eigenvalues']
+        eigenvalues_sorted = sorted(eigenvalues)[:50]  # Show first 50
+        # get the real part
+        eigenvalues_sorted = [ev.real for ev in eigenvalues_sorted]
+        
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.line_chart(eigenvalues_sorted)
+        with col2:
+            st.metric("Number of Modes", len(eigenvalues))
+            st.metric("First Non-rigid Mode", "6" if len(eigenvalues) >= 6 else len(eigenvalues))
+        
+        # Download options
+        st.subheader("Download Results")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            eigenvectors_csv = np.array2string(st.session_state['hdanm_eigenvectors'], separator=',')
+            st.download_button(
+                label="Download Eigenvectors (CSV)",
+                data=eigenvectors_csv,
+                file_name="eigenvectors.csv",
+                mime="text/csv"
+            )
+        
+        with col2:
+            eigenvalues_csv = np.array2string(st.session_state['hdanm_eigenvalues'], separator=',')
+            st.download_button(
+                label="Download Eigenvalues (CSV)",
+                data=eigenvalues_csv,
+                file_name="eigenvalues.csv",
+                mime="text/csv"
+            )
+        
+        # Movie generation
+        st.subheader("Generate Motion Movies")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            mode_num = st.number_input("Mode Number:", min_value=6, max_value=len(eigenvalues), value=6)
+        with col2:
+            n_frames = st.number_input("Number of Frames:", min_value=5, max_value=50, value=10)
+        with col3:
+            scale = st.number_input("Movie Scale:", min_value=0.1, max_value=100.0, value=10.0)
+        with col4:
+            projection = st.selectbox("Projection Method:", ["Curvilinear", "Linear"])
+        
+        ca_to_aa = st.checkbox("Project C-Alpha motions to all atoms", value=False)
+        
+        if st.button("Generate Movie"):
+            try:
+                with st.spinner("Generating movie..."):
+                    projection_map = {"Curvilinear": "curvilinear", "Linear": "linear"}
+                    st.session_state['hdanm_model'].calculate_movie(
+                        mode_num,
+                        n=n_frames,
+                        scale=scale,
+                        extrapolation=projection_map[projection],
+                        ca_to_aa=ca_to_aa
+                    )
+                st.success(f"Movie generated for mode {mode_num}!")
+
+                st.session_state['hdanm_movie_file'] = f"{mode_num}.cif"
+                st.session_state['hdanm_movie_generated'] = True
+            except Exception as e:
+                st.error(f"Error generating movie: {str(e)}")
+
+        if 'hdanm_movie_generated' in st.session_state and st.session_state['hdanm_movie_generated']:
+                st.subheader("3D Structure Visualization")
+
+                try:
+                    # render the generated movie inside a box
+                    render_generated_movie(st.session_state['hdanm_movie_file'])
+                except Exception as e:
+                    st.warning(f"Could not render 3D visualization: {str(e)}")
+                
+                if os.path.exists(st.session_state['hdanm_movie_file']):
+                    with open(st.session_state['hdanm_movie_file'], 'r') as f:
+                        movie_content = f.read()
+                        st.session_state['hdanm_movie_content'] = movie_content
+                    st.download_button(
+                        label="Download Movie (CIF)",
+                        data=st.session_state['hdanm_movie_content'],
+                        file_name=st.session_state['hdanm_movie_file'],
+                        mime="text/plain"
+                    )
+                    
+            
+    
+        
 def page_packing_entropy():
     """Voronoi Packing Entropy page"""
     st.title("📈 Voronoi Packing Entropy")
