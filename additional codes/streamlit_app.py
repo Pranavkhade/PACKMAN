@@ -117,25 +117,43 @@ def render_protein_with_hinges(pdb_path, hinge_residues, chain_id=None):
 
 def render_generated_movie(cif_file):
     """Render generated movie from hdANM"""
-    #cif_file = '1DMP.cif'  # Example file, replace with actual generated movie file
+    
+    mol = molecule.load_cif(cif_file)
+
+    # save individual frames as cif files and add slider to select frame
+    all_files = []
+    for numi,i in enumerate(*mol.get_models()):
+        frame = molecule.Protein(str(numi), [i])
+        frame.write_pdb(f"frame_{numi}.pdb")
+        all_files.append(f"frame_{numi}.pdb")
+
     try:
         view = py3Dmol.view(width=800, height=600)
-        with open(cif_file, 'r') as f:
-            cif_content = f.read()
-        view.addModelsAsFrames(cif_content, 'cif')
+
+        all_models = ""
+        for numf, f in enumerate(all_files):
+            with open(f, 'r') as file:
+                local_file_content = file.read()
+                local_file_content = local_file_content.replace("Model\t0\n", f"MODEL {numf}\n")
+                all_models += local_file_content
+                #st.info(local_file_content.split('\n')[0])
+        all_models += "END\n"  # End of PDB file
+
+        # save file
+        with open("movie_frames.pdb", 'w') as f:
+            f.write(all_models)
+    
+        view.addModelsAsFrames(all_models, 'pdb')
         
-        view.setStyle({'ss': 'h'}, {'cartoon': {'color': 'white'}})
-        view.setStyle({'ss': 's'}, {'cartoon': {'color': 'white'}})
-        view.setStyle({'ss': 'c'}, {'cartoon': {'color': 'white'}})
-        # display all frames in the movie
-        #view.animate({"loop": "backAndForth", "interval": 100}) 
-        # draw box around the frame
+        view.setStyle({}, {'cartoon': {'color': 'spectrum'}})
+
         view.zoomTo()
-        
+        view.animate({'loop': 'forward', 'interval': 50})
         stmol.showmol(view, height=600, width=800)
 
     except Exception as e:
         st.error(f"Error rendering movie: {str(e)}")
+
 
 def scan_alpha_hinge_prediction(backbone_atoms, alpha_start, alpha_stop, step_size):
     """
@@ -206,7 +224,7 @@ def page_home():
     with col1:
         st.header("About PACKMAN")
         st.write("""
-        PACKMAN (Protein pACKing and Mobility ANalysis) is a multi-utility tool 
+        PACKMAN (Protein pACKing and Motion ANalysis) is a multi-utility tool 
         for studying protein packing and its effects on protein dynamics.
         
         ### Key Features:
@@ -540,6 +558,8 @@ def page_hdanm():
             st.session_state['hdanm_model'] = Model
             st.session_state['hdanm_eigenvalues'] = Model.get_eigenvalues()
             st.session_state['hdanm_eigenvectors'] = Model.get_eigenvectors()
+            Model.calculate_fluctuations()
+            st.session_state['hdanm_fluctuations'] = Model.get_fluctuations()
         except Exception as e:
             st.error(f"Error during hdANM analysis: {str(e)}")
             logger.exception("hdANM error")
@@ -552,22 +572,33 @@ def page_hdanm():
         # get the real part
         eigenvalues_sorted = [ev.real for ev in eigenvalues_sorted]
         
-        col1, col2 = st.columns([3, 1])
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.line_chart(eigenvalues_sorted)
         with col2:
             st.metric("Number of Modes", len(eigenvalues))
             st.metric("First Non-rigid Mode", "6" if len(eigenvalues) >= 6 else len(eigenvalues))
-        
+        with col3:
+            fluctuations = st.session_state['hdanm_fluctuations']
+            fluctuations = st.session_state['hdanm_fluctuations']/ max(st.session_state['hdanm_fluctuations'])
+            st.line_chart([ev.real for ev in fluctuations])
+
         # Download options
         st.subheader("Download Results")
         col1, col2 = st.columns(2)
         
         with col1:
-            eigenvectors_csv = np.array2string(st.session_state['hdanm_eigenvectors'], separator=',')
+            twod_array = list(st.session_state['hdanm_eigenvectors'])
+
+            #2d array to csv string
+            full_eigenvectors_csv = ""
+            for row in twod_array:
+                full_eigenvectors_csv += ",".join([str(val.real) for val in row]) + "\n"
+            
+
             st.download_button(
                 label="Download Eigenvectors (CSV)",
-                data=eigenvectors_csv,
+                data=full_eigenvectors_csv,
                 file_name="eigenvectors.csv",
                 mime="text/csv"
             )
@@ -589,14 +620,19 @@ def page_hdanm():
             mode_num = st.number_input("Mode Number:", min_value=6, max_value=len(eigenvalues), value=6)
         with col2:
             n_frames = st.number_input("Number of Frames:", min_value=5, max_value=50, value=10)
+            st.session_state['hdanm_n_frames'] = n_frames
         with col3:
             scale = st.number_input("Movie Scale:", min_value=0.1, max_value=100.0, value=10.0)
         with col4:
             projection = st.selectbox("Projection Method:", ["Curvilinear", "Linear"])
         
-        ca_to_aa = st.checkbox("Project C-Alpha motions to all atoms", value=False)
+        ca_to_aa = st.checkbox("Project C-Alpha motions to all atoms", value=True)
+
+        if(ca_to_aa==False):
+            st.warning("Movie will not appear if the all atoms are not projected. Please download and visualize .cif file locally.")
         
         if st.button("Generate Movie"):
+            st.session_state['hdanm_movie_generated'] = False
             try:
                 with st.spinner("Generating movie..."):
                     projection_map = {"Curvilinear": "curvilinear", "Linear": "linear"}
@@ -607,6 +643,7 @@ def page_hdanm():
                         extrapolation=projection_map[projection],
                         ca_to_aa=ca_to_aa
                     )
+                
                 st.success(f"Movie generated for mode {mode_num}!")
 
                 st.session_state['hdanm_movie_file'] = f"{mode_num}.cif"
@@ -633,10 +670,7 @@ def page_hdanm():
                         file_name=st.session_state['hdanm_movie_file'],
                         mime="text/plain"
                     )
-                    
-            
-    
-        
+
 def page_packing_entropy():
     """Voronoi Packing Entropy page"""
     st.title("📈 Voronoi Packing Entropy")
@@ -645,7 +679,7 @@ def page_packing_entropy():
     Calculate packing entropy using Voronoi tessellation to analyze 
     how tightly atoms are packed in your protein structure.
     """)
-    
+    st.info("Please remove hydrogen atoms from your structure for accurate entropy calculations, as they can skew the results.")
     col1, col2 = st.columns([2, 1])
     
     with col1:
