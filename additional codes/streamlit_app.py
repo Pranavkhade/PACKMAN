@@ -723,22 +723,15 @@ def page_packing_entropy():
                         mol = molecule.load_cif(pdb_path)
                     elif(os.path.splitext(pdb_path)[-1] == '.pdb'):
                         mol = molecule.load_pdb(pdb_path)
-                    print(os.path.splitext(pdb_path)[-1])
+                    
                 except:
                     st.info("Downloading structure from PDB...")
                     try:
-                        if input_type == "PDB ID":
-                            molecule.download_structure(pdb_path, ftype='cif')
-                            mol = molecule.load_structure(f"{pdb_path}.cif")
-                        else:
-                            mol = molecule.load_structure(pdb_path + '.cif')
+                        pdb_id = os.path.splitext(os.path.basename(pdb_path))[0]
+                        molecule.download_structure(pdb_id, ftype='cif')
+                        mol = molecule.load_structure(pdb_id + '.cif')
                     except:
-                        try:
-                            molecule.download_structure(pdb_path)
-                            mol = molecule.load_structure(f"{pdb_path}.pdb")
-                        except Exception as e:
-                            st.error(f"Could not load structure: {str(e)}")
-                            return
+                        st.warning("Could not load CIF file, trying PDB format...")
             
             st.success("Structure loaded!")
             
