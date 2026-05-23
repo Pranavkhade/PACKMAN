@@ -31,7 +31,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
 
 # Copy application code
-COPY additional\ codes/streamlit_app.py /app/
+COPY ["additional codes/streamlit_app.py", "/app/"]
 
 # Create non-root user for security
 RUN useradd -m -u 1000 streamlit && \
