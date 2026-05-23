@@ -692,9 +692,12 @@ def page_packing_entropy():
             uploaded_file = st.file_uploader("Choose a PDB/CIF file", type=["pdb", "cif"], key="entropy_file")
             if uploaded_file:
                 pdb_path = uploaded_file.name
-                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{input_type.lower()}") as f:
+                
+                extension = os.path.splitext(uploaded_file.name)[1].lower()
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f"{extension.lower()}") as f:
                     f.write(uploaded_file.read())
                     pdb_path = f.name
+                    
         else:
             pdb_id = st.text_input("Enter PDB ID (e.g., 1EXR):", value="1EXR", key="entropy_pdb_id")
             pdb_path = pdb_id
@@ -708,9 +711,19 @@ def page_packing_entropy():
     
     if st.button("Calculate Packing Entropy", type="primary", use_container_width=True):
         try:
+            if( os.path.splitext(pdb_path)[-1] == '' ):
+                pdb_path = pdb_path + '.cif'
+            else:
+                pdb_path = pdb_path
+            
             with st.spinner("Loading structure..."):
                 try:
-                    mol = molecule.load_structure(pdb_path)
+                    
+                    if(os.path.splitext(pdb_path)[-1] == '.cif'):
+                        mol = molecule.load_cif(pdb_path)
+                    elif(os.path.splitext(pdb_path)[-1] == '.pdb'):
+                        mol = molecule.load_pdb(pdb_path)
+                    print(os.path.splitext(pdb_path)[-1])
                 except:
                     st.info("Downloading structure from PDB...")
                     try:
@@ -792,18 +805,7 @@ def page_packing_entropy():
                 for r in results:
                     csv_content += f"{r['Frame']},{r['Chain']},{r['Residue_ID']},{r['Residue_Name']},{r['Packing_Entropy']}\n"
                 
-                st.download_button(
-                    label="Download Results (CSV)",
-                    data=csv_content,
-                    file_name="packing_entropy_results.csv",
-                    mime="text/csv"
-                )
                 
-                # Visualization
-                residue_entropies = [r for r in results if r['Chain'] not in ['TOTAL', 'NORMALIZED']]
-                if residue_entropies:
-                    st.subheader("Entropy Distribution")
-                    entropies_df = st.dataframe(residue_entropies[:100], use_container_width=True)  # Show first 100
             else:
                 st.warning("No results obtained. Check your parameters.")
         
