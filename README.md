@@ -17,7 +17,11 @@ DOCUMENTATION
 
 WEB-GUI
 -------
-This option allows user to use the hinge prediction, hdANM and Entropy calculation all in one place with few clicks. If users do not wish to use any commandline and code, this is the best option. Please install [docker](https://www.docker.com/) software and run the following commands.
+This option allows user to use the hinge prediction, hdANM and Entropy calculation all in one place with few clicks. If users do not wish to use any CLI/ Python code, this is the best option. Please install [docker](https://www.docker.com/)
+
+✨If you struggle with the command line, please visit the [packman-streamlit](https://hub.docker.com/r/pranavkhade/packman-streamlit) repo, select the latest from dropdown and click on "▶︎ Run in Docker Desktop" in bottom right to skip the commands below.
+
+Otherwise, two command setup:
 ```
 docker pull pranavkhade/packman-streamlit
 docker run -p 8501:8501 pranavkhade/packman-streamlit:latest
