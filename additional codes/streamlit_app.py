@@ -628,7 +628,7 @@ def page_hdanm():
         
         ca_to_aa = st.checkbox("Project C-Alpha motions to all atoms", value=True)
 
-        if(ca_to_aa==False):
+        if(ca_to_aa is False):
             st.warning("Movie will not appear if the all atoms are not projected. Please download and visualize .cif file locally.")
         
         if st.button("Generate Movie"):
