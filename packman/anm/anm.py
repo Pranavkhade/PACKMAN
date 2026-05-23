@@ -79,7 +79,7 @@ class ANM:
         """Get the Hessian Matrix of the ANM model.
 
         Note:
-            * * Make sure that the ANM().calculate_hessian() is called before calling this function.
+            * Make sure that the ANM().calculate_hessian() is called before calling this function.
         
         Returns:
             numpy.ndarray: Hessian matrix

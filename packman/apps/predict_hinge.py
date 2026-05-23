@@ -277,7 +277,7 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',fil
         centrality_sorted_with_keys = numpy.array([float(centrality[j]) for j in sorted([i for i in centrality.keys()])]).reshape(-1, 1)
         
         #Cluster (4 is like a resolution here)
-        km=KMeans(n_clusters=nclusters)
+        km=KMeans(n_clusters=nclusters, n_init=10)
         km.fit(centrality_sorted_with_keys)
         central_nodes=numpy.argwhere(km.labels_==numpy.argmin(km.cluster_centers_)).T[0]
         HingeResidues=list(set([atoms[i].get_parent() for i in central_nodes]))
