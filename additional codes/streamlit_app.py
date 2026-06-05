@@ -420,41 +420,48 @@ def generate_hng_file(pdb_path, hinges_data, selected_ids, chain_lengths):
     """Generate .hng format file"""
     filename = Path(pdb_path).stem
     content = []
+
+    # Filter hinges that are selected
+    selected_hinges = [h for h in hinges_data if h['ID'] in selected_ids]
+
+    st.info("Note: At least 3 residues are needed in each domain. Beware of hinges on the beginning and end of protein chains.")
+    
+    # remove hinges that are not selected and add domain information based on hinge positions
     
     prev_end = 0
     domain_count = 1
-    for i, hinge in enumerate(hinges_data):
-        if hinge['ID'] in selected_ids:
-            chain = hinge['Chain']
-            start = hinge['Start']
-            end = hinge['End']
-            
-            # add domain information
-            if(i==0):
-                content.append(f"{filename}_{chain}\tD{domain_count}\t1:{start - 1}")
-                domain_count += 1
-            elif(hinge['Chain'] != hinges_data[i-1]['Chain']):
-                content.append(f"{filename}_{chain}\tD{domain_count}\t1:{start - 1}")
-                domain_count += 1
-            else:
-                # start from previous hinge end + 1
-                content.append(f"{filename}_{chain}\tD{domain_count}\t{prev_end + 1}:{start - 1}")
-                domain_count += 1
+    for i, hinge in enumerate(selected_hinges):
+        chain = hinge['Chain']
+        start = hinge['Start']
+        end = hinge['End']
+        
+        # add domain information
+        if i == 0:
+            content.append(f"{filename}_{chain}\tD{domain_count}\t1:{start - 1}")
+            domain_count += 1
+        elif hinge['Chain'] != selected_hinges[i-1]['Chain']:
+            content.append(f"{filename}_{chain}\tD{domain_count}\t1:{start - 1}")
+            domain_count += 1
+        else:
+            # start from previous hinge end + 1
+            content.append(f"{filename}_{chain}\tD{domain_count}\t{prev_end + 1}:{start - 1}")
+            domain_count += 1
 
-            content.append(f"{filename}_{chain}\tH{hinge['ID']}\t{start}:{end}")
+        content.append(f"{filename}_{chain}\tH{hinge['ID']}\t{start}:{end}")
 
-            # add domain information if another hinge doesnt exist in the given chain
-            next_chain = hinges_data[i + 1]['Chain'] if i + 1 < len(hinges_data) else None
-            if next_chain != chain:
-                content.append(f"{filename}_{chain}\tD{domain_count}\t{end + 1}:{chain_lengths[chain]}")
-                domain_count += 1
-                # display warning if less than 3 residues in the last domain
-                if(chain_lengths[chain] - end < 3):
-                    st.warning(f"Warning: Last domain in chain {chain} has less than 3 residues, which may affect hdANM analysis.")
-            
-            prev_end = end
+        # add domain information if another hinge doesnt exist in the given chain
+        next_chain = selected_hinges[i + 1]['Chain'] if i + 1 < len(selected_hinges) else None
+        if next_chain != chain:
+            content.append(f"{filename}_{chain}\tD{domain_count}\t{end + 1}:{chain_lengths[chain]}")
+            domain_count += 1
+            # display warning if less than 3 residues in the last domain
+            if chain_lengths[chain] - end < 3:
+                st.warning(f"Warning: Last domain in chain {chain} has less than 3 residues, which may affect hdANM analysis.")
+        
+        prev_end = end
         
     return "\n".join(content)
+
 
 def page_hdanm():
     """hdANM Analysis page"""
