@@ -4,7 +4,9 @@
 DCI Analysis CLI
 ================
 
-This tutorial familiarises users with the Command-line Interface (CLI) of the DCI Analysis. The same functionality is also available in the PACKMAN API ( :ref:`tutorials_dci_api` )
+This tutorial familiarises users with the command-line interface (CLI) for DCI.
+The analysis is also available through :class:`packman.apps.DCI`; see the
+:doc:`../api-map` for the API reference.
 
 PACKMAN DCI Analysis Web Server:
 

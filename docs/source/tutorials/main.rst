@@ -1,34 +1,65 @@
 .. _tutorials_main:
 
+User guides
+===========
 
-Tutorials
-=========
+Choose a workflow below. Each method guide links the user-facing interface to
+its API when the same calculation is available in more than one way.
 
-Installation
-------------
-#. :ref:`tutorials_installation`
-
-Graphical User Interface (GUI)
-------------------------------
-#. :ref:`tutorials_gui`
-
-Command Line Interface (CLI)
-----------------------------
-#. :ref:`tutorials_hinge_prediction_cli`
-#. :ref:`tutorials_hdanm_cli`
-#. :ref:`tutorials_entropy_cli`
-#. :ref:`tutorials_dci_cli`
-
-Application Programming Interface (API)
----------------------------------------
-#. :ref:`tutorials_molecule`
-#. :ref:`tutorials_predict_hinge`
-#. :ref:`tutorials_compliance`
-#. :ref:`tutorials_hdANM`
-#. :ref:`tutorials_entropy_api`
-#. :ref:`tutorials_gnm_api`
-
-Utilities (API)
+Getting started
 ---------------
-#. :ref:`tutorials_bond_rotate`
-#. :ref:`tutorials_alpha_shape`
+
+.. toctree::
+   :maxdepth: 1
+
+   installation
+   ../quickstart
+
+Graphical interface
+-------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   gui
+
+Web application
+---------------
+
+.. toctree::
+   :maxdepth: 1
+
+   streamlit
+
+Command line
+------------
+
+.. toctree::
+   :maxdepth: 1
+
+   hinge_predict_cli
+   hdANM_cli
+   entropy_cli
+   dci_cli
+
+Python API
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   molecule
+   hinge_predict
+   compliance
+   hdANM
+   GNM
+   entropy_api
+
+Geometry and utilities
+----------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   alpha_shape
+   bond_rotate

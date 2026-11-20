@@ -128,7 +128,7 @@ class Bond():
         """Set the atoms involved in the bond.
         
         Args:
-            atom_pair (tuple): Tuple of :ref:`packman.molecule.Atom` objects.
+            atom_pair (tuple): Tuple of :class:`packman.molecule.Atom` objects.
         
         Returns:
             True if successful, False otherwise.

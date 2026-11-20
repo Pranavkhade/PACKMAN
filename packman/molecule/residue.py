@@ -108,7 +108,7 @@ class Residue():
             key (int/str): Get atom by the id/name
         
         Returns:
-            atom (:ref:`packman.molecule.Atom`): Atom of the given ID/ Name if successful; None otherwise.
+            atom (:class:`packman.molecule.Atom`): Atom of the given ID/Name if successful; None otherwise.
         """
         try:
             return self.__Atoms[key]

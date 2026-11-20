@@ -4,7 +4,9 @@
 hdANM CLI
 =========
 
-This tutorial familiarises users with the Command-line Interface (CLI) of the hdanm Analysis. The same functionality is also available in the PACKMAN API ( :ref:`tutorials_hdANM:` ) and GUI (:ref:`tutorials_gui`).
+This tutorial familiarises users with the command-line interface (CLI) for
+hdANM. The same analysis is available through the :ref:`tutorials_hdANM` API
+guide and the :ref:`tutorials_gui` GUI.
 
 PACKMAN hdANM Analysis Web Server: https://hdanm.bb.iastate.edu/
 

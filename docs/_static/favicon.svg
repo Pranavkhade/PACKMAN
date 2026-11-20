@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" role="img" aria-labelledby="title">
+  <title id="title">PACKMAN</title>
+  <rect width="48" height="48" rx="12" fill="#164e63"/>
+  <g fill="none" stroke="#67e8f9" stroke-linecap="round" stroke-width="2.5">
+    <path d="m12 24 12-12 12 12-12 12Z"/>
+    <path d="M24 12v24M12 24h24"/>
+  </g>
+  <g fill="#fb923c">
+    <circle cx="12" cy="24" r="3.5"/>
+    <circle cx="24" cy="12" r="3.5"/>
+    <circle cx="36" cy="24" r="3.5"/>
+    <circle cx="24" cy="36" r="3.5"/>
+  </g>
+</svg>

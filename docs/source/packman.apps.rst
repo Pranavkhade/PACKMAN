@@ -13,4 +13,6 @@ Submodules
    :maxdepth: 4
 
    packman.apps.calculate_entropy
+   packman.apps.dci
+   packman.apps.hdanm
    packman.apps.predict_hinge

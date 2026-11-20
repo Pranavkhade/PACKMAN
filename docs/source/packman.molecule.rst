@@ -14,8 +14,8 @@ Submodules
 
    packman.molecule.annotations
    packman.molecule.atom
+   packman.molecule.bond
    packman.molecule.chain
-   packman.molecule.hetatom
    packman.molecule.hetmol
    packman.molecule.model
    packman.molecule.molecule
