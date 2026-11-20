@@ -3,7 +3,7 @@
 [![Docs](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/)
 
 <p align="center">
-  <img src="docs/_static/logo.svg" alt="PACKMAN" width="300">
+  <img src="docs/_static/gallary/logo.gif" alt="Classic animated PACKMAN logo" width="250">
 </p>
 
 # PACKMAN
