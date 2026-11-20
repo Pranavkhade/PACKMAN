@@ -427,6 +427,8 @@ def generate_hng_file(pdb_path, hinges_data, selected_ids, chain_lengths):
     st.info("Note: At least 3 residues are needed in each domain. Beware of hinges on the beginning and end of protein chains.")
     
     # remove hinges that are not selected and add domain information based on hinge positions
+
+    #
     
     prev_end = 0
     domain_count = 1
@@ -564,7 +566,7 @@ def page_hdanm():
             
             st.session_state['hdanm_model'] = Model
             st.session_state['hdanm_eigenvalues'] = Model.get_eigenvalues()
-            st.session_state['hdanm_eigenvectors'] = Model.get_eigenvectors()
+            st.session_state['hdanm_eigenvectors'] = Model.get_RT_eigen_vectors()
             Model.calculate_fluctuations()
             st.session_state['hdanm_fluctuations'] = Model.get_fluctuations()
         except Exception as e:

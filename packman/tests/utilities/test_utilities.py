@@ -1,9 +1,9 @@
 from ... import molecule, utilities, geometry
 import unittest
 import numpy
+import io
 
 import logging
-from os import remove as rm
 
 class Test_Utilities(unittest.TestCase):
 
@@ -28,13 +28,53 @@ class Test_Utilities(unittest.TestCase):
         self.assertTrue( numpy.allclose( b2, expected_b2, rtol=1e-14 ) )
     
     def test_RMSD(self):
-        self.assertTrue( (utilities.RMSD(self.mol[0]['A'], self.mol[0]['B'], use='calpha') - 0.10400695339185048) < 0.001 )
-        self.assertTrue( (utilities.RMSD(self.mol[0]['A'], self.mol[0]['B'], use='backbone')- 0.11195505579911495) < 0.001  )
+        self.assertAlmostEqual(
+            utilities.RMSD(self.mol[0]['A'], self.mol[0]['B'], use='calpha'),
+            0.10400695339185048,
+            places=10,
+        )
+        self.assertAlmostEqual(
+            utilities.RMSD(self.mol[0]['A'], self.mol[0]['B'], use='backbone'),
+            0.11195505579911495,
+            places=10,
+        )
 
     def test_WriteOBJ(self):
-        AS = geometry.AlphaShape([i for i in self.mol[0].get_atoms()], float('inf'))
-        self.assertTrue( utilities.WriteOBJ( self.mol[0].get_atoms(), AS[0], open('test.obj','wb') ) )
-        rm('test.obj')
+        atoms = list(self.mol[0].get_atoms())
+        simplices, _ = geometry.AlphaShape(atoms, float('inf'))
+        output = io.BytesIO()
+        self.assertTrue(utilities.WriteOBJ(atoms, simplices, output))
+        lines = output.getvalue().splitlines()
+        self.assertEqual(lines[0], b'mtllib master.mtl')
+        self.assertEqual(sum(line.startswith(b'v ') for line in lines), len(atoms))
+        self.assertEqual(sum(line.startswith(b'f ') for line in lines), len(simplices))
+
+    def test_load_hinge(self):
+        self.assertEqual(
+            utilities.load_hinge('packman/tests/data/4hla.hng'),
+            {
+                '4hla_A_D1': [1.0, 20.0],
+                '4hla_A_H1': [21.0, 34.0],
+                '4hla_A_D2': [35.0, 56.0],
+                '4hla_A_H2': [57.0, 62.0],
+                '4hla_A_D3': [62.0, 99.0],
+                '4hla_B_D4': [1.0, 20.0],
+                '4hla_B_H4': [21.0, 34.0],
+                '4hla_B_D5': [34.0, 99.0],
+            },
+        )
+        self.assertEqual(
+            utilities.load_hinge('packman/tests/data/1prw.hng'),
+            {
+                '1exr.pdb_A_D1': [1.0, 70.0],
+                '1exr.pdb_A_H1': [71.0, 90.0],
+                '1exr.pdb_A_D2': [91.0, 149.0],
+            },
+        )
+
+    def test_change_alphabet(self):
+        self.assertEqual(utilities.change_alphabet('ALA'), 'A')
+        self.assertEqual(utilities.change_alphabet('A'), 'ALA')
 
     def tearDown(self):
         logging.info('Utilities Test Done.')
