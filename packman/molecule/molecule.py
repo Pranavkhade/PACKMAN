@@ -391,13 +391,13 @@ def load_cif(filename: str) -> Protein:
             current_atoms    = [None]
             current_residues = [None]
 
-        #In case the hetatoms are not present at all
-        try:
+        # CIF models may contain only polymer ATOM records.
+        if i < len(AllHetAtoms) and i < len(AllHetMols):
             current_hetatms = AllHetAtoms[i]
             current_hetmols = AllHetMols[i]
-        except:
-            current_hetatms = [None]
-            current_hetmols = [None]
+        else:
+            current_hetatms = {}
+            current_hetmols = {}
         
         #In case the chains are missing
         try:
