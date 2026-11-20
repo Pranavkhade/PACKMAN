@@ -1,6 +1,6 @@
 [![PyPI](https://badge.fury.io/py/py-packman.svg)](https://badge.fury.io/py/py-packman)
 [![CI](https://github.com/Pranavkhade/PACKMAN/actions/workflows/python-package.yml/badge.svg)](https://github.com/Pranavkhade/PACKMAN/actions/workflows/python-package.yml)
-[![Docs](https://readthedocs.org/projects/py-packman/badge/?version=latest)](https://py-packman.readthedocs.io/en/latest/)
+[![Downloads](https://pepy.tech/badge/py-packman)](https://pepy.tech/project/py-packman)
 
 <p align="center">
   <img src="docs/_static/gallary/logo.gif" alt="Classic animated PACKMAN logo" width="250">
