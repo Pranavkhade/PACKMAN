@@ -86,6 +86,14 @@ CIF_EXPECTED_OUTPUTS = {
 }
 
 CIF_EDGE_CASE_OUTPUTS = {
+    '1exr.cif': {
+        'model_ids': (1,),
+        'chain_ids': ('A',),
+        'residue_count': 146,
+        'atom_count': 1150,
+        'het_atom_count': 183,
+        'hetmol_counts': {'CA': 5, 'HOH': 178},
+    },
     '1crn.cif': {
         'model_ids': (1,),
         'chain_ids': ('A',),

@@ -45,7 +45,8 @@ def load_pdb(filename: str) -> Protein:
     AllAnnotations = []
     start          = 0
 
-    fh = open( filename ).read()
+    with open(filename) as structure_file:
+        fh = structure_file.read()
 
     frames = fh.split('\nMODEL')
 
@@ -175,7 +176,8 @@ def load_cif(filename: str) -> Protein:
 
     AllAnnotations = []
 
-    sections = open(filename, 'r').read().split('loop_\n')
+    with open(filename, 'r') as structure_file:
+        sections = structure_file.read().split('loop_\n')
     for section in sections:
         for subsection in section.split( '#' ):
             column_indices = {}
