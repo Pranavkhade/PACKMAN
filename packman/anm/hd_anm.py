@@ -223,9 +223,10 @@ class hdANM:
             - Eigen values and Eigen Vectors are calculated. use hdANM().get_eigenvalues() and hdANM().get_eigenvectors() to obtain them.
             - Currently only molecular weight is included in case of Amino Acid Residue(coarse grained) mass.
             - Mass of the Amino Acid Residues/Atoms can be found in /packman/constants/Constants.py 
-            ie...
-            from packman.constants import amino_acid_molecular_weight
-            from packman.constants import atomic_weigh
+
+            Use ``packman.constants.amino_acid_molecular_weight`` or
+            ``packman.constants.atomic_weight`` to inspect the available
+            residue and atom masses.
         """
         if(include_mass):
             self.eigen_values, self.eigen_vectors= scipy_eig(self.domain_hessian,self.domain_mass_matrix)
@@ -250,9 +251,10 @@ class hdANM:
             * Possible argument removal for the decomposition function
             * use hdANM().domain_hessian, hdANM().domain_mass_matrix and hdANM().domain_info to access output of this function
             * Mass of the Amino Acid Residues/Atoms can be found in /packman/constants/Constants.py
-            ie...
-            from packman.constants import amino_acid_molecular_weight
-            from packman.constants import atomic_weigh
+
+            Use ``packman.constants.amino_acid_molecular_weight`` or
+            ``packman.constants.atomic_weight`` to inspect the available
+            residue and atom masses.
         """
         all_mass_types=['unit','atom','residue']
         #Error Handling

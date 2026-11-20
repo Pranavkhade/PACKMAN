@@ -4,7 +4,7 @@ from ... import geometry
 import unittest
 
 import logging
-from os import remove as rm
+import numpy
 
 class Test_Geometry(unittest.TestCase):
 
@@ -12,17 +12,22 @@ class Test_Geometry(unittest.TestCase):
         self.mol = molecule.load_structure('packman/tests/data/4hla.cif',ftype='cif')
     
     def test_Circumsphere(self):
-        self.assertIsInstance( geometry.Circumsphere( [i for i in self.mol[0].get_atoms()][:4] )[0][0], float )
-        self.assertIsInstance( geometry.Circumsphere( [i for i in self.mol[0].get_atoms()][:4] )[0][1], float )
-        self.assertIsInstance( geometry.Circumsphere( [i for i in self.mol[0].get_atoms()][:4] )[0][2], float )
-        self.assertIsInstance( geometry.Circumsphere( [i for i in self.mol[0].get_atoms()][:4] )[1], float )
+        atoms = list(self.mol[0].get_atoms())[:4]
+        center, radius = geometry.Circumsphere(atoms)
+        expected_center = numpy.array([19.851322237851143, -22.995767842220495, -1.779101667088373])
+        self.assertEqual(center.shape, (3,))
+        self.assertTrue(numpy.allclose(center, expected_center, rtol=0, atol=1e-10))
+        self.assertAlmostEqual(radius, 1.4243694807576892, places=10)
 
     def test_AlphaShape(self):
-        #Checked only one instance of the atom
-        try:
-            self.assertIsInstance( geometry.AlphaShape( [j for i in self.mol[0].get_backbone() for j in i], 4 )[0][0], molecule.Atom )
-        except:
-            self.assertIsInstance( geometry.AlphaShape( [j for i in self.mol[0].get_backbone() for j in i], 4 )[0][0][0], molecule.Atom )
+        backbone = [atom for residue_atoms in self.mol[0].get_backbone() for atom in residue_atoms]
+        simplices, graph = geometry.AlphaShape(backbone, 4)
+        self.assertEqual(len(backbone), 792)
+        self.assertEqual(len(simplices), 2833)
+        self.assertEqual(graph.number_of_nodes(), len(backbone))
+        self.assertEqual(graph.number_of_edges(), 4494)
+        self.assertTrue(all(len(simplex) == 4 for simplex in simplices))
+        self.assertIsInstance(simplices[0][0], molecule.Atom)
         
     def tearDown(self):
         logging.info('Geometry Test Done.')

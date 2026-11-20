@@ -3,7 +3,9 @@
 Hinge Prediction using Alpha Shape (API)
 ========================================
 
-This tutorial familiarises users with the API of the Hinge Prediction algorithm using Alpha Shapes. The same functionality is also available in the PACKMAN commandline interface ( :ref:`tutorials_hinge_prediction` ).
+This tutorial introduces the Hinge Prediction API using alpha shapes. The same
+functionality is available through the
+:ref:`tutorials_hinge_prediction_cli` command-line interface.
 
 How to cite::
 

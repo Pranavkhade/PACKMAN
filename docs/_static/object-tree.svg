@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="450" viewBox="0 0 1120 450" role="img" aria-labelledby="title description">
+  <title id="title">PACKMAN molecular object hierarchy</title>
+  <desc id="description">Protein contains models, which contain chains. Chains contain residues and hetero-molecules. Residues and hetero-molecules contain atoms. Bonds connect pairs of atoms.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#0e7490"/>
+    </marker>
+    <style>
+      .node { fill: #ecfeff; stroke: #0e7490; stroke-width: 2; }
+      .secondary { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; }
+      .line { fill: none; stroke: #0e7490; stroke-width: 2.5; marker-end: url(#arrow); }
+      .link { fill: none; stroke: #ea580c; stroke-width: 2.5; stroke-dasharray: 6 5; }
+      .label { fill: #164e63; font: 600 18px Arial, sans-serif; text-anchor: middle; }
+      .caption { fill: #475569; font: 15px Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1120" height="450" rx="18" fill="#f8fafc"/>
+  <text x="44" y="42" fill="#164e63" font-family="Arial, sans-serif" font-size="22" font-weight="700">Molecular structure objects</text>
+  <g class="line">
+    <path d="M190 125h45"/>
+    <path d="M380 125h45"/>
+    <path d="M570 125h45"/>
+    <path d="M760 125h45"/>
+    <path d="M475 155v76h45"/>
+    <path d="M665 261h45"/>
+  </g>
+  <g>
+    <rect class="node" x="50" y="95" width="140" height="60" rx="12"/>
+    <text class="label" x="120" y="132">Protein</text>
+    <rect class="node" x="240" y="95" width="140" height="60" rx="12"/>
+    <text class="label" x="310" y="132">Model</text>
+    <rect class="node" x="430" y="95" width="140" height="60" rx="12"/>
+    <text class="label" x="500" y="132">Chain</text>
+    <rect class="node" x="620" y="95" width="140" height="60" rx="12"/>
+    <text class="label" x="690" y="132">Residue</text>
+    <rect class="node" x="810" y="95" width="140" height="60" rx="12"/>
+    <text class="label" x="880" y="132">Atom</text>
+    <rect class="secondary" x="520" y="231" width="145" height="60" rx="12"/>
+    <text class="label" x="592" y="268">HetMol</text>
+    <rect class="secondary" x="710" y="231" width="140" height="60" rx="12"/>
+    <text class="label" x="780" y="268">Atom</text>
+    <path class="link" d="M880 155c65 40 95 95 90 165"/>
+    <path class="link" d="M850 261c25 25 50 50 72 59"/>
+    <rect class="secondary" x="880" y="320" width="180" height="60" rx="12"/>
+    <text class="label" x="970" y="357">Bond</text>
+    <text class="caption" x="880" y="405">Associates two atoms</text>
+  </g>
+  <text class="caption" x="50" y="430">Protein → Model → Chain → Residue → Atom</text>
+  <text class="caption" x="520" y="430">A Chain may also contain HetMol objects and their atoms.</text>
+</svg>

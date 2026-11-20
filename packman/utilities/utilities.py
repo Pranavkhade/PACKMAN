@@ -147,9 +147,9 @@ def load_hinge(filename: str) -> Dict[str, List[float]]:
 
     Example of .hng file for PDBID 1EXR::
 
-    1EXR_A  D1  1:70
-    1EXR_A  H1  70:90
-    1EXR_A  D2  90:148
+        1EXR_A  D1  1:70
+        1EXR_A  H1  70:90
+        1EXR_A  D2  90:148
 
     Above format means that there are two domains (D1 and D2) separated by a hinge (H1). D1 stretches from residue 1 to 70; D2 stretches from 90 to 148 and hinge H1 is in the middle.
 

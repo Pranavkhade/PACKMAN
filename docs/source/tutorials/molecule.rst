@@ -1,6 +1,6 @@
 .. _tutorials_molecule:
 
-Using 'Molecule' to load and manupulate molecular structures. (Basics)
+Using 'Molecule' to load and manipulate molecular structures (basics)
 ======================================================================
 
 This module is base for all the algorithms and programs written in the PACKMAN. This tutorial aims to give an idea about the information flow and hierarchy in the objects. Once the object's basic understanding is developed, all the objects' advanced special features can be explored on their object documentation page.

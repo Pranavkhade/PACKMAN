@@ -12,4 +12,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   packman.bin.GUI
    packman.bin.PACKMAN

@@ -1,14 +1,6 @@
-numpy
-scipy
-networkx
-mlxtend
-scikit-learn
-sphinx-rtd-theme
-Sphinx
-sphinxcontrib-applehelp
-sphinxcontrib-devhelp
-sphinxcontrib-htmlhelp
-sphinxcontrib-jsmath
-sphinxcontrib-napoleon
-sphinxcontrib-qthelp
-sphinxcontrib-serializinghtml
+Sphinx>=6,<9
+pydata-sphinx-theme>=0.15; python_version >= "3.9"
+pydata-sphinx-theme==0.14.4; python_version < "3.9"
+sphinx-copybutton>=0.5
+sphinx-design>=0.6; python_version >= "3.9"
+sphinx-design==0.5.0; python_version < "3.9"

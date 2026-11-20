@@ -1,0 +1,32 @@
+:root {
+  --pst-color-primary: #0e7490;
+  --pst-color-secondary: #164e63;
+  --pst-color-accent: #ea580c;
+}
+
+.bd-content .sd-card {
+  border-radius: 0.8rem;
+  box-shadow: 0 0.15rem 0.8rem rgb(15 23 42 / 8%);
+}
+
+.bd-content .sd-card:hover {
+  border-color: var(--pst-color-primary);
+  transform: translateY(-2px);
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.bd-content h1,
+.bd-content h2 {
+  letter-spacing: -0.02em;
+}
+
+.bd-content pre {
+  border-radius: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-content .sd-card:hover {
+    transform: none;
+    transition: none;
+  }
+}

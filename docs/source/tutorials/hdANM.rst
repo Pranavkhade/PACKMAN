@@ -3,7 +3,9 @@
 Using hd-ANM to study the global dynamics of the molecular structures
 =====================================================================
 
-This tutorial aims to get the user to familiarize with the concept of hdANM API. Please note that the hdANM is also available with GUI, CLI (:ref:`tutorials_hdnam_api`) and the webserver.
+This tutorial introduces the hdANM API. The method is also available through
+the :ref:`tutorials_hdanm_cli` CLI, the :ref:`tutorials_gui` GUI, and the
+`hdANM web server <https://hdanm.bb.iastate.edu/>`_.
 
 PACKMAN hdANM Analysis Web Server: https://hdanm.bb.iastate.edu/
 
@@ -43,7 +45,9 @@ Step 2: Loading the hdANM Object
 
 The hd-ANM object has one required argument (set of atoms) and several optional arguments that can be changed according to the user's needs. Please check :mod:`packman.anm.hd_anm` for more details.
 
-Important Note: hdANM also requires the user to provide the .hng file containing the information about which parts of the protein are hinges and which parts are rigid domains. This information can be obtained from the PACKMAN's hinge prediction algorithm. Please read the following for more details: :ref:`tutorials_hinge_prediction`
+Important note: hdANM requires a ``.hng`` file describing the hinge and domain
+regions. Generate it with the :ref:`tutorials_predict_hinge` hinge-prediction
+workflow.
 
 Hinge Information file format (.hng) Example::
 

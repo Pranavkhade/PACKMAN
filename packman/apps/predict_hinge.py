@@ -23,6 +23,7 @@ from scipy.stats import mode
 from scipy.optimize import minimize
 
 from sklearn.cluster import KMeans
+from threadpoolctl import threadpool_info, threadpool_limits
 from mlxtend.evaluate import permutation_test
 from itertools import groupby, count
 
@@ -38,6 +39,7 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',fil
         * The packman.bin.PACKMAN uses this function
 
         * Ideally, the alpha values should be scanned from 0 to 10 to obtain conclusively repetative hinges (Use '' for this purpose) 
+        * K-means clustering uses a fixed random state so identical inputs produce reproducible predictions.
 
         * Please refer to the following paper for the details on the algorithm and citation:
             Pranav M. Khade, Ambuj Kumar, Robert L. Jernigan, Characterizing and Predicting Protein Hinges for Mechanistic Insight,
@@ -82,22 +84,26 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',fil
             """
             hinge_atoms=[i.get_backbone() for i in SelectedHingeResidues]
             hinge_atoms=[item for sublist in hinge_atoms for item in sublist]
-            non_hinge_atoms=list(set([i for i in atoms])-set(hinge_atoms))
+            hinge_atoms_set = set(hinge_atoms)
+            non_hinge_atoms = [atom for atom in atoms if atom not in hinge_atoms_set]
             all_atoms_bfactor=[i.get_bfactor() for i in atoms]
             hinge_atoms_bfactor=[i.get_bfactor() for i in hinge_atoms]
             non_hinge_atoms_bfactor=[i.get_bfactor() for i in non_hinge_atoms]
 
             return_stats=[]
+            total_mode = mode(all_atoms_bfactor, keepdims=True)[0]
+            hinge_mode = mode(hinge_atoms_bfactor, keepdims=True)[0]
+            non_hinge_mode = mode(non_hinge_atoms_bfactor, keepdims=True)[0]
 
             outputfile.write('\nSTATISTICS\n\t\tN\tMin\tMax\tMean\tMode\tMedian\tSTDDev\n')
             return_stats.append(['','N','Min','Max','Mean','Mode','Median','STDDev'])
             
-            outputfile.write('Total   '+'\t'+str(len(all_atoms_bfactor))+'\t'+str(numpy.min(all_atoms_bfactor))+'\t'+str(numpy.max(all_atoms_bfactor))+'\t'+str(numpy.mean(all_atoms_bfactor))+'\t'+str(mode(all_atoms_bfactor)[0])+'\t'+str(numpy.median(all_atoms_bfactor))+'\t'+str(numpy.std(all_atoms_bfactor))+'\n')
-            return_stats.append(['Total',len(all_atoms_bfactor),numpy.min(all_atoms_bfactor),numpy.max(all_atoms_bfactor),numpy.mean(all_atoms_bfactor),mode(all_atoms_bfactor)[0],numpy.median(all_atoms_bfactor),numpy.std(all_atoms_bfactor)])
-            outputfile.write('Hinge   '+'\t'+str(len(hinge_atoms_bfactor))+'\t'+str(numpy.min(hinge_atoms_bfactor))+'\t'+str(numpy.max(hinge_atoms_bfactor))+'\t'+str(numpy.mean(hinge_atoms_bfactor))+'\t'+str(mode(hinge_atoms_bfactor)[0])+'\t'+str(numpy.median(hinge_atoms_bfactor))+'\t'+str(numpy.std(hinge_atoms_bfactor))+'\n')
-            return_stats.append(['Hinge',len(hinge_atoms_bfactor),numpy.min(hinge_atoms_bfactor),numpy.max(hinge_atoms_bfactor),numpy.mean(hinge_atoms_bfactor),mode(hinge_atoms_bfactor)[0],numpy.median(hinge_atoms_bfactor),numpy.std(hinge_atoms_bfactor)])
-            outputfile.write('NonHinge'+'\t'+str(len(non_hinge_atoms_bfactor))+'\t'+str(numpy.min(non_hinge_atoms_bfactor))+'\t'+str(numpy.max(non_hinge_atoms_bfactor))+'\t'+str(numpy.mean(non_hinge_atoms_bfactor))+'\t'+str(mode(non_hinge_atoms_bfactor)[0])+'\t'+str(numpy.median(non_hinge_atoms_bfactor))+'\t'+str(numpy.std(non_hinge_atoms_bfactor))+'\n')
-            return_stats.append(['NonHinge',len(non_hinge_atoms_bfactor),numpy.min(non_hinge_atoms_bfactor),numpy.max(non_hinge_atoms_bfactor),numpy.mean(non_hinge_atoms_bfactor),mode(non_hinge_atoms_bfactor)[0],numpy.median(non_hinge_atoms_bfactor),numpy.std(non_hinge_atoms_bfactor)])
+            outputfile.write('Total   '+'\t'+str(len(all_atoms_bfactor))+'\t'+str(numpy.min(all_atoms_bfactor))+'\t'+str(numpy.max(all_atoms_bfactor))+'\t'+str(numpy.mean(all_atoms_bfactor))+'\t'+str(total_mode)+'\t'+str(numpy.median(all_atoms_bfactor))+'\t'+str(numpy.std(all_atoms_bfactor))+'\n')
+            return_stats.append(['Total',len(all_atoms_bfactor),numpy.min(all_atoms_bfactor),numpy.max(all_atoms_bfactor),numpy.mean(all_atoms_bfactor),total_mode,numpy.median(all_atoms_bfactor),numpy.std(all_atoms_bfactor)])
+            outputfile.write('Hinge   '+'\t'+str(len(hinge_atoms_bfactor))+'\t'+str(numpy.min(hinge_atoms_bfactor))+'\t'+str(numpy.max(hinge_atoms_bfactor))+'\t'+str(numpy.mean(hinge_atoms_bfactor))+'\t'+str(hinge_mode)+'\t'+str(numpy.median(hinge_atoms_bfactor))+'\t'+str(numpy.std(hinge_atoms_bfactor))+'\n')
+            return_stats.append(['Hinge',len(hinge_atoms_bfactor),numpy.min(hinge_atoms_bfactor),numpy.max(hinge_atoms_bfactor),numpy.mean(hinge_atoms_bfactor),hinge_mode,numpy.median(hinge_atoms_bfactor),numpy.std(hinge_atoms_bfactor)])
+            outputfile.write('NonHinge'+'\t'+str(len(non_hinge_atoms_bfactor))+'\t'+str(numpy.min(non_hinge_atoms_bfactor))+'\t'+str(numpy.max(non_hinge_atoms_bfactor))+'\t'+str(numpy.mean(non_hinge_atoms_bfactor))+'\t'+str(non_hinge_mode)+'\t'+str(numpy.median(non_hinge_atoms_bfactor))+'\t'+str(numpy.std(non_hinge_atoms_bfactor))+'\n')
+            return_stats.append(['NonHinge',len(non_hinge_atoms_bfactor),numpy.min(non_hinge_atoms_bfactor),numpy.max(non_hinge_atoms_bfactor),numpy.mean(non_hinge_atoms_bfactor),non_hinge_mode,numpy.median(non_hinge_atoms_bfactor),numpy.std(non_hinge_atoms_bfactor)])
             
             p_value = permutation_test(hinge_atoms_bfactor, non_hinge_atoms_bfactor,method='approximate',num_rounds=10000,seed=0)
             outputfile.write('\np-value:\t'+str(p_value)+'\n')
@@ -277,8 +283,19 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',fil
         centrality_sorted_with_keys = numpy.array([float(centrality[j]) for j in sorted([i for i in centrality.keys()])]).reshape(-1, 1)
         
         #Cluster (4 is like a resolution here)
-        km=KMeans(n_clusters=nclusters, n_init=10)
-        km.fit(centrality_sorted_with_keys)
+        km=KMeans(n_clusters=nclusters, n_init=10, random_state=0)
+        threadpools = threadpool_info()
+        has_vcomp = any(module['prefix'] == 'vcomp' for module in threadpools)
+        has_mkl = any(
+            module['internal_api'] == 'mkl' and module.get('threading_layer') == 'intel'
+            for module in threadpools
+        )
+        if has_vcomp and has_mkl:
+            # Avoid scikit-learn's Windows vcomp/MKL KMeans memory-leak condition.
+            with threadpool_limits(limits=1, user_api='openmp'):
+                km.fit(centrality_sorted_with_keys)
+        else:
+            km.fit(centrality_sorted_with_keys)
         central_nodes=numpy.argwhere(km.labels_==numpy.argmin(km.cluster_centers_)).T[0]
         HingeResidues=list(set([atoms[i].get_parent() for i in central_nodes]))
         HingeResiduesID=[i.get_id() for i in HingeResidues]
@@ -293,7 +310,7 @@ def predict_hinge(atoms, outputfile, Alpha=float('Inf'),method='alpha_shape',fil
 
         #Print part
         Hinges=[]
-        Chains=','.join(list(set([i.get_parent().get_id() for i in SortedHingeResidues])))
+        Chains=','.join(sorted({i.get_parent().get_id() for i in SortedHingeResidues}))
         outputfile.write('Filename= '+str(filename)+'\t| Chain(s)= '+Chains+'\t| AlphaValue= '+str(Alpha)+'\t| MinimumHingeLength= '+str(MinimumHingeLength)+'\t| EccentricityClusters= '+str(nclusters)+ '\n')
         outputfile.write('Hindge Residues(Predicted):\n')
         for numi,i in enumerate(PredictedHinges):

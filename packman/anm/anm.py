@@ -193,8 +193,9 @@ class ANM:
                     lobj = [[d,d,d],[d,d,d], [d,d,d]]
                     dmat = numpy.array(lobj)
                     distance_mat[i*3:i*3+3, j*3:j*3+3] = dmat
+                    distance_mat[j*3:j*3+3, i*3:i*3+3] = dmat
 
-        if self.pf is not None:
+        if self.pf is True:
             hessian = numpy.divide(hessian, distance_mat)
         
         self.hessian=hessian

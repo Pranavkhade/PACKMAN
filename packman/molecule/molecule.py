@@ -45,7 +45,8 @@ def load_pdb(filename: str) -> Protein:
     AllAnnotations = []
     start          = 0
 
-    fh = open( filename ).read()
+    with open(filename) as structure_file:
+        fh = structure_file.read()
 
     frames = fh.split('\nMODEL')
 
@@ -175,7 +176,8 @@ def load_cif(filename: str) -> Protein:
 
     AllAnnotations = []
 
-    sections = open(filename, 'r').read().split('loop_\n')
+    with open(filename, 'r') as structure_file:
+        sections = structure_file.read().split('loop_\n')
     for section in sections:
         for subsection in section.split( '#' ):
             column_indices = {}
@@ -391,13 +393,13 @@ def load_cif(filename: str) -> Protein:
             current_atoms    = [None]
             current_residues = [None]
 
-        #In case the hetatoms are not present at all
-        try:
+        # CIF models may contain only polymer ATOM records.
+        if i < len(AllHetAtoms) and i < len(AllHetMols):
             current_hetatms = AllHetAtoms[i]
             current_hetmols = AllHetMols[i]
-        except:
-            current_hetatms = [None]
-            current_hetmols = [None]
+        else:
+            current_hetatms = {}
+            current_hetmols = {}
         
         #In case the chains are missing
         try:

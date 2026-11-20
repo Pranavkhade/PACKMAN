@@ -18,12 +18,14 @@ Step 1
 
 Step 2
 ------
-1. Download the PDB file
-2. Load the PDB file into the 'mol' object::
-   
-   pdbid = '1exr'
-   molecule.download_structure(pdbid,save_name=pdbid)
-   mol = molecule.load_structure(pdbid+'.cif')
+
+Download and load the structure:
+
+.. code-block:: python
+
+   pdbid = "1exr"
+   molecule.download_structure(pdbid, save_name=pdbid)
+   mol = molecule.load_structure(pdbid + ".cif")
 
 Step 3
 ------

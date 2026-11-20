@@ -17,5 +17,7 @@ Subpackages
    packman.bin
    packman.constants
    packman.entropy
+   packman.geometry
+   packman.gnm
    packman.molecule
    packman.utilities
